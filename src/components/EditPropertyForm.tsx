@@ -8,117 +8,32 @@ import { PropertyDescription } from "./property/PropertyDescription";
 import { PropertyImages } from "./property/PropertyImages";
 import { useParams } from "react-router-dom";
 import { usePropertyForm } from "@/hooks/usePropertyForm";
-import { useFileUpload } from "@/hooks/useFileUpload";
+import { usePropertyImages } from "@/hooks/usePropertyImages";
 import { useFeatures } from "@/hooks/useFeatures";
 import type { PropertySubmitData } from "@/types/property";
 import { Json } from "@/integrations/supabase/types";
 
-interface PropertyFormProps {
+interface EditPropertyFormProps {
   onSubmit: (data: PropertySubmitData) => void;
 }
 
-export function PropertyForm({ onSubmit }: PropertyFormProps) {
+export function EditPropertyForm({ onSubmit }: EditPropertyFormProps) {
   const { id } = useParams();
   const { toast } = useToast();
   const { formData, setFormData } = usePropertyForm(id, onSubmit);
-  const { uploadFile } = useFileUpload();
   const { addFeature, removeFeature, updateFeature } = useFeatures(formData, setFormData);
+  const {
+    handleImageUpload,
+    handleFloorplanUpload,
+    handleRemoveImage,
+    handleRemoveFloorplan,
+    handleSetFeaturedImage,
+    handleToggleGridImage
+  } = usePropertyImages(formData, setFormData);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
-  };
-
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files) {
-      try {
-        const files = Array.from(e.target.files);
-        const uploadPromises = files.map(async (file) => {
-          const url = await uploadFile(file);
-          return url;
-        });
-
-        const uploadedUrls = await Promise.all(uploadPromises);
-        
-        setFormData(prev => ({
-          ...prev,
-          images: [...prev.images, ...uploadedUrls]
-        }));
-
-        toast({
-          title: "Success",
-          description: "Images uploaded successfully",
-          variant: "default",
-        });
-      } catch (error) {
-        console.error('Error uploading images:', error);
-        toast({
-          title: "Error",
-          description: "Failed to upload images",
-          variant: "destructive",
-        });
-      }
-    }
-  };
-
-  const handleFloorplanUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files) {
-      try {
-        const files = Array.from(e.target.files);
-        const uploadPromises = files.map(async (file) => {
-          const url = await uploadFile(file);
-          return url;
-        });
-
-        const uploadedUrls = await Promise.all(uploadPromises);
-        
-        setFormData(prev => ({
-          ...prev,
-          floorplans: [...prev.floorplans, ...uploadedUrls]
-        }));
-
-        toast({
-          title: "Success",
-          description: "Floorplans uploaded successfully",
-          variant: "default",
-        });
-      } catch (error) {
-        console.error('Error uploading floorplans:', error);
-        toast({
-          title: "Error",
-          description: "Failed to upload floorplans",
-          variant: "destructive",
-        });
-      }
-    }
-  };
-
-  const handleRemoveImage = (index: number) => {
-    setFormData(prev => ({
-      ...prev,
-      images: prev.images.filter((_, i) => i !== index)
-    }));
-  };
-
-  const handleRemoveFloorplan = (index: number) => {
-    setFormData(prev => ({
-      ...prev,
-      floorplans: prev.floorplans.filter((_, i) => i !== index)
-    }));
-  };
-
-  const handleSetFeaturedImage = (url: string | null) => {
-    setFormData(prev => ({
-      ...prev,
-      featuredImage: url
-    }));
-  };
-
-  const handleToggleGridImage = (newGridImages: string[]) => {
-    setFormData(prev => ({
-      ...prev,
-      gridImages: newGridImages
-    }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -137,7 +52,7 @@ export function PropertyForm({ onSubmit }: PropertyFormProps) {
         ...formData,
         features: formData.features as unknown as Json,
         featuredImage: formData.featuredImage,
-        gridImages: formData.gridImages
+        gridImages: formData.gridImages,
       };
 
       await onSubmit(submitData);

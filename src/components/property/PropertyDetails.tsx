@@ -1,6 +1,7 @@
 
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 
 interface PropertyDetailsProps {
   title: string;
@@ -13,6 +14,7 @@ interface PropertyDetailsProps {
   bathrooms: string;
   garages: string;
   energyLabel: string;
+  hasGarden: boolean;
   onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => void;
 }
 
@@ -27,8 +29,24 @@ export function PropertyDetails({
   bathrooms,
   garages,
   energyLabel,
+  hasGarden,
   onChange,
 }: PropertyDetailsProps) {
+  // Create a separate handler for boolean switch changes
+  const handleGardenChange = (checked: boolean) => {
+    const event = new Event('change', { bubbles: true }) as unknown as React.ChangeEvent<HTMLInputElement>;
+    Object.defineProperty(event, 'target', {
+      writable: false,
+      value: {
+        name: 'hasGarden',
+        value: checked,
+        type: 'checkbox',
+        checked: checked,
+      },
+    });
+    onChange(event);
+  };
+
   return (
     <div className="space-y-4">
       <div>
@@ -39,7 +57,6 @@ export function PropertyDetails({
           value={title}
           onChange={onChange}
           className="mt-1"
-          required
         />
       </div>
 
@@ -53,7 +70,6 @@ export function PropertyDetails({
             value={price}
             onChange={onChange}
             className="mt-1"
-            required
           />
         </div>
         <div>
@@ -65,7 +81,6 @@ export function PropertyDetails({
             value={buildYear}
             onChange={onChange}
             className="mt-1"
-            required
           />
         </div>
       </div>
@@ -78,7 +93,6 @@ export function PropertyDetails({
           value={address}
           onChange={onChange}
           className="mt-1"
-          required
         />
       </div>
 
@@ -92,7 +106,6 @@ export function PropertyDetails({
             value={sqft}
             onChange={onChange}
             className="mt-1"
-            required
           />
         </div>
         <div>
@@ -104,7 +117,6 @@ export function PropertyDetails({
             value={livingArea}
             onChange={onChange}
             className="mt-1"
-            required
           />
         </div>
       </div>
@@ -119,7 +131,6 @@ export function PropertyDetails({
             value={bedrooms}
             onChange={onChange}
             className="mt-1"
-            required
           />
         </div>
         <div>
@@ -131,7 +142,6 @@ export function PropertyDetails({
             value={bathrooms}
             onChange={onChange}
             className="mt-1"
-            required
           />
         </div>
         <div>
@@ -143,33 +153,41 @@ export function PropertyDetails({
             value={garages}
             onChange={onChange}
             className="mt-1"
-            required
           />
         </div>
       </div>
 
-      <div>
-        <Label htmlFor="energyLabel">Energielabel</Label>
-        <select
-          id="energyLabel"
-          name="energyLabel"
-          value={energyLabel}
-          onChange={onChange}
-          className="w-full mt-1 rounded-md border border-input bg-background px-3 py-2"
-          required
-        >
-          <option value="">Selecteer label</option>
-          <option value="A+++">A+++</option>
-          <option value="A++">A++</option>
-          <option value="A+">A+</option>
-          <option value="A">A</option>
-          <option value="B">B</option>
-          <option value="C">C</option>
-          <option value="D">D</option>
-          <option value="E">E</option>
-          <option value="F">F</option>
-          <option value="G">G</option>
-        </select>
+      <div className="grid grid-cols-2 gap-4 items-center">
+        <div>
+          <Label htmlFor="energyLabel">Energielabel</Label>
+          <select
+            id="energyLabel"
+            name="energyLabel"
+            value={energyLabel}
+            onChange={onChange}
+            className="w-full mt-1 rounded-md border border-input bg-background px-3 py-2"
+          >
+            <option value="">Selecteer label</option>
+            <option value="A+++">A+++</option>
+            <option value="A++">A++</option>
+            <option value="A+">A+</option>
+            <option value="A">A</option>
+            <option value="B">B</option>
+            <option value="C">C</option>
+            <option value="D">D</option>
+            <option value="E">E</option>
+            <option value="F">F</option>
+            <option value="G">G</option>
+          </select>
+        </div>
+        <div className="flex items-center space-x-2">
+          <Switch
+            id="hasGarden"
+            checked={hasGarden}
+            onCheckedChange={handleGardenChange}
+          />
+          <Label htmlFor="hasGarden">Tuin</Label>
+        </div>
       </div>
     </div>
   );
