@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -87,16 +88,18 @@ export function PropertyLocation({
       if (error) throw error;
 
       if (data?.description) {
+        // Update the location_description field instead of the general description
         const { error: updateError } = await supabase
           .from('properties')
-          .update({ description: data.description })
+          .update({ location_description: data.description })
           .eq('id', id);
 
         if (updateError) throw updateError;
 
+        // Create a synthetic event to update the form state
         const event = {
           target: {
-            name: 'description',
+            name: 'location_description',
             value: data.description
           }
         } as React.ChangeEvent<HTMLTextAreaElement>;
@@ -256,14 +259,14 @@ export function PropertyLocation({
       )}
 
       <div className="space-y-2">
-        <Label htmlFor="description">Locatiebeschrijving</Label>
+        <Label htmlFor="location_description">Locatiebeschrijving</Label>
         <Textarea
-          id="description"
-          name="description"
+          id="location_description"
+          name="location_description"
           value={description}
           onChange={onChange}
           className="min-h-[200px]"
-          placeholder="Genereer een beschrijving met de knop hierboven..."
+          placeholder="Genereer een beschrijving van de locatie met de knop hierboven..."
         />
       </div>
 
