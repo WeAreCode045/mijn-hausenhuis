@@ -1,32 +1,18 @@
 
 import { useState, useEffect } from "react";
-import { supabase } from "@/integrations/supabase/client";
-import { AgencySettings } from "@/types/agency";
+import { AgencySettings, Agent } from "@/types/agency";
 import { useToast } from "@/components/ui/use-toast";
 import { fetchAgencySettings } from "@/utils/fetchAgencySettings";
+import { defaultAgencySettings } from "@/utils/defaultAgencySettings";
+import { agencySettingsService } from "@/services/agencySettingsService";
+import { useLogoUpload } from "./useLogoUpload";
+import { Json } from "@/integrations/supabase/types";
 
 export const useAgencySettings = () => {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
-  const [settings, setSettings] = useState<AgencySettings>({
-    name: "",
-    agentName: "",
-    email: "",
-    phone: "",
-    address: "",
-    primaryColor: "#40497A",
-    secondaryColor: "#E2E8F0",
-    iconBuildYear: "calendar",
-    iconBedrooms: "bed",
-    iconBathrooms: "bath",
-    iconGarages: "car",
-    iconEnergyClass: "zap",
-    iconSqft: "ruler",
-    iconLivingSpace: "home",
-    googleMapsApiKey: "",
-    xmlImportUrl: "",
-  });
-  const [logoPreview, setLogoPreview] = useState<string>("");
+  const [settings, setSettings] = useState<AgencySettings>(defaultAgencySettings);
+  const { logoPreview, setLogoPreview, handleLogoUpload } = useLogoUpload();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -38,66 +24,39 @@ export const useAgencySettings = () => {
       if (logoPreview && !logoPreview.startsWith('http')) {
         const file = await (await fetch(logoPreview)).blob();
         const filename = `logo-${Date.now()}.png`;
-        
-        const { data: uploadData, error: uploadError } = await supabase.storage
-          .from('agency_files')
-          .upload(filename, file);
-
-        if (uploadError) throw uploadError;
-
-        const { data: { publicUrl } } = supabase.storage
-          .from('agency_files')
-          .getPublicUrl(filename);
-
-        logoUrl = publicUrl;
+        logoUrl = await agencySettingsService.uploadLogo(file, filename);
       }
 
-      const { error } = settings.id 
-        ? await supabase
-            .from('agency_settings')
-            .update({
-              name: settings.name,
-              agent_name: settings.agentName,
-              email: settings.email,
-              phone: settings.phone,
-              address: settings.address,
-              primary_color: settings.primaryColor,
-              secondary_color: settings.secondaryColor,
-              logo_url: logoUrl,
-              icon_build_year: settings.iconBuildYear,
-              icon_bedrooms: settings.iconBedrooms,
-              icon_bathrooms: settings.iconBathrooms,
-              icon_garages: settings.iconGarages,
-              icon_energy_class: settings.iconEnergyClass,
-              icon_sqft: settings.iconSqft,
-              icon_living_space: settings.iconLivingSpace,
-              google_maps_api_key: settings.googleMapsApiKey,
-              xml_import_url: settings.xmlImportUrl,
-            })
-            .eq('id', settings.id)
-        : await supabase
-            .from('agency_settings')
-            .insert({
-              name: settings.name,
-              agent_name: settings.agentName,
-              email: settings.email,
-              phone: settings.phone,
-              address: settings.address,
-              primary_color: settings.primaryColor,
-              secondary_color: settings.secondaryColor,
-              logo_url: logoUrl,
-              icon_build_year: settings.iconBuildYear,
-              icon_bedrooms: settings.iconBedrooms,
-              icon_bathrooms: settings.iconBathrooms,
-              icon_garages: settings.iconGarages,
-              icon_energy_class: settings.iconEnergyClass,
-              icon_sqft: settings.iconSqft,
-              icon_living_space: settings.iconLivingSpace,
-              google_maps_api_key: settings.googleMapsApiKey,
-              xml_import_url: settings.xmlImportUrl,
-            });
+      const updateData = {
+        ...settings,
+        logoUrl
+      };
 
-      if (error) throw error;
+      if (settings.id) {
+        await agencySettingsService.updateSettings(settings.id, updateData);
+      } else {
+        const createData = {
+          name: settings.name,
+          email: settings.email,
+          phone: settings.phone,
+          address: settings.address,
+          primary_color: settings.primaryColor,
+          secondary_color: settings.secondaryColor,
+          logo_url: logoUrl,
+          description_background_url: settings.descriptionBackgroundUrl,
+          icon_build_year: settings.iconBuildYear,
+          icon_bedrooms: settings.iconBedrooms,
+          icon_bathrooms: settings.iconBathrooms,
+          icon_garages: settings.iconGarages,
+          icon_energy_class: settings.iconEnergyClass,
+          icon_sqft: settings.iconSqft,
+          icon_living_space: settings.iconLivingSpace,
+          google_maps_api_key: settings.googleMapsApiKey,
+          xml_import_url: settings.xmlImportUrl,
+          agents: settings.agents
+        };
+        await agencySettingsService.createSettings(createData);
+      }
 
       toast({
         title: "Success",
@@ -135,14 +94,49 @@ export const useAgencySettings = () => {
     }));
   };
 
-  const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      const file = e.target.files[0];
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setLogoPreview(reader.result as string);
-      };
-      reader.readAsDataURL(file);
+  const handleAgentChange = (agents: Agent[]) => {
+    setSettings((prev) => ({
+      ...prev,
+      agents,
+    }));
+  };
+
+  const handleDescriptionBackgroundUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    try {
+      const filename = `description-bg-${Date.now()}.${file.name.split('.').pop()}`;
+      const url = await agencySettingsService.uploadDescriptionBackground(file, filename);
+      
+      if (settings.id) {
+        await agencySettingsService.updateSettings(settings.id, {
+          ...settings,
+          descriptionBackgroundUrl: url
+        });
+
+        const newSettings = await fetchAgencySettings();
+        if (newSettings) {
+          setSettings(newSettings);
+        }
+      } else {
+        setSettings(prev => ({
+          ...prev,
+          descriptionBackgroundUrl: url
+        }));
+      }
+
+      toast({
+        title: "Success",
+        description: "Background image uploaded successfully",
+      });
+    } catch (error) {
+      console.error('Error uploading background image:', error);
+      toast({
+        title: "Error",
+        description: "Failed to upload background image",
+        variant: "destructive",
+      });
     }
   };
 
@@ -166,6 +160,8 @@ export const useAgencySettings = () => {
     handleSubmit,
     handleChange,
     handleSelectChange,
+    handleAgentChange,
     handleLogoUpload,
+    handleDescriptionBackgroundUpload,
   };
 };

@@ -2,8 +2,11 @@
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
+import { PropertyNearbyPlaces } from "./PropertyNearbyPlaces";
+import { PropertyPlaceType } from "@/types/property";
 
 interface PropertyDetailsProps {
+  id?: string;
   title: string;
   price: string;
   address: string;
@@ -15,10 +18,12 @@ interface PropertyDetailsProps {
   garages: string;
   energyLabel: string;
   hasGarden: boolean;
+  nearby_places?: PropertyPlaceType[];
   onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => void;
 }
 
 export function PropertyDetails({
+  id,
   title,
   price,
   address,
@@ -32,7 +37,6 @@ export function PropertyDetails({
   hasGarden,
   onChange,
 }: PropertyDetailsProps) {
-  // Create a separate handler for boolean switch changes
   const handleGardenChange = (checked: boolean) => {
     const event = new Event('change', { bubbles: true }) as unknown as React.ChangeEvent<HTMLInputElement>;
     Object.defineProperty(event, 'target', {
@@ -48,7 +52,7 @@ export function PropertyDetails({
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       <div>
         <Label htmlFor="title">Titel Woning</Label>
         <Input

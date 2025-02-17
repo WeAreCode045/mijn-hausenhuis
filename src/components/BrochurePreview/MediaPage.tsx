@@ -17,7 +17,7 @@ export function MediaPage({ images, floorplans }: MediaPageProps) {
               <div key={index} className="relative pb-[75%] overflow-hidden">
                 <img
                   src={imageUrl}
-                  alt={`Fotos ${index + 1}`}
+                  alt={`Foto ${index + 1}`}
                   className="absolute inset-0 w-full h-full object-cover"
                 />
               </div>

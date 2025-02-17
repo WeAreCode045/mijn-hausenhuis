@@ -1,19 +1,18 @@
 
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { AgencySettings } from "@/types/agency";
 
-interface TypographySettingsProps {
+interface ElementsSettingsProps {
   settings: AgencySettings;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  onSelectChange: (name: string, value: string) => void;
 }
 
-export const TypographySettings = ({ settings, onChange, onSelectChange }: TypographySettingsProps) => {
+export const ElementsSettings = ({ settings, onChange }: ElementsSettingsProps) => {
   return (
     <div className="space-y-6">
-      <h3 className="text-lg font-medium">Typography Settings</h3>
+      <h3 className="text-lg font-medium">Elements</h3>
+      <p className="text-sm text-gray-500">These settings apply to buttons, backgrounds, borders etc.</p>
       
       <div className="space-y-2">
         <Label htmlFor="primaryColor">Primary Color</Label>

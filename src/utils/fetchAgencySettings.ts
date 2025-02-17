@@ -1,6 +1,8 @@
 
 import { supabase } from "@/integrations/supabase/client";
-import { AgencySettings } from "@/types/agency";
+import { AgencySettings, Agent } from "@/types/agency";
+import { defaultAgencySettings } from "./defaultAgencySettings";
+import { Json } from "@/integrations/supabase/types";
 
 export async function fetchAgencySettings(): Promise<AgencySettings | null> {
   const { data, error } = await supabase
@@ -15,24 +17,37 @@ export async function fetchAgencySettings(): Promise<AgencySettings | null> {
 
   if (!data) return null;
 
+  // Ensure agents is an array and has the correct shape
+  const agents: Agent[] = Array.isArray(data.agents) 
+    ? (data.agents as Json[]).map((agent: any) => ({
+        name: agent.name || "",
+        phone: agent.phone || "",
+        email: agent.email || "",
+        whatsapp: agent.whatsapp || ""
+      }))
+    : [];
+
   return {
     id: String(data.id),
-    name: data.name || "",
-    agentName: data.agent_name || "",
-    email: data.email || "",
-    phone: data.phone || "",
-    address: data.address || "",
-    primaryColor: data.primary_color || "#40497A",
-    secondaryColor: data.secondary_color || "#E2E8F0",
+    name: data.name || defaultAgencySettings.name,
+    email: data.email || defaultAgencySettings.email,
+    phone: data.phone || defaultAgencySettings.phone,
+    address: data.address || defaultAgencySettings.address,
+    primaryColor: data.primary_color || defaultAgencySettings.primaryColor,
+    secondaryColor: data.secondary_color || defaultAgencySettings.secondaryColor,
     logoUrl: data.logo_url,
-    iconBuildYear: data.icon_build_year || "calendar",
-    iconBedrooms: data.icon_bedrooms || "bed",
-    iconBathrooms: data.icon_bathrooms || "bath",
-    iconGarages: data.icon_garages || "car",
-    iconEnergyClass: data.icon_energy_class || "zap",
-    iconSqft: data.icon_sqft || "ruler",
-    iconLivingSpace: data.icon_living_space || "home",
-    googleMapsApiKey: data.google_maps_api_key || "",
-    xmlImportUrl: data.xml_import_url || "",
+    instagramUrl: data.instagram_url || defaultAgencySettings.instagramUrl,
+    youtubeUrl: data.youtube_url || defaultAgencySettings.youtubeUrl,
+    facebookUrl: data.facebook_url || defaultAgencySettings.facebookUrl,
+    agents: agents,
+    iconBuildYear: data.icon_build_year || defaultAgencySettings.iconBuildYear,
+    iconBedrooms: data.icon_bedrooms || defaultAgencySettings.iconBedrooms,
+    iconBathrooms: data.icon_bathrooms || defaultAgencySettings.iconBathrooms,
+    iconGarages: data.icon_garages || defaultAgencySettings.iconGarages,
+    iconEnergyClass: data.icon_energy_class || defaultAgencySettings.iconEnergyClass,
+    iconSqft: data.icon_sqft || defaultAgencySettings.iconSqft,
+    iconLivingSpace: data.icon_living_space || defaultAgencySettings.iconLivingSpace,
+    googleMapsApiKey: data.google_maps_api_key || defaultAgencySettings.googleMapsApiKey,
+    xmlImportUrl: data.xml_import_url || defaultAgencySettings.xmlImportUrl,
   };
 }

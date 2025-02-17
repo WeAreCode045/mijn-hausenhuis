@@ -1,16 +1,14 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { LogoUpload } from "@/components/settings/LogoUpload";
-import { AgencyFields } from "@/components/settings/AgencyFields";
-import { ColorInputs } from "@/components/settings/ColorInputs";
-import { TypographySettings } from "@/components/settings/TypographySettings";
-import { IconSettings } from "@/components/settings/IconSettings";
-import { XmlImportSettings } from "@/components/settings/XmlImportSettings";
 import { useAgencySettings } from "@/hooks/useAgencySettings";
+import { SettingsTab } from "@/types/settings";
+import { AgencyTab } from "@/components/settings/AgencyTab";
+import { DesignTab } from "@/components/settings/DesignTab";
+import { AdvancedTab } from "@/components/settings/AdvancedTab";
 
 const Settings = () => {
-  const [activeTab, setActiveTab] = useState<"agency">("agency");
+  const [activeTab, setActiveTab] = useState<SettingsTab>("agency");
   const {
     settings,
     logoPreview,
@@ -18,46 +16,68 @@ const Settings = () => {
     handleSubmit,
     handleChange,
     handleSelectChange,
+    handleAgentChange,
     handleLogoUpload,
+    handleDescriptionBackgroundUpload,
   } = useAgencySettings();
 
   return (
     <div className="container mx-auto py-8">
       <h1 className="text-2xl font-bold mb-6">Settings</h1>
-      <div className="tabs">
-        <Button onClick={() => setActiveTab("agency")} className={activeTab === "agency" ? "active" : ""}>
-          Agency Settings
+      <div className="flex gap-2 mb-6">
+        <Button 
+          onClick={() => setActiveTab("agency")} 
+          variant={activeTab === "agency" ? "default" : "outline"}
+        >
+          Agency Details
+        </Button>
+        <Button 
+          onClick={() => setActiveTab("design")} 
+          variant={activeTab === "design" ? "default" : "outline"}
+        >
+          Design
+        </Button>
+        <Button 
+          onClick={() => setActiveTab("advanced")} 
+          variant={activeTab === "advanced" ? "default" : "outline"}
+        >
+          Advanced
         </Button>
       </div>
-      {activeTab === "agency" ? (
-        <form onSubmit={handleSubmit} className="space-y-6 max-w-2xl">
-          <LogoUpload logoPreview={logoPreview} onLogoUpload={handleLogoUpload} />
-          <AgencyFields settings={settings} onChange={handleChange} />
-          <ColorInputs
-            primaryColor={settings.primaryColor}
-            secondaryColor={settings.secondaryColor}
+
+      <form onSubmit={handleSubmit} className="space-y-6 max-w-2xl">
+        {activeTab === "agency" && (
+          <AgencyTab
+            settings={settings}
+            logoPreview={logoPreview}
             onChange={handleChange}
+            onLogoUpload={handleLogoUpload}
+            onAgentChange={handleAgentChange}
           />
-          <TypographySettings
+        )}
+        
+        {activeTab === "design" && (
+          <DesignTab
             settings={settings}
             onChange={handleChange}
             onSelectChange={handleSelectChange}
+            onDescriptionBackgroundUpload={handleDescriptionBackgroundUpload}
           />
-          <IconSettings
-            settings={settings}
-            onSelectChange={handleSelectChange}
-          />
-          <XmlImportSettings
+        )}
+        
+        {activeTab === "advanced" && (
+          <AdvancedTab
             settings={settings}
             onChange={handleChange}
           />
-          <Button type="submit" disabled={isLoading}>
-            {isLoading ? "Saving..." : "Save Settings"}
-          </Button>
-        </form>
-      ) : null}
+        )}
+
+        <Button type="submit" disabled={isLoading}>
+          {isLoading ? "Saving..." : "Save Settings"}
+        </Button>
+      </form>
     </div>
   );
-};
+}
 
 export default Settings;

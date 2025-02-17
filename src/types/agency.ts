@@ -1,14 +1,21 @@
 
+export interface Agent {
+  name: string;
+  phone: string;
+  email: string;
+  whatsapp: string;
+}
+
 export interface AgencySettings {
   id?: string;
   name: string;
-  agentName: string;
   email: string;
   phone: string;
   address: string;
   primaryColor: string;
   secondaryColor: string;
   logoUrl?: string;
+  descriptionBackgroundUrl?: string;
   iconBuildYear?: string;
   iconBedrooms?: string;
   iconBathrooms?: string;
@@ -18,4 +25,8 @@ export interface AgencySettings {
   iconLivingSpace?: string;
   googleMapsApiKey?: string;
   xmlImportUrl?: string;
+  agents: Agent[];
+  instagramUrl?: string;
+  youtubeUrl?: string;
+  facebookUrl?: string;
 }

@@ -1,37 +1,96 @@
 
 import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
-import { PropertyWebView } from "./PropertyWebView";
 import { getOrCreateWebViewUrl } from "@/utils/webViewUtils";
 import { PropertyQROverlay } from "./PropertyQROverlay";
-import { ArrowUpRight, Pencil, Trash } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { useAgencySettings } from "@/hooks/useAgencySettings";
+import { PropertyCardActions } from "./PropertyCardActions";
+import { PropertySubmissionsDialog } from "./PropertySubmissionsDialog";
+import { PropertyData } from "@/types/property";
 
 interface PropertyCardProps {
-  property: any;
+  property: PropertyData;
   onDelete: (id: string) => void;
+}
+
+interface Submission {
+  id: string;
+  name: string;
+  email: string;
+  phone: string;
+  inquiry_type: string;
+  message: string;
+  created_at: string;
+  is_read: boolean;
 }
 
 export const PropertyCard = ({
   property,
   onDelete,
 }: PropertyCardProps) => {
-  const navigate = useNavigate();
-  const [webViewOpen, setWebViewOpen] = useState(false);
   const [showQR, setShowQR] = useState(false);
   const [webViewUrl, setWebViewUrl] = useState<string | null>(null);
+  const [showSubmissions, setShowSubmissions] = useState(false);
+  const [submissions, setSubmissions] = useState<Submission[]>([]);
+  const [unreadCount, setUnreadCount] = useState(0);
+  const { settings } = useAgencySettings();
 
   useEffect(() => {
     const fetchWebViewUrl = async () => {
-      const url = await getOrCreateWebViewUrl(property.id);
+      // Generate a fallback ID if object_id is not present
+      const objectId = property.object_id || `temp-${property.id}-${Date.now()}`;
+      const url = await getOrCreateWebViewUrl(property.id, objectId);
       if (url) {
         setWebViewUrl(url);
       }
     };
     
     fetchWebViewUrl();
+    fetchSubmissions();
+
+    const channel = supabase
+      .channel('property_submissions')
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'property_contact_submissions',
+          filter: `property_id=eq.${property.id}`,
+        },
+        () => {
+          fetchSubmissions();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, [property.id]);
+
+  const fetchSubmissions = async () => {
+    const { data } = await supabase
+      .from('property_contact_submissions')
+      .select('*')
+      .eq('property_id', property.id)
+      .order('created_at', { ascending: false });
+
+    if (data) {
+      setSubmissions(data);
+      setUnreadCount(data.filter(s => !s.is_read).length);
+    }
+  };
+
+  const markAsRead = async (submissionId: string) => {
+    await supabase
+      .from('property_contact_submissions')
+      .update({ is_read: true })
+      .eq('id', submissionId);
+    
+    fetchSubmissions();
+  };
 
   return (
     <>
@@ -59,38 +118,21 @@ export const PropertyCard = ({
           <p className="text-lg font-medium">{property.price}</p>
         </div>
 
-        <div className="flex gap-2">
-          <Button 
-            variant="outline" 
-            size="icon"
-            onClick={() => setWebViewOpen(true)}
-            title="Open Preview"
-          >
-            <ArrowUpRight className="h-4 w-4" />
-          </Button>
-          <Button 
-            variant="outline" 
-            size="icon"
-            onClick={() => navigate(`/property/${property.id}/edit`)}
-            title="Bewerk"
-          >
-            <Pencil className="h-4 w-4" />
-          </Button>
-          <Button 
-            variant="destructive" 
-            size="icon"
-            onClick={() => onDelete(property.id)}
-            title="Verwijder"
-          >
-            <Trash className="h-4 w-4" />
-          </Button>
-        </div>
+        <PropertyCardActions
+          property={property}
+          settings={settings}
+          onDelete={onDelete}
+          unreadCount={unreadCount}
+          onShowSubmissions={() => setShowSubmissions(true)}
+        />
       </Card>
 
-      <PropertyWebView
-        property={property}
-        open={webViewOpen}
-        onOpenChange={setWebViewOpen}
+      <PropertySubmissionsDialog
+        open={showSubmissions}
+        onOpenChange={setShowSubmissions}
+        propertyTitle={property.title}
+        submissions={submissions}
+        onMarkAsRead={markAsRead}
       />
     </>
   );

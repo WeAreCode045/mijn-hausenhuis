@@ -1,13 +1,12 @@
 
 import { supabase } from "@/integrations/supabase/client";
-import { nanoid } from 'nanoid';
 
-export async function getOrCreateWebViewUrl(propertyId: string): Promise<string | null> {
+export async function getOrCreateWebViewUrl(propertyId: string, objectId: string): Promise<string | null> {
   try {
     // First, try to get existing web view URL
     const { data: existingView, error } = await supabase
       .from('property_web_views')
-      .select('view_token')
+      .select('object_id')
       .eq('property_id', propertyId)
       .maybeSingle();
 
@@ -17,17 +16,15 @@ export async function getOrCreateWebViewUrl(propertyId: string): Promise<string 
     }
 
     if (existingView) {
-      return `/property/view/${existingView.view_token}`;
+      return `/property/view/${existingView.object_id}`;
     }
 
     // If no existing view, create a new one
-    const viewToken = nanoid(10); // Generate a unique token
-    
     const { error: insertError } = await supabase
       .from('property_web_views')
       .insert({
         property_id: propertyId,
-        view_token: viewToken
+        object_id: objectId
       });
 
     if (insertError) {
@@ -35,9 +32,10 @@ export async function getOrCreateWebViewUrl(propertyId: string): Promise<string 
       return null;
     }
 
-    return `/property/view/${viewToken}`;
+    return `/property/view/${objectId}`;
   } catch (error) {
     console.error('Unexpected error in getOrCreateWebViewUrl:', error);
     return null;
   }
 }
+

@@ -1,48 +1,57 @@
 
-import { Button } from "@/components/ui/button";
-import { Share2, Printer } from "lucide-react";
-import { getPrintStyles } from "./PrintStyles";
+import { Mail, Phone, MapPin } from "lucide-react";
+import { AgencySettings } from "@/types/agency";
 
 interface WebViewHeaderProps {
-  logoUrl?: string;
-  handleShare: (platform: string) => void;
-  title?: string;
+  settings?: AgencySettings;
 }
 
-export function WebViewHeader({ logoUrl, handleShare, title = "Brochure" }: WebViewHeaderProps) {
-  const handlePrint = () => {
-    const style = document.createElement('style');
-    style.innerHTML = getPrintStyles();
-    document.head.appendChild(style);
-    window.print();
-    document.head.removeChild(style);
-  };
-
+export function WebViewHeader({ settings }: WebViewHeaderProps) {
   return (
-    <div className="p-6 border-b flex items-center justify-between">
-      <div className="flex items-center gap-4">
-        {logoUrl && (
-          <img src={logoUrl} alt="Agency Logo" className="h-12 object-contain" />
+    <div className="p-6 flex flex-col sm:flex-row justify-between items-center gap-4">
+      <div>
+        {settings?.logoUrl && (
+          <img
+            src={settings.logoUrl}
+            alt="Agency Logo"
+            className="h-12 w-auto object-contain"
+          />
         )}
-        <div className="text-2xl font-semibold">{title}</div>
       </div>
-      <div className="flex gap-2 no-print">
-        <Button 
-          variant="outline" 
-          size="icon"
-          onClick={() => handleShare('whatsapp')}
-          title="Share on WhatsApp"
-        >
-          <Share2 className="h-4 w-4" />
-        </Button>
-        <Button 
-          variant="outline" 
-          size="icon"
-          onClick={handlePrint}
-          title="Print Brochure"
-        >
-          <Printer className="h-4 w-4" />
-        </Button>
+      <div className="flex flex-wrap justify-center sm:justify-end items-center gap-2 text-xs">
+        {settings?.address && (
+          <div className="flex items-center gap-1">
+            <div 
+              className="w-5 h-5 rounded-full flex items-center justify-center"
+              style={{ backgroundColor: settings?.secondaryColor }}
+            >
+              <MapPin className="w-3 h-3 text-white" />
+            </div>
+            <span className="text-gray-600">{settings.address}</span>
+          </div>
+        )}
+        {settings?.phone && (
+          <div className="flex items-center gap-1">
+            <div 
+              className="w-5 h-5 rounded-full flex items-center justify-center"
+              style={{ backgroundColor: settings?.secondaryColor }}
+            >
+              <Phone className="w-3 h-3 text-white" />
+            </div>
+            <span className="text-gray-600">{settings.phone}</span>
+          </div>
+        )}
+        {settings?.email && (
+          <div className="flex items-center gap-1">
+            <div 
+              className="w-5 h-5 rounded-full flex items-center justify-center"
+              style={{ backgroundColor: settings?.secondaryColor }}
+            >
+              <Mail className="w-3 h-3 text-white" />
+            </div>
+            <span className="text-gray-600">{settings.email}</span>
+          </div>
+        )}
       </div>
     </div>
   );
