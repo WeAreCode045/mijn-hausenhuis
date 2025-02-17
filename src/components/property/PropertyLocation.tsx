@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -78,7 +77,11 @@ export function PropertyLocation({
 
     try {
       const { data, error } = await supabase.functions.invoke('generate-location-description', {
-        body: { address, nearbyPlaces: nearby_places }
+        body: { 
+          address, 
+          nearbyPlaces: nearby_places,
+          language: 'nl' // Request Dutch description
+        }
       });
 
       if (error) throw error;
@@ -91,7 +94,6 @@ export function PropertyLocation({
 
         if (updateError) throw updateError;
 
-        // Create a synthetic event to update the form state
         const event = {
           target: {
             name: 'description',
@@ -102,14 +104,14 @@ export function PropertyLocation({
         onChange(event);
 
         toast({
-          description: "Location description generated successfully",
+          description: "Locatiebeschrijving succesvol gegenereerd",
         });
       }
     } catch (error) {
       console.error('Error generating description:', error);
       toast({
         variant: "destructive",
-        description: "Failed to generate location description",
+        description: "Kon geen locatiebeschrijving genereren",
       });
     }
   };
@@ -121,7 +123,6 @@ export function PropertyLocation({
     if (!id) return;
 
     try {
-      // Convert the filtered places to a format compatible with Json type
       const updatedPlaces = nearby_places
         .filter(place => place.id !== placeId)
         .map(place => ({
@@ -142,13 +143,13 @@ export function PropertyLocation({
 
       await onLocationFetch();
       toast({
-        description: "Place removed successfully",
+        description: "Voorziening verwijderd succesvol",
       });
     } catch (error) {
       console.error('Error removing place:', error);
       toast({
         variant: "destructive",
-        description: "Failed to remove place",
+        description: "Kon voorziening niet verwijderen",
       });
     }
   };
@@ -175,13 +176,21 @@ export function PropertyLocation({
   };
 
   const formatPlaceType = (type: string) => {
-    return type.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+    const typeTranslations: Record<string, string> = {
+      'public_transport': 'Openbaar Vervoer',
+      'restaurant': 'Restaurant',
+      'supermarket': 'Supermarkt',
+      'school': 'School',
+      'park': 'Park',
+      'shopping_mall': 'Winkelcentrum'
+    };
+    return typeTranslations[type] || type.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
   };
 
   return (
     <div className="space-y-6">
       <div className="space-y-2">
-        <Label htmlFor="address">Address</Label>
+        <Label htmlFor="address">Adres</Label>
         <div className="flex gap-2">
           <Input
             id="address"
@@ -201,7 +210,7 @@ export function PropertyLocation({
             ) : (
               <MapPin className="w-4 h-4 mr-2" />
             )}
-            Fetch Location
+            Locatie Ophalen
           </Button>
           <Button
             type="button"
@@ -209,7 +218,7 @@ export function PropertyLocation({
             onClick={handleGenerateDescription}
             disabled={!address || !nearby_places.length}
           >
-            Generate Description
+            Beschrijving Genereren
           </Button>
           <div className="relative">
             <Input
@@ -232,7 +241,7 @@ export function PropertyLocation({
                 ) : (
                   <Upload className="w-4 h-4 mr-2" />
                 )}
-                Upload Map
+                Kaart Uploaden
               </label>
             </Button>
           </div>
@@ -247,20 +256,20 @@ export function PropertyLocation({
       )}
 
       <div className="space-y-2">
-        <Label htmlFor="description">Location Description</Label>
+        <Label htmlFor="description">Locatiebeschrijving</Label>
         <Textarea
           id="description"
           name="description"
           value={description}
           onChange={onChange}
           className="min-h-[200px]"
-          placeholder="Generate a description using the button above..."
+          placeholder="Genereer een beschrijving met de knop hierboven..."
         />
       </div>
 
       {Object.entries(placesByType).length > 0 && (
         <div className="space-y-4">
-          <h3 className="font-medium text-lg">Nearby Places</h3>
+          <h3 className="font-medium text-lg">Nabijgelegen Voorzieningen</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {Object.entries(placesByType).map(([type, places]) => (
               <div key={type} className="border rounded-lg p-4">
