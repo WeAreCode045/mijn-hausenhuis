@@ -1,17 +1,15 @@
 
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { MapPin, Loader2, Upload, Trash2, Plus, Bus, Train } from "lucide-react";
 import { useLocationData } from "./location/useLocationData";
 import { useMapImage } from "./location/useMapImage";
 import { MapPreview } from "./location/MapPreview";
 import { supabase } from "@/integrations/supabase/client";
 import type { PropertyPlaceType } from "@/types/property";
 import type { Json } from "@/integrations/supabase/types";
-import { cn } from "@/lib/utils";
 import { useToast } from "@/components/ui/use-toast";
+import { AddressInput } from "./location/AddressInput";
+import { NearbyPlaces } from "./location/NearbyPlaces";
 
 interface PropertyLocationProps {
   id?: string;
@@ -81,14 +79,13 @@ export function PropertyLocation({
         body: { 
           address, 
           nearbyPlaces: nearby_places,
-          language: 'nl' // Request Dutch description
+          language: 'nl'
         }
       });
 
       if (error) throw error;
 
       if (data?.description) {
-        // Update the location_description field instead of the general description
         const { error: updateError } = await supabase
           .from('properties')
           .update({ location_description: data.description })
@@ -96,7 +93,6 @@ export function PropertyLocation({
 
         if (updateError) throw updateError;
 
-        // Create a synthetic event to update the form state
         const event = {
           target: {
             name: 'location_description',
@@ -157,99 +153,19 @@ export function PropertyLocation({
     }
   };
 
-  const placesByType = nearby_places.reduce((acc: Record<string, PropertyPlaceType[]>, place) => {
-    let type = place.type;
-    if (['bus_station', 'train_station', 'transit_station'].includes(place.type)) {
-      type = 'public_transport';
-    }
-    if (!acc[type]) {
-      acc[type] = [];
-    }
-    acc[type].push(place);
-    return acc;
-  }, {});
-
-  const getTypeIcon = (type: string) => {
-    switch (type) {
-      case 'public_transport':
-        return <Bus className="w-4 h-4" />;
-      default:
-        return null;
-    }
-  };
-
-  const formatPlaceType = (type: string) => {
-    const typeTranslations: Record<string, string> = {
-      'public_transport': 'Openbaar Vervoer',
-      'restaurant': 'Restaurant',
-      'supermarket': 'Supermarkt',
-      'school': 'School',
-      'park': 'Park',
-      'shopping_mall': 'Winkelcentrum'
-    };
-    return typeTranslations[type] || type.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
-  };
-
   return (
     <div className="space-y-6">
-      <div className="space-y-2">
-        <Label htmlFor="address">Adres</Label>
-        <div className="flex gap-2">
-          <Input
-            id="address"
-            name="address"
-            value={address}
-            onChange={onChange}
-            className="flex-1"
-          />
-          <Button 
-            type="button" 
-            onClick={handleLocationFetch}
-            disabled={isLoading || !id}
-            className="whitespace-nowrap"
-          >
-            {isLoading ? (
-              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-            ) : (
-              <MapPin className="w-4 h-4 mr-2" />
-            )}
-            Locatie Ophalen
-          </Button>
-          <Button
-            type="button"
-            variant="secondary"
-            onClick={handleGenerateDescription}
-            disabled={!address || !nearby_places.length}
-          >
-            Beschrijving Genereren
-          </Button>
-          <div className="relative">
-            <Input
-              type="file"
-              accept="image/*"
-              onChange={handleImageUpload}
-              className="hidden"
-              id="map-image-upload"
-              disabled={isUploading}
-            />
-            <Button
-              type="button"
-              variant="outline"
-              disabled={isUploading}
-              asChild
-            >
-              <label htmlFor="map-image-upload" className="cursor-pointer">
-                {isUploading ? (
-                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                ) : (
-                  <Upload className="w-4 h-4 mr-2" />
-                )}
-                Kaart Uploaden
-              </label>
-            </Button>
-          </div>
-        </div>
-      </div>
+      <AddressInput
+        address={address}
+        isLoading={isLoading}
+        isUploading={isUploading}
+        disabled={!id}
+        hasNearbyPlaces={nearby_places.length > 0}
+        onChange={onChange}
+        onLocationFetch={handleLocationFetch}
+        onImageUpload={handleImageUpload}
+        onGenerateDescription={handleGenerateDescription}
+      />
 
       {map_image && (
         <MapPreview 
@@ -270,47 +186,10 @@ export function PropertyLocation({
         />
       </div>
 
-      {Object.entries(placesByType).length > 0 && (
-        <div className="space-y-4">
-          <h3 className="font-medium text-lg">Nabijgelegen Voorzieningen</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {Object.entries(placesByType).map(([type, places]) => (
-              <div key={type} className="border rounded-lg p-4">
-                <h4 className="font-medium mb-2 capitalize flex items-center gap-2">
-                  {getTypeIcon(type)}
-                  {formatPlaceType(type)}
-                </h4>
-                <ul className="space-y-2">
-                  {places.map((place) => (
-                    <li key={place.id} className="text-sm">
-                      <div className="flex items-start justify-between group">
-                        <div>
-                          <span className="font-medium">{place.name}</span>
-                          {place.rating && (
-                            <span className="text-yellow-500 ml-2">★ {place.rating}</span>
-                          )}
-                          {place.vicinity && (
-                            <p className="text-gray-500 text-xs mt-1">{place.vicinity}</p>
-                          )}
-                        </div>
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="sm"
-                          onClick={(e) => handlePlaceDelete(e, place.id)}
-                          className="opacity-0 group-hover:opacity-100 transition-opacity"
-                        >
-                          <Trash2 className="w-4 h-4 text-red-500" />
-                        </Button>
-                      </div>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
+      <NearbyPlaces 
+        places={nearby_places} 
+        onPlaceDelete={handlePlaceDelete} 
+      />
     </div>
   );
 }
