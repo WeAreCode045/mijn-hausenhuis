@@ -1,5 +1,7 @@
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { MapPin, Loader2, Upload, Trash2, Plus, Bus, Train } from "lucide-react";
 import { useLocationData } from "./location/useLocationData";
@@ -13,9 +15,10 @@ import { useToast } from "@/components/ui/use-toast";
 interface PropertyLocationProps {
   id?: string;
   address: string;
+  description?: string;
   map_image?: string | null;
   nearby_places?: PropertyPlaceType[];
-  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
   onLocationFetch: () => Promise<void>;
   onMapImageDelete?: () => void;
   onMapImageUpload?: (url: string) => void;
@@ -24,6 +27,7 @@ interface PropertyLocationProps {
 export function PropertyLocation({
   id,
   address,
+  description,
   map_image,
   nearby_places = [],
   onChange,
@@ -86,6 +90,16 @@ export function PropertyLocation({
 
         if (updateError) throw updateError;
 
+        // Create a synthetic event to update the form state
+        const event = {
+          target: {
+            name: 'description',
+            value: data.description
+          }
+        } as React.ChangeEvent<HTMLTextAreaElement>;
+        
+        onChange(event);
+
         toast({
           description: "Location description generated successfully",
         });
@@ -100,20 +114,13 @@ export function PropertyLocation({
   };
 
   const handlePlaceDelete = async (e: React.MouseEvent, placeId: string) => {
-    e.preventDefault(); // Prevent form submission
-    e.stopPropagation(); // Stop event bubbling
+    e.preventDefault();
+    e.stopPropagation();
     
     if (!id) return;
 
     try {
-      const updatedPlaces = nearby_places.filter(place => place.id !== placeId).map(place => ({
-        id: place.id,
-        name: place.name,
-        type: place.type,
-        vicinity: place.vicinity,
-        rating: place.rating,
-        user_ratings_total: place.user_ratings_total
-      }));
+      const updatedPlaces = nearby_places.filter(place => place.id !== placeId);
 
       const { error } = await supabase
         .from('properties')
@@ -227,6 +234,18 @@ export function PropertyLocation({
           onDelete={onMapImageDelete ?? (() => {})} 
         />
       )}
+
+      <div className="space-y-2">
+        <Label htmlFor="description">Location Description</Label>
+        <Textarea
+          id="description"
+          name="description"
+          value={description}
+          onChange={onChange}
+          className="min-h-[200px]"
+          placeholder="Generate a description using the button above..."
+        />
+      </div>
 
       {Object.entries(placesByType).length > 0 && (
         <div className="space-y-4">
