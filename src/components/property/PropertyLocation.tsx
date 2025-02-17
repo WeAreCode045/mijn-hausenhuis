@@ -9,6 +9,7 @@ import { useMapImage } from "./location/useMapImage";
 import { MapPreview } from "./location/MapPreview";
 import { supabase } from "@/integrations/supabase/client";
 import type { PropertyPlaceType } from "@/types/property";
+import type { Json } from "@/integrations/supabase/types";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/components/ui/use-toast";
 
@@ -120,7 +121,17 @@ export function PropertyLocation({
     if (!id) return;
 
     try {
-      const updatedPlaces = nearby_places.filter(place => place.id !== placeId);
+      // Convert the filtered places to a format compatible with Json type
+      const updatedPlaces = nearby_places
+        .filter(place => place.id !== placeId)
+        .map(place => ({
+          id: place.id,
+          name: place.name,
+          type: place.type,
+          vicinity: place.vicinity,
+          rating: place.rating,
+          user_ratings_total: place.user_ratings_total
+        })) as Json;
 
       const { error } = await supabase
         .from('properties')
