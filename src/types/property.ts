@@ -41,6 +41,7 @@ export interface PropertyData {
   energyLabel: string;
   hasGarden: boolean;
   description: string;
+  location_description?: string;
   features: PropertyFeature[];
   images: string[];
   floorplans: string[];

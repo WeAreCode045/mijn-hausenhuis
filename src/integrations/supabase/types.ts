@@ -111,6 +111,7 @@ export type Database = {
           images: string[] | null
           latitude: number | null
           livingArea: string | null
+          location_description: string | null
           longitude: number | null
           map_image: string | null
           nearby_places: Json | null
@@ -140,6 +141,7 @@ export type Database = {
           images?: string[] | null
           latitude?: number | null
           livingArea?: string | null
+          location_description?: string | null
           longitude?: number | null
           map_image?: string | null
           nearby_places?: Json | null
@@ -169,6 +171,7 @@ export type Database = {
           images?: string[] | null
           latitude?: number | null
           livingArea?: string | null
+          location_description?: string | null
           longitude?: number | null
           map_image?: string | null
           nearby_places?: Json | null
