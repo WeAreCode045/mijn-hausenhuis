@@ -1,4 +1,3 @@
-
 import { useLocationData } from "./location/useLocationData";
 import { useMapImage } from "./location/useMapImage";
 import { MapPreview } from "./location/MapPreview";
@@ -9,7 +8,8 @@ import { useToast } from "@/components/ui/use-toast";
 import { AddressInput } from "./location/AddressInput";
 import { NearbyPlaces } from "./location/NearbyPlaces";
 import { Label } from "@/components/ui/label";
-import { EditorInstance as Editor } from "novel";
+import { BlockNoteView, useBlockNote } from "@blocknote/react";
+import "@blocknote/core/style.css";
 
 interface PropertyLocationProps {
   id?: string;
@@ -39,6 +39,19 @@ export function PropertyLocation({
   const { isLoading, fetchLocationData } = useLocationData();
   const { isUploading, uploadMapImage } = useMapImage();
   const { toast } = useToast();
+
+  const editor = useBlockNote({
+    initialContent: location_description ? [
+      {
+        type: "paragraph",
+        content: location_description
+      }
+    ] : undefined,
+    onEditorContentChange: (editor) => {
+      const content = editor.topLevelBlocks.map(block => block.content).join('\n');
+      handleEditorChange(content);
+    }
+  });
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files || !e.target.files[0] || !id) return;
@@ -206,16 +219,12 @@ export function PropertyLocation({
 
       <div className="space-y-2">
         <Label htmlFor="location_description">Locatiebeschrijving</Label>
-        <Editor 
-          defaultValue={location_description || ""}
-          onUpdate={(editor) => {
-            if (editor) {
-              handleEditorChange(editor.getHTML());
-            }
-          }}
-          disableLocalStorage
-          className="min-h-[200px] border rounded-md"
-        />
+        <div className="min-h-[200px] border rounded-md overflow-hidden">
+          <BlockNoteView 
+            editor={editor} 
+            theme="light"
+          />
+        </div>
       </div>
 
       <NearbyPlaces 
