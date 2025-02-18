@@ -1,6 +1,5 @@
 
 import { useLocationData } from "./location/useLocationData";
-import { useMapImage } from "./location/useMapImage";
 import { MapPreview } from "./location/MapPreview";
 import { supabase } from "@/integrations/supabase/client";
 import type { PropertyPlaceType } from "@/types/property";
@@ -20,7 +19,6 @@ interface PropertyLocationProps {
   onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
   onLocationFetch: () => Promise<void>;
   onMapImageDelete?: () => void;
-  onMapImageUpload?: (url: string) => void;
 }
 
 export function PropertyLocation({
@@ -33,10 +31,8 @@ export function PropertyLocation({
   onChange,
   onLocationFetch,
   onMapImageDelete,
-  onMapImageUpload,
 }: PropertyLocationProps) {
   const { isLoading, fetchLocationData } = useLocationData();
-  const { isUploading, uploadMapImage } = useMapImage();
   const { toast } = useToast();
 
   const handleLocationFetch = async () => {
@@ -46,43 +42,15 @@ export function PropertyLocation({
     }
   };
 
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (!e.target.files || !e.target.files[0] || !id) return;
-
-    const file = e.target.files[0];
-    const url = await uploadMapImage(file);
-    
-    if (url) {
-      try {
-        const { error } = await supabase
-          .from('properties')
-          .update({ map_image: url })
-          .eq('id', id);
-
-        if (error) throw error;
-
-        if (onMapImageUpload) {
-          onMapImageUpload(url);
-        }
-      } catch (error) {
-        console.error('Error updating property with map image:', error);
-      }
-    }
-
-    e.target.value = '';
-  };
-
   return (
     <div className="space-y-6">
       <AddressInput
         address={address}
         isLoading={isLoading}
-        isUploading={isUploading}
         disabled={!id}
         hasNearbyPlaces={nearby_places.length > 0}
         onChange={onChange}
         onLocationFetch={handleLocationFetch}
-        onImageUpload={handleImageUpload}
         onGenerateDescription={async () => {
           if (!id || !address) return;
           try {
