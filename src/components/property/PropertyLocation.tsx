@@ -1,6 +1,4 @@
 
-import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
 import { useLocationData } from "./location/useLocationData";
 import { useMapImage } from "./location/useMapImage";
 import { MapPreview } from "./location/MapPreview";
@@ -10,6 +8,8 @@ import type { Json } from "@/integrations/supabase/types";
 import { useToast } from "@/components/ui/use-toast";
 import { AddressInput } from "./location/AddressInput";
 import { NearbyPlaces } from "./location/NearbyPlaces";
+import { Label } from "@/components/ui/label";
+import { Editor } from "novel";
 
 interface PropertyLocationProps {
   id?: string;
@@ -118,6 +118,35 @@ export function PropertyLocation({
     }
   };
 
+  const handleEditorChange = async (content: string) => {
+    if (!id) return;
+
+    try {
+      const { error } = await supabase
+        .from('properties')
+        .update({ location_description: content })
+        .eq('id', id);
+
+      if (error) throw error;
+
+      // Create a synthetic event to update the form state
+      const event = {
+        target: {
+          name: 'location_description',
+          value: content
+        }
+      } as React.ChangeEvent<HTMLTextAreaElement>;
+      
+      onChange(event);
+    } catch (error) {
+      console.error('Error saving location description:', error);
+      toast({
+        variant: "destructive",
+        description: "Kon locatiebeschrijving niet opslaan",
+      });
+    }
+  };
+
   const handlePlaceDelete = async (e: React.MouseEvent, placeId: string) => {
     e.preventDefault();
     e.stopPropagation();
@@ -179,14 +208,17 @@ export function PropertyLocation({
 
       <div className="space-y-2">
         <Label htmlFor="location_description">Locatiebeschrijving</Label>
-        <Textarea
-          id="location_description"
-          name="location_description"
-          value={location_description || ""}
-          onChange={onChange}
-          className="min-h-[200px]"
-          placeholder="Genereer een beschrijving van de locatie met de knop hierboven..."
-        />
+        <div className="min-h-[200px] border rounded-md">
+          <Editor 
+            defaultValue={location_description || ""}
+            onDebouncedUpdate={(editor) => {
+              if (editor) {
+                handleEditorChange(editor.getHTML());
+              }
+            }}
+            className="min-h-[200px]"
+          />
+        </div>
       </div>
 
       <NearbyPlaces 
