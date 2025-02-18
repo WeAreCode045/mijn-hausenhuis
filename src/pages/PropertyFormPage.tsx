@@ -27,21 +27,26 @@ export default function PropertyFormPage() {
           .eq('id', id);
         
         if (updateError) throw updateError;
+
+        toast({
+          title: "Property Updated",
+          description: "The property has been saved successfully",
+          variant: "default",
+        });
       } else {
         const { error: insertError } = await supabase
           .from('properties')
           .insert(propertyData);
         
         if (insertError) throw insertError;
+
+        toast({
+          title: "Property Created",
+          description: "The property has been saved successfully",
+          variant: "default",
+        });
+        navigate('/');
       }
-
-      toast({
-        title: id ? "Property Updated" : "Property Created",
-        description: "The property has been saved successfully",
-        variant: "default",
-      });
-
-      navigate('/');
     } catch (error) {
       console.error('Error:', error);
       toast({

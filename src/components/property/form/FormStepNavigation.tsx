@@ -77,7 +77,7 @@ export function FormStepNavigation({
         
         {currentStep === steps.length ? (
           <Button type="submit">
-            {isUpdateMode ? "Update Property" : "Create Property"}
+            Save Property
           </Button>
         ) : (
           <Button type="button" onClick={onNext}>

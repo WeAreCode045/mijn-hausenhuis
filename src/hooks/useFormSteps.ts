@@ -1,49 +1,30 @@
 
 import { useState } from "react";
-import { useToast } from "@/components/ui/use-toast";
-import { PropertyFormData } from "@/types/property";
+import type { PropertyFormData } from "@/types/property";
 
 export function useFormSteps(
-  formData: PropertyFormData,
-  autosaveData: () => Promise<void>,
-  totalSteps: number
+  formData: PropertyFormData, 
+  onAutosave: () => void,
+  maxSteps: number
 ) {
   const [currentStep, setCurrentStep] = useState(1);
-  const { toast } = useToast();
 
-  const handleNext = async () => {
-    if (currentStep < totalSteps) {
-      try {
-        await autosaveData();
-        setCurrentStep(currentStep + 1);
-      } catch (error) {
-        toast({
-          variant: "destructive",
-          description: "Failed to save progress",
-        });
-      }
+  const handleNext = () => {
+    if (currentStep < maxSteps) {
+      setCurrentStep(prev => prev + 1);
     }
   };
 
   const handlePrevious = () => {
     if (currentStep > 1) {
-      setCurrentStep(currentStep - 1);
+      setCurrentStep(prev => prev - 1);
     }
   };
 
-  const handleStepClick = async (stepId: number) => {
-    if (stepId > currentStep) {
-      try {
-        await autosaveData();
-      } catch (error) {
-        toast({
-          variant: "destructive",
-          description: "Failed to save progress",
-        });
-        return;
-      }
+  const handleStepClick = (step: number) => {
+    if (step >= 1 && step <= maxSteps) {
+      setCurrentStep(step);
     }
-    setCurrentStep(stepId);
   };
 
   return {
