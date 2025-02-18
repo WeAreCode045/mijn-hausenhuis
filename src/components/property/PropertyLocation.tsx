@@ -15,6 +15,7 @@ interface PropertyLocationProps {
   id?: string;
   address: string;
   description?: string;
+  location_description?: string;
   map_image?: string | null;
   nearby_places?: PropertyPlaceType[];
   onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
@@ -27,6 +28,7 @@ export function PropertyLocation({
   id,
   address,
   description,
+  location_description,
   map_image,
   nearby_places = [],
   onChange,
@@ -179,7 +181,7 @@ export function PropertyLocation({
         <Textarea
           id="location_description"
           name="location_description"
-          value={description}
+          value={location_description || ""}
           onChange={onChange}
           className="min-h-[200px]"
           placeholder="Genereer een beschrijving van de locatie met de knop hierboven..."
