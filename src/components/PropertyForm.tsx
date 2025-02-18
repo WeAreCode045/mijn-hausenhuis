@@ -64,21 +64,6 @@ export function PropertyForm({ onSubmit }: PropertyFormProps) {
     }
   };
 
-  const handleMapImageUpload = async (url: string) => {
-    try {
-      const { error } = await supabase
-        .from('properties')
-        .update({ map_image: url })
-        .eq('id', formData.id);
-
-      if (error) throw error;
-
-      setFormData({ ...formData, map_image: url });
-    } catch (error) {
-      console.error('Error updating map image:', error);
-    }
-  };
-
   const { currentStep, handleNext, handlePrevious, handleStepClick } = useFormSteps(
     formData,
     () => autosaveData(formData),
@@ -123,7 +108,6 @@ export function PropertyForm({ onSubmit }: PropertyFormProps) {
           handleAreaImageUpload={handleAreaImageUpload}
           removeAreaImage={removeAreaImage}
           handleMapImageDelete={handleMapImageDelete}
-          handleMapImageUpload={handleMapImageUpload}
         />
       </form>
     </Card>
