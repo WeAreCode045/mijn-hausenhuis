@@ -17,6 +17,7 @@ const initialFormData: PropertyFormData = {
   energyLabel: "",
   hasGarden: false,
   description: "",
+  location_description: "",
   features: [],
   images: [],
   floorplans: [],
@@ -75,7 +76,6 @@ export function usePropertyForm(id: string | undefined, onSubmit: (data: Propert
             }))
           : [];
 
-        // Transform nearby places data
         const nearbyPlaces = Array.isArray(data.nearby_places)
           ? data.nearby_places.map((place: any) => ({
               id: place.id || "",
@@ -86,8 +86,6 @@ export function usePropertyForm(id: string | undefined, onSubmit: (data: Propert
               user_ratings_total: place.user_ratings_total || 0
             }))
           : [];
-
-        console.log('Loaded nearby places:', nearbyPlaces); // Debug log
 
         setFormData({
           id: data.id,
@@ -103,6 +101,7 @@ export function usePropertyForm(id: string | undefined, onSubmit: (data: Propert
           energyLabel: data.energyLabel || "",
           hasGarden: Boolean(data.hasGarden),
           description: data.description || "",
+          location_description: data.location_description || "",
           features: features,
           images: data.images || [],
           floorplans: data.floorplans || [],
