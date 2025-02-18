@@ -1,3 +1,4 @@
+
 import { useLocationData } from "./location/useLocationData";
 import { useMapImage } from "./location/useMapImage";
 import { MapPreview } from "./location/MapPreview";
@@ -8,7 +9,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { AddressInput } from "./location/AddressInput";
 import { NearbyPlaces } from "./location/NearbyPlaces";
 import { Label } from "@/components/ui/label";
-import { BlockNoteView, useBlockNote } from "@blocknote/react";
+import { BlockNoteViewRaw, useBlockNote } from "@blocknote/react";
 import "@blocknote/core/style.css";
 
 interface PropertyLocationProps {
@@ -47,7 +48,7 @@ export function PropertyLocation({
         content: location_description
       }
     ] : undefined,
-    onEditorContentChange: (editor) => {
+    onChange: (editor) => {
       const content = editor.topLevelBlocks.map(block => block.content).join('\n');
       handleEditorChange(content);
     }
@@ -220,7 +221,7 @@ export function PropertyLocation({
       <div className="space-y-2">
         <Label htmlFor="location_description">Locatiebeschrijving</Label>
         <div className="min-h-[200px] border rounded-md overflow-hidden">
-          <BlockNoteView 
+          <BlockNoteViewRaw 
             editor={editor} 
             theme="light"
           />
