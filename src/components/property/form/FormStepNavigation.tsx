@@ -22,6 +22,12 @@ export function FormStepNavigation({
   onSubmit,
   isUpdateMode
 }: FormStepNavigationProps) {
+  const handleStepClick = (e: React.MouseEvent, stepId: number) => {
+    e.preventDefault();
+    e.stopPropagation();
+    onStepClick(stepId);
+  };
+
   return (
     <>
       <div className="mb-8">
@@ -35,7 +41,8 @@ export function FormStepNavigation({
           {steps.map((step) => (
             <button
               key={step.id}
-              onClick={() => onStepClick(step.id)}
+              onClick={(e) => handleStepClick(e, step.id)}
+              type="button"
               className={`flex flex-col items-center gap-2 ${
                 step.id === currentStep
                   ? "text-primary"
