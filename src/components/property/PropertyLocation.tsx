@@ -1,4 +1,3 @@
-
 import { useLocationData } from "./location/useLocationData";
 import { useMapImage } from "./location/useMapImage";
 import { MapPreview } from "./location/MapPreview";
@@ -9,7 +8,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { AddressInput } from "./location/AddressInput";
 import { NearbyPlaces } from "./location/NearbyPlaces";
 import { Label } from "@/components/ui/label";
-import { Editor } from "novel";
+import { EditorInstance as Editor } from "novel";
 
 interface PropertyLocationProps {
   id?: string;
@@ -95,7 +94,6 @@ export function PropertyLocation({
 
         if (updateError) throw updateError;
 
-        // Create a synthetic event to update the form state
         const event = {
           target: {
             name: 'location_description',
@@ -129,7 +127,6 @@ export function PropertyLocation({
 
       if (error) throw error;
 
-      // Create a synthetic event to update the form state
       const event = {
         target: {
           name: 'location_description',
