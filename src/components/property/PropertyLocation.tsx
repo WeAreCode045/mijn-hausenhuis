@@ -9,7 +9,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { AddressInput } from "./location/AddressInput";
 import { NearbyPlaces } from "./location/NearbyPlaces";
 import { Label } from "@/components/ui/label";
-import { BlockNoteViewRaw, useBlockNote } from "@blocknote/react";
+import { BlockNoteView, useBlockNote } from "@blocknote/react";
 import "@blocknote/core/style.css";
 
 interface PropertyLocationProps {
@@ -48,10 +48,16 @@ export function PropertyLocation({
         content: location_description
       }
     ] : undefined,
-    onChange: (editor) => {
+    onEditorContentChange: (editor) => {
       const content = editor.topLevelBlocks.map(block => block.content).join('\n');
       handleEditorChange(content);
-    }
+    },
+    domAttributes: {
+      editor: {
+        class: "min-h-[200px] px-3 py-2 focus:outline-none"
+      }
+    },
+    defaultStyles: false
   });
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -221,9 +227,8 @@ export function PropertyLocation({
       <div className="space-y-2">
         <Label htmlFor="location_description">Locatiebeschrijving</Label>
         <div className="min-h-[200px] border rounded-md overflow-hidden">
-          <BlockNoteViewRaw 
-            editor={editor} 
-            theme="light"
+          <BlockNoteView 
+            editor={editor}
           />
         </div>
       </div>
