@@ -45,6 +45,7 @@ export function usePropertyFormSubmit(onSubmit: (data: PropertySubmitData) => vo
         energyLabel: formData.energyLabel,
         hasGarden: formData.hasGarden,
         description: formData.description,
+        location_description: formData.location_description,
         images: formData.images,
         floorplans: formData.floorplans,
         featuredImage: formData.featuredImage,

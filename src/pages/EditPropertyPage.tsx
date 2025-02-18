@@ -25,6 +25,7 @@ export default function EditPropertyPage() {
         garages: data.garages,
         energyLabel: data.energyLabel,
         description: data.description,
+        location_description: data.location_description,
         features: data.features as Json,
         images: data.images,
         floorplans: data.floorplans,
@@ -32,6 +33,8 @@ export default function EditPropertyPage() {
         gridImages: data.gridImages,
         hasGarden: data.hasGarden,
         areas: data.areas as Json[],
+        map_image: data.map_image,
+        nearby_places: data.nearby_places,
       };
 
       if (id) {
