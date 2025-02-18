@@ -1,3 +1,4 @@
+
 import { useLocationData } from "./location/useLocationData";
 import { useMapImage } from "./location/useMapImage";
 import { MapPreview } from "./location/MapPreview";
@@ -205,17 +206,16 @@ export function PropertyLocation({
 
       <div className="space-y-2">
         <Label htmlFor="location_description">Locatiebeschrijving</Label>
-        <div className="min-h-[200px] border rounded-md">
-          <Editor 
-            defaultValue={location_description || ""}
-            onDebouncedUpdate={(editor) => {
-              if (editor) {
-                handleEditorChange(editor.getHTML());
-              }
-            }}
-            className="min-h-[200px]"
-          />
-        </div>
+        <Editor 
+          defaultValue={location_description || ""}
+          onUpdate={(editor) => {
+            if (editor) {
+              handleEditorChange(editor.getHTML());
+            }
+          }}
+          disableLocalStorage
+          className="min-h-[200px] border rounded-md"
+        />
       </div>
 
       <NearbyPlaces 
