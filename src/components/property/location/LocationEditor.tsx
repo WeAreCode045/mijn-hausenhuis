@@ -1,8 +1,6 @@
 
-import { BlockNoteViewRaw } from "@blocknote/react";
-import "@blocknote/core/style.css";
 import { Label } from "@/components/ui/label";
-import { useLocationEditor } from "./useLocationEditor";
+import { Textarea } from "@/components/ui/textarea";
 
 interface LocationEditorProps {
   id?: string;
@@ -10,17 +8,18 @@ interface LocationEditorProps {
   onChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
 }
 
-export function LocationEditor({ id, location_description, onChange }: LocationEditorProps) {
-  const editor = useLocationEditor(id, location_description, onChange);
-
+export function LocationEditor({ location_description, onChange }: LocationEditorProps) {
   return (
     <div className="space-y-2">
       <Label htmlFor="location_description">Locatiebeschrijving</Label>
-      <div className="min-h-[200px] border rounded-md overflow-hidden">
-        <BlockNoteViewRaw 
-          editor={editor}
-        />
-      </div>
+      <Textarea
+        id="location_description"
+        name="location_description"
+        value={location_description || ""}
+        onChange={onChange}
+        className="min-h-[200px] resize-none"
+        placeholder="Voer een locatiebeschrijving in..."
+      />
     </div>
   );
 }

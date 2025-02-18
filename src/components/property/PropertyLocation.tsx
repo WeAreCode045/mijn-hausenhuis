@@ -1,13 +1,14 @@
+
 import { useLocationData } from "./location/useLocationData";
 import { useMapImage } from "./location/useMapImage";
 import { MapPreview } from "./location/MapPreview";
 import { supabase } from "@/integrations/supabase/client";
 import type { PropertyPlaceType } from "@/types/property";
+import type { Json } from "@/integrations/supabase/types";
+import { useToast } from "@/components/ui/use-toast";
 import { AddressInput } from "./location/AddressInput";
 import { NearbyPlaces } from "./location/NearbyPlaces";
 import { LocationEditor } from "./location/LocationEditor";
-import type { Json } from "@/integrations/supabase/types";
-import { useToast } from "@/components/ui/use-toast";
 
 interface PropertyLocationProps {
   id?: string;
