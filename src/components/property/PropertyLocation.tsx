@@ -42,6 +42,49 @@ export function PropertyLocation({
     }
   };
 
+  const handleGenerateDescription = async () => {
+    if (!id || !address) return;
+    try {
+      const { data, error } = await supabase.functions.invoke('generate-location-description', {
+        body: { 
+          address, 
+          nearbyPlaces: nearby_places,
+          language: 'nl'
+        }
+      });
+
+      if (error) throw error;
+
+      if (data?.description) {
+        const { error: updateError } = await supabase
+          .from('properties')
+          .update({ location_description: data.description })
+          .eq('id', id);
+
+        if (updateError) throw updateError;
+
+        const event = {
+          target: {
+            name: 'location_description',
+            value: data.description
+          }
+        } as React.ChangeEvent<HTMLTextAreaElement>;
+        
+        onChange(event);
+
+        toast({
+          description: "Locatiebeschrijving succesvol gegenereerd",
+        });
+      }
+    } catch (error) {
+      console.error('Error generating description:', error);
+      toast({
+        variant: "destructive",
+        description: "Kon geen locatiebeschrijving genereren",
+      });
+    }
+  };
+
   return (
     <div className="space-y-6">
       <AddressInput
@@ -51,48 +94,7 @@ export function PropertyLocation({
         hasNearbyPlaces={nearby_places.length > 0}
         onChange={onChange}
         onLocationFetch={handleLocationFetch}
-        onGenerateDescription={async () => {
-          if (!id || !address) return;
-          try {
-            const { data, error } = await supabase.functions.invoke('generate-location-description', {
-              body: { 
-                address, 
-                nearbyPlaces: nearby_places,
-                language: 'nl'
-              }
-            });
-
-            if (error) throw error;
-
-            if (data?.description) {
-              const { error: updateError } = await supabase
-                .from('properties')
-                .update({ location_description: data.description })
-                .eq('id', id);
-
-              if (updateError) throw updateError;
-
-              const event = {
-                target: {
-                  name: 'location_description',
-                  value: data.description
-                }
-              } as React.ChangeEvent<HTMLTextAreaElement>;
-              
-              onChange(event);
-
-              toast({
-                description: "Locatiebeschrijving succesvol gegenereerd",
-              });
-            }
-          } catch (error) {
-            console.error('Error generating description:', error);
-            toast({
-              variant: "destructive",
-              description: "Kon geen locatiebeschrijving genereren",
-            });
-          }
-        }}
+        onGenerateDescription={handleGenerateDescription}
       />
 
       {map_image && (

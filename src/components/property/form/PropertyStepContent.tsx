@@ -32,7 +32,6 @@ interface PropertyStepContentProps {
   handleAreaImageUpload: (id: string, files: FileList) => void;
   removeAreaImage: (areaId: string, imageUrl: string) => void;
   handleMapImageDelete: () => void;
-  handleMapImageUpload: (url: string) => void;
 }
 
 export function PropertyStepContent({
@@ -58,7 +57,6 @@ export function PropertyStepContent({
   handleAreaImageUpload,
   removeAreaImage,
   handleMapImageDelete,
-  handleMapImageUpload,
 }: PropertyStepContentProps) {
   switch (currentStep) {
     case 1:
@@ -141,6 +139,7 @@ export function PropertyStepContent({
             address={formData.address}
             map_image={formData.map_image}
             nearby_places={formData.nearby_places}
+            location_description={formData.location_description}
             onChange={handleInputChange}
             onLocationFetch={async () => {
               if (id) {
@@ -162,7 +161,6 @@ export function PropertyStepContent({
               }
             }}
             onMapImageDelete={handleMapImageDelete}
-            onMapImageUpload={handleMapImageUpload}
           />
           <div className="mt-6">
             <PropertyImages
