@@ -95,6 +95,7 @@ export function PropertyLocation({
 
         if (updateError) throw updateError;
 
+        // Create a synthetic event to update the form state
         const event = {
           target: {
             name: 'location_description',
