@@ -39,19 +39,14 @@ export function FormStepNavigation({
               className={`flex flex-col items-center gap-2 ${
                 step.id === currentStep
                   ? "text-primary"
-                  : step.id < currentStep
-                  ? "text-gray-500 hover:text-primary transition-colors"
-                  : "text-gray-300"
-              } ${step.id <= currentStep ? "cursor-pointer" : "cursor-not-allowed"}`}
-              disabled={step.id > currentStep}
+                  : "text-gray-500 hover:text-primary transition-colors"
+              } cursor-pointer`}
             >
               <div
                 className={`w-10 h-10 rounded-full flex items-center justify-center ${
                   step.id === currentStep
                     ? "bg-primary text-white"
-                    : step.id < currentStep
-                    ? "bg-gray-200 hover:bg-primary/10 transition-colors"
-                    : "bg-gray-100"
+                    : "bg-gray-200 hover:bg-primary/10 transition-colors"
                 }`}
               >
                 {step.icon}
