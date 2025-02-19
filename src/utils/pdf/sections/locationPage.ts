@@ -1,8 +1,9 @@
+
 import jsPDF from 'jspdf';
 import { PropertyData } from '@/types/property';
 import { AgencySettings } from '@/types/agency';
 import { BROCHURE_STYLES } from '../constants/styles';
-import { addHeaderFooter } from '../utils/pageUtils';
+import { addHeaderFooter, getContentArea } from '../utils/pageUtils';
 
 export const generateLocationPage = async (
   pdf: jsPDF,
@@ -21,8 +22,8 @@ export const generateLocationPage = async (
   pageNum++;
   addHeaderFooter(pdf, pageNum, totalPages, settings, propertyTitle);
 
-  const { margin, contentPadding } = BROCHURE_STYLES.spacing;
-  let yPos = contentPadding.top;
+  const { margin } = BROCHURE_STYLES.spacing;
+  let yPos = getContentArea().top;
 
   // Location title
   pdf.setFillColor(settings.primaryColor || BROCHURE_STYLES.colors.primary);

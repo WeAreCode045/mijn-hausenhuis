@@ -1,7 +1,8 @@
+
 import jsPDF from 'jspdf';
 import { AgencySettings } from '@/types/agency';
 import { BROCHURE_STYLES } from '../constants/styles';
-import { addHeaderFooter } from '../utils/pageUtils';
+import { addHeaderFooter, getContentArea } from '../utils/pageUtils';
 
 export const generateContactPage = async (
   pdf: jsPDF,
@@ -13,8 +14,8 @@ export const generateContactPage = async (
   pdf.addPage();
   addHeaderFooter(pdf, currentPage, totalPages, settings, propertyTitle);
 
-  const { margin, contentPadding } = BROCHURE_STYLES.spacing;
-  let yPos = contentPadding.top;
+  const { margin } = BROCHURE_STYLES.spacing;
+  let yPos = getContentArea().top;
 
   // Contact title with accent bar
   pdf.setFillColor(settings.primaryColor || BROCHURE_STYLES.colors.primary);
