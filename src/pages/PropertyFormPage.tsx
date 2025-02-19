@@ -13,11 +13,6 @@ export default function PropertyFormPage() {
   const navigate = useNavigate();
   const { id } = useParams();
   const { toast } = useToast();
-  const { formData, setFormData } = usePropertyForm(id, onSubmit);
-  const {
-    handleImageUpload,
-    handleRemoveImage
-  } = usePropertyImages(formData, setFormData);
 
   const handleSubmit = async (data: PropertySubmitData) => {
     try {
@@ -64,6 +59,12 @@ export default function PropertyFormPage() {
       });
     }
   };
+
+  const { formData, setFormData } = usePropertyForm(id, handleSubmit);
+  const {
+    handleImageUpload,
+    handleRemoveImage
+  } = usePropertyImages(formData, setFormData);
 
   if (!formData) {
     return null;
