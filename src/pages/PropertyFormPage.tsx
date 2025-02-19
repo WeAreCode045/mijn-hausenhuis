@@ -23,10 +23,10 @@ export default function PropertyFormPage() {
     try {
       const propertyData = {
         ...data,
-        features: data.features as Json,
+        features: data.features.map(f => ({ id: f.id, description: f.description })) as Json[],
         areas: data.areas as Json[],
         gridImages: data.gridImages,
-        images: data.images as unknown as Json[]
+        images: data.images.map(img => ({ id: img.id, url: img.url })) as Json[]
       };
 
       if (id) {
