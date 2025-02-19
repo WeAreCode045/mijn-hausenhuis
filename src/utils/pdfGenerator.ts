@@ -7,6 +7,13 @@ import { addCoverPage } from './pdf/sections/coverPage';
 import { addDetailsPage } from './pdf/sections/detailsPage';
 import { addContactPage } from './pdf/sections/contactPage';
 
+const brandColors = {
+  primary: '#9b87f5',
+  secondary: '#7E69AB',
+  accent: '#D6BCFA',
+  neutral: '#F1F0FB',
+};
+
 export const generatePropertyPDF = async (property: PropertyData, settings?: AgencySettings) => {
   const pdf = new jsPDF('p', 'mm', 'a4');
   const totalPages = property.areas ? property.areas.length + 3 : 3;
@@ -26,7 +33,7 @@ export const generatePropertyPDF = async (property: PropertyData, settings?: Age
       addHeaderFooter(pdf, pageNumber++, totalPages, settings, property.title);
       
       // Area title with accent line
-      pdf.setFillColor(settings?.primaryColor || '#9b87f5');
+      pdf.setFillColor(settings?.primaryColor || brandColors.primary);
       pdf.rect(20, 45, 3, 20, 'F');
       
       pdf.setTextColor(50, 50, 50);
@@ -84,7 +91,7 @@ export const generatePropertyPDF = async (property: PropertyData, settings?: Age
     pdf.addPage();
     addHeaderFooter(pdf, totalPages - 1, totalPages, settings, property.title);
 
-    pdf.setFillColor(settings?.primaryColor || '#9b87f5');
+    pdf.setFillColor(settings?.primaryColor || brandColors.primary);
     pdf.rect(20, 45, 3, 20, 'F');
     
     pdf.setTextColor(50, 50, 50);
@@ -134,8 +141,8 @@ export const generatePropertyPDF = async (property: PropertyData, settings?: Age
     email: '',
     phone: '',
     address: '',
-    primaryColor: '#9b87f5',
-    secondaryColor: '#7E69AB',
+    primaryColor: brandColors.primary,
+    secondaryColor: brandColors.secondary,
     agents: []
   }, totalPages, totalPages, property);
 
