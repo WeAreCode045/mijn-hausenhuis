@@ -40,7 +40,12 @@ export function FeaturedImageSection({
         ) : (
           <ImageSelectDialog
             images={images}
-            onSelect={(urls) => onSetFeaturedImage(urls[0])}
+            onSelect={(imageIds) => {
+              const selectedImage = images.find(img => img.id === imageIds[0]);
+              if (selectedImage) {
+                onSetFeaturedImage(selectedImage.url);
+              }
+            }}
             buttonText="Select Featured Image"
             maxSelect={1}
           />
