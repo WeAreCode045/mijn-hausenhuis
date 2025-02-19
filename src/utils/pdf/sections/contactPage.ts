@@ -1,16 +1,15 @@
-
 import jsPDF from 'jspdf';
 import { AgencySettings } from '@/types/agency';
 import { BROCHURE_STYLES } from '../constants/styles';
 import { addHeaderFooter } from '../utils/pageUtils';
 
-export const generateContactPage = (
+export const generateContactPage = async (
   pdf: jsPDF,
   settings: AgencySettings,
   currentPage: number,
   totalPages: number,
   propertyTitle: string
-): void => {
+): Promise<void> => {
   pdf.addPage();
   addHeaderFooter(pdf, currentPage, totalPages, settings, propertyTitle);
 
