@@ -1,6 +1,7 @@
 
 import jsPDF from 'jspdf';
 import { AgencySettings } from '@/types/agency';
+import { PropertyData } from '@/types/property';
 import { BROCHURE_STYLES } from '../constants/styles';
 
 export const addHeaderFooter = (
