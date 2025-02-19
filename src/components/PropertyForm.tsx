@@ -1,4 +1,3 @@
-
 import { Card } from "@/components/ui/card";
 import { useParams } from "react-router-dom";
 import { usePropertyForm } from "@/hooks/usePropertyForm";
@@ -29,7 +28,7 @@ export function PropertyForm({ onSubmit }: PropertyFormProps) {
     handleImageUpload,
     handleAreaPhotosUpload,
     handleFloorplanUpload,
-    handleRemoveImage,
+    handleRemoveImage: handleImageRemove,
     handleRemoveAreaPhoto,
     handleRemoveFloorplan,
     handleSetFeaturedImage,

@@ -1,23 +1,33 @@
 
 import { supabase } from "@/integrations/supabase/client";
-import type { PropertySubmitData, PropertyDatabaseData } from "@/types/property";
+import { PropertyData, PropertySubmitData } from "@/types/property";
+import { Json } from "@/integrations/supabase/types";
 
-export async function usePropertySubmit(propertyData: PropertySubmitData) {
-  try {
-    const { images, ...rest } = propertyData;
+export const usePropertySubmit = () => {
+  const submitProperty = async (property: PropertyData): Promise<void> => {
+    const imageUrls = property.images.map(img => img.url);
     
-    const databaseData: PropertyDatabaseData = {
-      ...rest,
-      images: images.map(img => img.url)
+    const submitData: PropertySubmitData = {
+      ...property,
+      features: property.features as unknown as Json,
+      areas: property.areas.map(area => ({
+        id: area.id,
+        title: area.title,
+        description: area.description,
+        imageIds: area.imageIds
+      })) as unknown as Json[],
+      images: imageUrls,
+      nearby_places: property.nearby_places as unknown as Json
     };
 
     const { error } = await supabase
       .from('properties')
-      .upsert(databaseData);
+      .insert(submitData);
 
-    if (error) throw error;
-  } catch (error) {
-    console.error('Error submitting property:', error);
-    throw error;
-  }
-}
+    if (error) {
+      throw error;
+    }
+  };
+
+  return { submitProperty };
+};
