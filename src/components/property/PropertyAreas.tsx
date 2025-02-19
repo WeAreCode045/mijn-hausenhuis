@@ -3,12 +3,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { PropertyArea } from "@/types/property";
+import { PropertyArea, PropertyImage } from "@/types/property";
 import { PlusCircle, MinusCircle, ChevronDown, ChevronUp } from "lucide-react";
 import { useState } from "react";
 import { ImageSelectDialog } from "./ImageSelectDialog";
 import { usePropertyForm } from "@/hooks/usePropertyForm";
 import { useParams } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
 
 interface PropertyAreasProps {
   areas: PropertyArea[];
@@ -35,8 +36,37 @@ export function PropertyAreas({
     setExpandedArea(expandedArea === id ? null : id);
   };
 
-  const handleImagesSelect = (areaId: string, selectedUrls: string[]) => {
-    onUpdate(areaId, 'images', [...areas.find(a => a.id === areaId)?.images || [], ...selectedUrls]);
+  const handleImagesSelect = async (areaId: string, selectedImageIds: string[]) => {
+    if (!id) return;
+
+    try {
+      // Insert into area_images junction table
+      const positionPromises = selectedImageIds.map(async (imageId, index) => {
+        const { error } = await supabase
+          .from('area_images')
+          .insert({
+            area_id: areaId,
+            image_id: imageId,
+            position: index
+          });
+
+        if (error) throw error;
+      });
+
+      await Promise.all(positionPromises);
+
+      // Update local state
+      onUpdate(areaId, 'imageIds', [
+        ...(areas.find(a => a.id === areaId)?.imageIds || []),
+        ...selectedImageIds
+      ]);
+    } catch (error) {
+      console.error('Error associating images with area:', error);
+    }
+  };
+
+  const getImageUrl = (imageId: string): string | undefined => {
+    return formData?.images.find(img => img.id === imageId)?.url;
   };
 
   return (
@@ -107,27 +137,32 @@ export function PropertyAreas({
               <div>
                 <Label>Foto's</Label>
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 mt-2">
-                  {area.images.map((imageUrl) => (
-                    <div key={imageUrl} className="relative group">
-                      <img
-                        src={imageUrl}
-                        alt={area.title}
-                        className="w-full aspect-square object-cover rounded-lg"
-                      />
-                      <Button
-                        type="button"
-                        variant="destructive"
-                        size="icon"
-                        className="absolute top-1 right-1 w-6 h-6 opacity-0 group-hover:opacity-100 transition-opacity"
-                        onClick={() => onImageRemove(area.id, imageUrl)}
-                      >
-                        <MinusCircle className="w-4 h-4" />
-                      </Button>
-                    </div>
-                  ))}
+                  {area.imageIds.map((imageId) => {
+                    const imageUrl = getImageUrl(imageId);
+                    if (!imageUrl) return null;
+
+                    return (
+                      <div key={imageId} className="relative group">
+                        <img
+                          src={imageUrl}
+                          alt={area.title}
+                          className="w-full aspect-square object-cover rounded-lg"
+                        />
+                        <Button
+                          type="button"
+                          variant="destructive"
+                          size="icon"
+                          className="absolute top-1 right-1 w-6 h-6 opacity-0 group-hover:opacity-100 transition-opacity"
+                          onClick={() => onImageRemove(area.id, imageId)}
+                        >
+                          <MinusCircle className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    );
+                  })}
                   <ImageSelectDialog
                     images={formData?.images || []}
-                    onSelect={(urls) => handleImagesSelect(area.id, urls)}
+                    onSelect={(imageIds) => handleImagesSelect(area.id, imageIds)}
                     buttonText="Foto's Toevoegen"
                     maxSelect={6}
                   />

@@ -90,6 +90,32 @@ export type Database = {
         }
         Relationships: []
       }
+      area_images: {
+        Row: {
+          area_id: string
+          image_id: string
+          position: number
+        }
+        Insert: {
+          area_id: string
+          image_id: string
+          position: number
+        }
+        Update: {
+          area_id?: string
+          image_id?: string
+          position?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "area_images_image_id_fkey"
+            columns: ["image_id"]
+            isOneToOne: false
+            referencedRelation: "property_images"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       properties: {
         Row: {
           address: string | null
@@ -223,6 +249,35 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "property_contact_submissions_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "properties"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      property_images: {
+        Row: {
+          created_at: string
+          id: string
+          property_id: string | null
+          url: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          property_id?: string | null
+          url: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          property_id?: string | null
+          url?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "property_images_property_id_fkey"
             columns: ["property_id"]
             isOneToOne: false
             referencedRelation: "properties"

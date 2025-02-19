@@ -10,10 +10,11 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Image } from "lucide-react";
+import type { PropertyImage } from "@/types/property";
 
 interface ImageSelectDialogProps {
-  images: string[];
-  onSelect: (urls: string[]) => void;
+  images: PropertyImage[];
+  onSelect: (imageIds: string[]) => void;
   buttonText: string;
   maxSelect?: number;
 }
@@ -27,15 +28,15 @@ export function ImageSelectDialog({
   const [open, setOpen] = useState(false);
   const [selectedImages, setSelectedImages] = useState<string[]>([]);
 
-  const handleImageClick = (url: string) => {
+  const handleImageClick = (imageId: string) => {
     setSelectedImages(prev => {
-      if (prev.includes(url)) {
-        return prev.filter(img => img !== url);
+      if (prev.includes(imageId)) {
+        return prev.filter(id => id !== imageId);
       }
       if (maxSelect && prev.length >= maxSelect) {
         return prev;
       }
-      return [...prev, url];
+      return [...prev, imageId];
     });
   };
 
@@ -63,24 +64,24 @@ export function ImageSelectDialog({
           <DialogTitle>Select Images</DialogTitle>
         </DialogHeader>
         <div className="grid grid-cols-3 sm:grid-cols-4 gap-4 mt-4 max-h-[60vh] overflow-y-auto p-4">
-          {images.map((url) => (
+          {images.map((image) => (
             <div
-              key={url}
+              key={image.id}
               className="relative group cursor-pointer"
-              onClick={() => handleImageClick(url)}
+              onClick={() => handleImageClick(image.id)}
             >
               <img
-                src={url}
+                src={image.url}
                 alt="Property"
                 className={`w-full aspect-square object-cover rounded-lg transition-all ${
-                  selectedImages.includes(url) 
+                  selectedImages.includes(image.id) 
                     ? 'ring-2 ring-primary ring-offset-2' 
                     : 'hover:ring-2 hover:ring-primary/50 hover:ring-offset-2'
                 }`}
               />
-              {selectedImages.includes(url) && (
+              {selectedImages.includes(image.id) && (
                 <div className="absolute top-2 right-2 bg-primary text-white w-6 h-6 rounded-full flex items-center justify-center text-sm">
-                  {selectedImages.indexOf(url) + 1}
+                  {selectedImages.indexOf(image.id) + 1}
                 </div>
               )}
             </div>

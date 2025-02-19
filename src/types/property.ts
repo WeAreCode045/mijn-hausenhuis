@@ -6,11 +6,16 @@ export interface PropertyFeature {
   description: string;
 }
 
+export interface PropertyImage {
+  id: string;
+  url: string;
+}
+
 export interface PropertyArea {
   id: string;
   title: string;
   description: string;
-  images: string[];
+  imageIds: string[];
 }
 
 export interface PropertyPlaceType {
@@ -43,7 +48,7 @@ export interface PropertyData {
   description: string;
   location_description?: string;
   features: PropertyFeature[];
-  images: string[];
+  images: PropertyImage[];
   floorplans: string[];
   featuredImage: string | null;
   gridImages: string[];
@@ -57,14 +62,13 @@ export interface PropertyData {
   longitude?: number;
 }
 
-// Make id optional for form data since it won't exist for new properties
 export interface PropertyFormData extends Omit<PropertyData, 'id'> {
   id?: string;
 }
 
-// Updated PropertySubmitData to handle the Json type conversion
-export interface PropertySubmitData extends Omit<PropertyData, 'features' | 'areas' | 'nearby_places'> {
+export interface PropertySubmitData extends Omit<PropertyData, 'features' | 'areas' | 'nearby_places' | 'images'> {
   features: Json;
   areas: Json[];
   nearby_places: Json;
+  images: Json;
 }
