@@ -30,20 +30,25 @@ export async function generatePropertyBrochure(
     Math.ceil(property.areas.length / 2) + 6 : 6;
 
   // Generate pages
-  currentPage = generateCoverPage(
+  currentPage = await generateCoverPage(
     pdf,
     property,
-    settings
+    settings,
+    currentPage,
+    totalPages,
+    property.title
   );
 
-  currentPage = generateDetailsPage(
+  currentPage = await generateDetailsPage(
     pdf,
     property,
-    settings
+    settings,
+    currentPage,
+    totalPages
   );
 
   if (property.areas && property.areas.length > 0) {
-    currentPage = generateAreaPages(
+    currentPage = await generateAreaPages(
       pdf,
       property,
       settings,
@@ -53,7 +58,7 @@ export async function generatePropertyBrochure(
     );
   }
 
-  currentPage = generateLocationPage(
+  currentPage = await generateLocationPage(
     pdf,
     property,
     settings,
@@ -62,7 +67,7 @@ export async function generatePropertyBrochure(
     property.title
   );
 
-  generateContactPage(
+  await generateContactPage(
     pdf,
     settings,
     currentPage,

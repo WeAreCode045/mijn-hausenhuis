@@ -25,6 +25,7 @@ export default function PropertyFormPage() {
         features: data.features as Json,
         areas: data.areas as Json[],
         gridImages: data.gridImages,
+        images: data.images.map(img => ({ id: img.id, url: img.url })) as unknown as Json[]
       };
 
       if (id) {
@@ -67,7 +68,7 @@ export default function PropertyFormPage() {
   const { formData, setFormData } = usePropertyForm(id, handleSubmit);
   const {
     handleImageUpload,
-    handleRemoveImage
+    handleRemoveImage,
   } = usePropertyImages(formData, setFormData);
 
   const handleDelete = async (propertyId: string) => {
@@ -128,9 +129,14 @@ export default function PropertyFormPage() {
               </Card>
             )}
             <PropertyMediaLibrary
-              images={formData.images}
+              images={formData.images.map(img => img.url)}
               onImageUpload={handleImageUpload}
-              onRemoveImage={handleRemoveImage}
+              onRemoveImage={(index) => {
+                const imageToRemove = formData.images[index];
+                if (imageToRemove) {
+                  handleRemoveImage(imageToRemove.id);
+                }
+              }}
             />
           </div>
         </div>

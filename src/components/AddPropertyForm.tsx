@@ -1,44 +1,70 @@
 
 import { Card } from "@/components/ui/card";
 import { PropertyFormContent } from "./property/form/PropertyFormContent";
-import { usePropertyFormState } from "./property/form/usePropertyFormState";
-import { useFeatures } from "@/hooks/useFeatures";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import type { PropertySubmitData, PropertyDatabaseData } from "@/types/property";
-import { Json } from "@/integrations/supabase/types";
+import type { PropertyFormData, PropertySubmitData } from "@/types/property";
+import { useToast } from "@/components/ui/use-toast";
+
+const initialFormData: PropertyFormData = {
+  title: "",
+  price: "",
+  address: "",
+  bedrooms: "",
+  bathrooms: "",
+  sqft: "",
+  livingArea: "",
+  buildYear: "",
+  garages: "",
+  energyLabel: "",
+  hasGarden: false,
+  description: "",
+  location_description: "",
+  features: [],
+  images: [],
+  floorplans: [],
+  featuredImage: null,
+  gridImages: [],
+  areas: [],
+  map_image: null,
+  nearby_places: [],
+  latitude: null,
+  longitude: null
+};
 
 export function AddPropertyForm() {
   const [currentStep, setCurrentStep] = useState(1);
-  const { formState, handleSubmit } = usePropertyFormState();
+  const [formData, setFormData] = useState<PropertyFormData>(initialFormData);
+  const { toast } = useToast();
 
-  const handleMapImageDelete = async () => {
+  const handleSubmit = async (data: PropertySubmitData) => {
     try {
-      if (!formState.formData.id) return;
-      
-      const updateData: PropertyDatabaseData = {
-        map_image: null
-      };
-
       const { error } = await supabase
         .from('properties')
-        .update(updateData)
-        .eq('id', formState.formData.id);
+        .insert(data);
 
       if (error) throw error;
 
-      formState.setFormData({ ...formState.formData, map_image: null });
+      toast({
+        title: "Success",
+        description: "Property created successfully",
+      });
     } catch (error) {
-      console.error('Error removing map image:', error);
+      console.error('Error:', error);
+      toast({
+        title: "Error",
+        description: "Failed to create property",
+        variant: "destructive",
+      });
     }
   };
 
   return (
     <Card className="w-full max-w-2xl p-6 space-y-6 animate-fadeIn">
       <PropertyFormContent 
-        {...formState}
+        formData={formData}
+        setFormData={setFormData}
         currentStep={currentStep}
-        handleMapImageDelete={handleMapImageDelete}
         onSubmit={handleSubmit}
       />
     </Card>
