@@ -3,7 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { PropertyForm } from "@/components/PropertyForm";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
-import type { PropertySubmitData, PropertyData } from "@/types/property";
+import type { PropertySubmitData, PropertyFormData } from "@/types/property";
 import { Json } from "@/integrations/supabase/types";
 import { PropertyMediaLibrary } from "@/components/property/PropertyMediaLibrary";
 import { usePropertyForm } from "@/hooks/usePropertyForm";
@@ -19,20 +19,42 @@ export default function PropertyFormPage() {
   const { toast } = useToast();
   const { settings } = useAgencySettings();
 
-  const handleSubmit = async (data: PropertySubmitData) => {
+  const handleSubmit = async (data: PropertyFormData) => {
     try {
-      const propertyData = {
-        ...data,
-        features: data.features.map(f => ({ id: f.id, description: f.description })) as Json[],
-        areas: data.areas as Json[],
+      // Convert PropertyFormData to PropertySubmitData
+      const submitData: PropertySubmitData = {
+        id: data.id,
+        title: data.title,
+        price: data.price,
+        address: data.address,
+        bedrooms: data.bedrooms,
+        bathrooms: data.bathrooms,
+        sqft: data.sqft,
+        livingArea: data.livingArea,
+        buildYear: data.buildYear,
+        garages: data.garages,
+        energyLabel: data.energyLabel,
+        hasGarden: data.hasGarden,
+        description: data.description,
+        location_description: data.location_description,
+        floorplans: data.floorplans,
+        featuredImage: data.featuredImage,
         gridImages: data.gridImages,
-        images: data.images.map(img => ({ id: img.id, url: img.url })) as Json[]
+        areaPhotos: data.areaPhotos,
+        features: data.features as unknown as Json,
+        areas: data.areas as unknown as Json[],
+        nearby_places: data.nearby_places as unknown as Json,
+        images: data.images.map(img => img.url), // Only send the URLs to the database
+        latitude: data.latitude,
+        longitude: data.longitude,
+        object_id: data.object_id,
+        map_image: data.map_image
       };
 
       if (id) {
         const { error: updateError } = await supabase
           .from('properties')
-          .update(propertyData)
+          .update(submitData)
           .eq('id', id);
         
         if (updateError) throw updateError;
@@ -45,7 +67,7 @@ export default function PropertyFormPage() {
       } else {
         const { error: insertError } = await supabase
           .from('properties')
-          .insert(propertyData);
+          .insert(submitData);
         
         if (insertError) throw insertError;
 
