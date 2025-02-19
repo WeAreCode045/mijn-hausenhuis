@@ -1,7 +1,9 @@
+
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Trash2 } from "lucide-react";
+import { ImageSelectDialog } from "./ImageSelectDialog";
 
 interface PropertyImagesProps {
   images: string[];
@@ -51,7 +53,7 @@ export function PropertyImages({
           <div className="space-y-4">
             <Label>Featured Image</Label>
             <div className="relative group">
-              {featuredImage && (
+              {featuredImage ? (
                 <div className="relative">
                   <img
                     src={featuredImage}
@@ -68,14 +70,14 @@ export function PropertyImages({
                     <Trash2 className="h-3 w-3" />
                   </Button>
                 </div>
+              ) : (
+                <ImageSelectDialog
+                  images={images}
+                  onSelect={onSetFeaturedImage}
+                  buttonText="Select Featured Image"
+                />
               )}
             </div>
-            <Input
-              type="file"
-              onChange={onFeaturedImageUpload}
-              accept="image/*"
-              className="mt-2"
-            />
           </div>
 
           <div className="space-y-4">
@@ -105,14 +107,14 @@ export function PropertyImages({
                   </div>
                 </div>
               ))}
+              {gridImages.length < 4 && (
+                <ImageSelectDialog
+                  images={images.filter(img => !gridImages.includes(img))}
+                  onSelect={(url) => onToggleGridImage([...gridImages, url])}
+                  buttonText="Add Grid Image"
+                />
+              )}
             </div>
-            <Input
-              type="file"
-              onChange={onGridImageUpload}
-              accept="image/*"
-              multiple
-              className="mt-2"
-            />
           </div>
         </div>
       )}

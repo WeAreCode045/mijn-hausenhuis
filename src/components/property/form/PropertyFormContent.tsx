@@ -1,4 +1,3 @@
-
 import { PropertyDetails } from "../PropertyDetails";
 import { PropertyDescription } from "../PropertyDescription";
 import { PropertyFeatures } from "../PropertyFeatures";
@@ -9,6 +8,7 @@ import { PropertyNearbyPlaces } from "../PropertyNearbyPlaces";
 import { transformNearbyPlaces } from "./transformUtils";
 import { supabase } from "@/integrations/supabase/client";
 import type { PropertyFormData, PropertyArea } from "@/types/property";
+import { PropertyMediaLibrary } from "../PropertyMediaLibrary";
 
 interface PropertyFormContentProps {
   currentStep: number;
@@ -63,10 +63,17 @@ export function PropertyFormContent({
     case 1:
       return (
         <>
-          <PropertyDetails
-            {...formData}
-            onChange={handleInputChange}
+          <PropertyMediaLibrary
+            images={formData.images}
+            onImageUpload={handleImageUpload}
+            onRemoveImage={handleRemoveImage}
           />
+          <div className="mt-8">
+            <PropertyDetails
+              {...formData}
+              onChange={handleInputChange}
+            />
+          </div>
           <PropertyDescription
             description={formData.description}
             onChange={handleInputChange}
