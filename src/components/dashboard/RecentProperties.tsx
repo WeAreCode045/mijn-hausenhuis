@@ -7,18 +7,26 @@ import { transformSupabaseData } from "@/components/property/webview/utils/trans
 import { Button } from "@/components/ui/button";
 import { ArrowUpRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/providers/AuthProvider";
 
 export function RecentProperties() {
   const navigate = useNavigate();
+  const { profile, isAdmin } = useAuth();
   
   const { data: recentProperties = [] } = useQuery({
-    queryKey: ['recent-properties'],
+    queryKey: ['recent-properties', profile?.id, isAdmin],
     queryFn: async () => {
-      const { data, error } = await supabase
+      let query = supabase
         .from('properties')
-        .select('*')
+        .select('*, property_images(*)')
         .order('created_at', { ascending: false })
         .limit(3);
+
+      if (!isAdmin && profile) {
+        query = query.eq('agent_id', profile.id);
+      }
+
+      const { data, error } = await query;
 
       if (error) throw error;
       return (data || []).map(item => transformSupabaseData(item));
