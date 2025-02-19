@@ -20,9 +20,9 @@ export const BROCHURE_STYLES = {
     gutter: 10,
     headerHeight: 30,
     footerHeight: 20,
-    contentPadding: {
-      top: 50,    // Space after header
-      bottom: 40  // Space before footer
+    contentArea: {
+      top: 40,    // Starting point after header
+      bottom: 30  // Space before footer
     }
   },
   imageAspectRatio: 1.5,

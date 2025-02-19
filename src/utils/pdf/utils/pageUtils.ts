@@ -4,6 +4,22 @@ import { AgencySettings } from '@/types/agency';
 import { PropertyData } from '@/types/property';
 import { BROCHURE_STYLES } from '../constants/styles';
 
+export const getContentArea = () => {
+  const { headerHeight, footerHeight, contentArea } = BROCHURE_STYLES.spacing;
+  const { height } = BROCHURE_STYLES.pageSize;
+  
+  return {
+    top: headerHeight + contentArea.top,
+    bottom: height - footerHeight - contentArea.bottom,
+    height: height - headerHeight - footerHeight - contentArea.top - contentArea.bottom
+  };
+};
+
+export const isContentOverflowing = (currentY: number): boolean => {
+  const { bottom } = getContentArea();
+  return currentY >= bottom;
+};
+
 export const addHeaderFooter = (
   pdf: jsPDF,
   pageNum: number,
@@ -12,10 +28,11 @@ export const addHeaderFooter = (
   propertyTitle: string
 ): void => {
   const { width, height } = BROCHURE_STYLES.pageSize;
-  const { margin } = BROCHURE_STYLES.spacing;
+  const { margin, headerHeight, footerHeight } = BROCHURE_STYLES.spacing;
 
+  // Header
   pdf.setFillColor(settings.primaryColor || BROCHURE_STYLES.colors.primary);
-  pdf.rect(0, 0, width, 30, 'F');
+  pdf.rect(0, 0, width, headerHeight, 'F');
 
   if (settings.logoUrl) {
     try {
@@ -39,7 +56,7 @@ export const addHeaderFooter = (
 
   // Footer
   pdf.setFillColor(settings.secondaryColor || BROCHURE_STYLES.colors.secondary);
-  pdf.rect(0, height - 20, width, 20, 'F');
+  pdf.rect(0, height - footerHeight, width, footerHeight, 'F');
 
   pdf.setTextColor(255, 255, 255);
   pdf.setFontSize(8);
@@ -60,4 +77,21 @@ export const calculateTotalPages = (property: PropertyData): number => {
     pages += Math.ceil(property.floorplans.length / 2);
   }
   return pages;
+};
+
+export const startNewPageIfNeeded = (
+  pdf: jsPDF,
+  currentY: number,
+  settings: AgencySettings,
+  currentPage: number,
+  totalPages: number,
+  propertyTitle: string
+): { newPage: number, newY: number } => {
+  if (isContentOverflowing(currentY)) {
+    pdf.addPage();
+    currentPage++;
+    addHeaderFooter(pdf, currentPage, totalPages, settings, propertyTitle);
+    return { newPage: currentPage, newY: getContentArea().top };
+  }
+  return { newPage: currentPage, newY: currentY };
 };
