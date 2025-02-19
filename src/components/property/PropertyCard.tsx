@@ -8,7 +8,7 @@ import { PropertyCardActions } from "./PropertyCardActions";
 import { PropertySubmissionsDialog } from "./PropertySubmissionsDialog";
 import { PropertyData } from "@/types/property";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth } from "@/providers/AuthProvider";
 
 interface PropertyCardProps {
   property: PropertyData;
