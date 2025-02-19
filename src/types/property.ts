@@ -9,6 +9,7 @@ export interface PropertyFeature {
 export interface PropertyImage {
   id: string;
   url: string;
+  [key: string]: string; // Add index signature to make it compatible with Json type
 }
 
 export interface PropertyArea {
@@ -92,7 +93,7 @@ export interface PropertySubmitData {
   features: Json;
   areas: Json[];
   nearby_places: Json;
-  images: PropertyImage[];
+  images: string[]; // Change to string[] to match database expectation
 }
 
 export interface PropertyDatabaseData {

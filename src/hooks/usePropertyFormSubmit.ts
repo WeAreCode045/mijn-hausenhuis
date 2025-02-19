@@ -47,7 +47,7 @@ export function usePropertyFormSubmit(onSubmit: (data: PropertySubmitData) => vo
         features: formData.features as unknown as Json,
         areas: formData.areas as unknown as Json[],
         nearby_places: formData.nearby_places as unknown as Json,
-        images: imageUrls as unknown as Json[]
+        images: imageUrls // Only send the URLs to the database
       };
 
       await onSubmit(submitData);
