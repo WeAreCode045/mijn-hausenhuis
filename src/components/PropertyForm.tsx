@@ -16,6 +16,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "./ui/button";
 import { FileText } from "lucide-react";
 import { useToast } from "./ui/use-toast";
+import { PropertyMediaLibrary } from "./property/PropertyMediaLibrary";
 
 interface PropertyFormProps {
   onSubmit: (data: PropertySubmitData) => void;
@@ -82,7 +83,6 @@ export function PropertyForm({ onSubmit }: PropertyFormProps) {
 
       if (error) throw error;
 
-      // Create a link to download the PDF
       const link = document.createElement('a');
       link.href = data.pdf;
       link.download = `${formData.title.replace(/\s+/g, '-').toLowerCase()}-brochure.pdf`;
@@ -128,6 +128,15 @@ export function PropertyForm({ onSubmit }: PropertyFormProps) {
           </Button>
         )}
       </div>
+      
+      <div className="mb-8">
+        <PropertyMediaLibrary
+          images={formData.images}
+          onImageUpload={handleImageUpload}
+          onRemoveImage={handleRemoveImage}
+        />
+      </div>
+
       <form onSubmit={(e) => handleSubmit(e, formData)} className="space-y-6">
         <FormStepNavigation
           steps={steps}
