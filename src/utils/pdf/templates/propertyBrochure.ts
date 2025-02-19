@@ -1,10 +1,9 @@
+
 import jsPDF from 'jspdf';
 import { PropertyData } from '@/types/property';
 import { AgencySettings } from '@/types/agency';
 import { generateCoverPage } from '../sections/coverPage';
 import { generateDetailsPage } from '../sections/detailsPage';
-import { generateFeaturesPage } from '../sections/featuresPage';
-import { generateMediaPage } from '../sections/mediaPage';
 import { generateAreaPages } from '../sections/areaPages';
 import { generateContactPage } from '../sections/contactPage';
 import { generateLocationPage } from '../sections/locationPage';
@@ -12,11 +11,11 @@ import { generateLocationPage } from '../sections/locationPage';
 export async function generatePropertyBrochure(
   property: PropertyData,
   settings: AgencySettings,
+  propertyImages: string[],
+  featuredImageUrl: string | null,
   description_background_url?: string,
   locationImageUrl?: string,
   contactImageUrl?: string,
-  propertyImages: string[],
-  featuredImageUrl: string | null
 ): Promise<jsPDF> {
   const pdf = new jsPDF({
     orientation: 'portrait',
@@ -30,7 +29,7 @@ export async function generatePropertyBrochure(
   const totalPages = property.areas && property.areas.length > 0 ? 
     Math.ceil(property.areas.length / 2) + 6 : 6;
 
-  // Generate cover page
+  // Generate pages
   currentPage = await generateCoverPage(
     pdf,
     property,
@@ -49,30 +48,14 @@ export async function generatePropertyBrochure(
     totalPages
   );
 
-  currentPage = await generateFeaturesPage(
-    pdf,
-    property,
-    settings,
-    currentPage,
-    totalPages
-  );
-
-  currentPage = await generateMediaPage(
-    pdf,
-    property,
-    settings,
-    currentPage,
-    totalPages,
-    propertyImages
-  );
-
   if (property.areas && property.areas.length > 0) {
     currentPage = await generateAreaPages(
       pdf,
       property,
       settings,
       currentPage,
-      totalPages
+      totalPages,
+      property.title
     );
   }
 
@@ -82,18 +65,15 @@ export async function generatePropertyBrochure(
     settings,
     currentPage,
     totalPages,
-    locationImageUrl,
-    property.latitude,
-    property.longitude,
-    property.address
+    property.title
   );
 
-  currentPage = await generateContactPage(
+  await generateContactPage(
     pdf,
     settings,
     currentPage,
     totalPages,
-    contactImageUrl
+    property.title
   );
 
   return pdf;

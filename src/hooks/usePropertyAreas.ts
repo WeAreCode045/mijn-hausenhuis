@@ -17,26 +17,26 @@ export function usePropertyAreas(
       imageIds: []
     };
 
-    setFormData(prev => ({
-      ...prev,
-      areas: [...prev.areas, newArea]
-    }));
+    setFormData({
+      ...formData,
+      areas: [...formData.areas, newArea]
+    });
   };
 
   const removeArea = (id: string) => {
-    setFormData(prev => ({
-      ...prev,
-      areas: prev.areas.filter(area => area.id !== id)
-    }));
+    setFormData({
+      ...formData,
+      areas: formData.areas.filter(area => area.id !== id)
+    });
   };
 
   const updateArea = (id: string, field: keyof PropertyArea, value: string | string[]) => {
-    setFormData(prev => ({
-      ...prev,
-      areas: prev.areas.map(area =>
+    setFormData({
+      ...formData,
+      areas: formData.areas.map(area =>
         area.id === id ? { ...area, [field]: value } : area
       )
-    }));
+    });
   };
 
   const handleAreaImageUpload = async (areaId: string, files: FileList) => {
