@@ -24,7 +24,8 @@ export const generateDetailsPage = async (
     { label: 'Perceeloppervlakte', value: `${property.sqft} m²` },
     { label: 'Slaapkamers', value: property.bedrooms },
     { label: 'Badkamers', value: property.bathrooms },
-    { label: 'Bouwjaar', value: property.buildYear }
+    { label: 'Bouwjaar', value: property.buildYear },
+    { label: 'Garages', value: property.garages }
   ].filter(item => item.value);
 
   let yPos = 50;
@@ -57,4 +58,22 @@ export const generateDetailsPage = async (
   pdf.setTextColor(BROCHURE_STYLES.colors.text.secondary);
   const description = pdf.splitTextToSize(property.description, contentWidth);
   pdf.text(description, margin, yPos + 15);
+
+  // Features section
+  yPos += description.length * 7 + 30;
+  pdf.setFontSize(20);
+  pdf.setTextColor(settings.primaryColor || BROCHURE_STYLES.colors.primary);
+  pdf.text('Kenmerken', margin, yPos);
+
+  if (property.features?.length) {
+    yPos += 15;
+    pdf.setFontSize(11);
+    pdf.setTextColor(BROCHURE_STYLES.colors.text.secondary);
+    
+    property.features.forEach((feature, index) => {
+      if (index > 0 && index % 3 === 0) yPos += 20;
+      const xPos = margin + (index % 3) * (highlightWidth + gutter);
+      pdf.text(`• ${feature.description}`, xPos, yPos);
+    });
+  }
 };

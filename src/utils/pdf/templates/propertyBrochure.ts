@@ -5,6 +5,7 @@ import { AgencySettings } from '@/types/agency';
 import { BROCHURE_STYLES } from '../constants/styles';
 import { generateCoverPage } from '../sections/coverPage';
 import { generateDetailsPage } from '../sections/detailsPage';
+import { generateContactPage } from '../sections/contactPage';
 import { addHeaderFooter, calculateTotalPages } from '../utils/pageUtils';
 
 class PropertyBrochure {
@@ -46,7 +47,7 @@ class PropertyBrochure {
       const description = this.pdf.splitTextToSize(area.description, 170);
       this.pdf.text(description, margin, yPos);
 
-      // Area images
+      // Area images in 3 columns
       if (area.images?.length) {
         yPos += description.length * 7 + 10;
         await this.addAreaImages(area.images, yPos);
@@ -57,7 +58,7 @@ class PropertyBrochure {
   private async addAreaImages(images: string[], startY: number) {
     const { margin, gutter } = BROCHURE_STYLES.spacing;
     const contentWidth = BROCHURE_STYLES.pageSize.width - (margin * 2);
-    const imageWidth = (contentWidth - gutter) / 2;
+    const imageWidth = (contentWidth - gutter * 2) / 3;
     const imageHeight = imageWidth / BROCHURE_STYLES.imageAspectRatio;
 
     for (let i = 0; i < images.length; i++) {
@@ -68,8 +69,8 @@ class PropertyBrochure {
           img.onload = resolve;
         });
 
-        const xPos = margin + (i % 2) * (imageWidth + gutter);
-        const yPos = startY + Math.floor(i / 2) * (imageHeight + gutter);
+        const xPos = margin + (i % 3) * (imageWidth + gutter);
+        const yPos = startY + Math.floor(i / 3) * (imageHeight + gutter);
 
         this.pdf.addImage(img, 'JPEG', xPos, yPos, imageWidth, imageHeight);
       } catch (error) {
@@ -94,12 +95,77 @@ class PropertyBrochure {
     this.pdf.setFontSize(18);
     this.pdf.text('Plattegronden', margin + 10, yPos + 15);
 
-    // Add floorplan images
+    // Add floorplan images with less spacing
     yPos += 40;
     for (const floorplan of this.property.floorplans) {
       try {
         const img = new Image();
         img.src = floorplan;
+        await new Promise((resolve) => {
+          img.onload = resolve;
+        });
+
+        const maxWidth = 180;
+        const maxHeight = 130;
+        
+        const imgAspectRatio = img.width / img.height;
+        let finalWidth = maxWidth;
+        let finalHeight = finalWidth / imgAspectRatio;
+        
+        if (finalHeight > maxHeight) {
+          finalHeight = maxHeight;
+          finalWidth = finalHeight * imgAspectRatio;
+        }
+
+        const xOffset = (BROCHURE_STYLES.pageSize.width - finalWidth) / 2;
+        this.pdf.addImage(img, 'JPEG', xOffset, yPos, finalWidth, finalHeight);
+        yPos += finalHeight + 10; // Reduced spacing between floorplans
+
+        if (yPos > BROCHURE_STYLES.pageSize.height - 40) {
+          this.pdf.addPage();
+          this.currentPage++;
+          addHeaderFooter(this.pdf, this.currentPage, this.totalPages, this.settings, this.property.title);
+          yPos = 50;
+        }
+      } catch (error) {
+        console.error('Error loading floorplan:', error);
+      }
+    }
+  }
+
+  private async addLocationPage() {
+    if (!this.property.location_description && !this.property.map_image) return;
+
+    this.pdf.addPage();
+    this.currentPage++;
+    addHeaderFooter(this.pdf, this.currentPage, this.totalPages, this.settings, this.property.title);
+
+    const { margin } = BROCHURE_STYLES.spacing;
+    let yPos = 50;
+
+    // Location title
+    this.pdf.setFillColor(this.settings.primaryColor || BROCHURE_STYLES.colors.primary);
+    this.pdf.rect(margin, yPos, 3, 20, 'F');
+    
+    this.pdf.setTextColor(BROCHURE_STYLES.colors.text.primary);
+    this.pdf.setFontSize(18);
+    this.pdf.text('Locatie', margin + 10, yPos + 15);
+
+    // Location description
+    if (this.property.location_description) {
+      yPos += 40;
+      this.pdf.setFontSize(11);
+      this.pdf.setTextColor(BROCHURE_STYLES.colors.text.secondary);
+      const description = this.pdf.splitTextToSize(this.property.location_description, 170);
+      this.pdf.text(description, margin, yPos);
+      yPos += description.length * 7 + 20;
+    }
+
+    // Map image
+    if (this.property.map_image) {
+      try {
+        const img = new Image();
+        img.src = this.property.map_image;
         await new Promise((resolve) => {
           img.onload = resolve;
         });
@@ -118,16 +184,8 @@ class PropertyBrochure {
 
         const xOffset = (BROCHURE_STYLES.pageSize.width - finalWidth) / 2;
         this.pdf.addImage(img, 'JPEG', xOffset, yPos, finalWidth, finalHeight);
-        yPos += finalHeight + 20;
-
-        if (yPos > BROCHURE_STYLES.pageSize.height - 40) {
-          this.pdf.addPage();
-          this.currentPage++;
-          addHeaderFooter(this.pdf, this.currentPage, this.totalPages, this.settings, this.property.title);
-          yPos = 50;
-        }
       } catch (error) {
-        console.error('Error loading floorplan:', error);
+        console.error('Error loading map image:', error);
       }
     }
   }
@@ -149,6 +207,13 @@ class PropertyBrochure {
     if (this.property.floorplans?.length) {
       await this.addFloorplansPage();
     }
+
+    // Location page
+    await this.addLocationPage();
+
+    // Contact page
+    this.currentPage++;
+    generateContactPage(this.pdf, this.settings, this.currentPage, this.totalPages, this.property.title);
 
     // Save PDF
     const filename = `${this.property.title.replace(/[^a-z0-9]/gi, '_').toLowerCase()}_brochure.pdf`;
