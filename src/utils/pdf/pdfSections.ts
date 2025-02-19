@@ -1,3 +1,4 @@
+
 import jsPDF from 'jspdf';
 import { PropertyData } from '@/types/property';
 import { AgencySettings } from '@/types/agency';
