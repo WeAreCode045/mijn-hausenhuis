@@ -66,10 +66,61 @@ export interface PropertyFormData extends Omit<PropertyData, 'id'> {
   id?: string;
 }
 
-export interface PropertySubmitData extends Omit<PropertyData, 'id' | 'features' | 'areas' | 'nearby_places' | 'images'> {
+export interface PropertySubmitData {
   id?: string;
+  title: string;
+  price: string;
+  address: string;
+  bedrooms: string;
+  bathrooms: string;
+  sqft: string;
+  livingArea: string;
+  buildYear: string;
+  garages: string;
+  energyLabel: string;
+  hasGarden: boolean;
+  description: string;
+  location_description?: string;
+  floorplans: string[];
+  featuredImage: string | null;
+  gridImages: string[];
+  areaPhotos?: string[];
+  object_id?: string;
+  map_image?: string | null;
+  latitude?: number | null;
+  longitude?: number | null;
   features: Json;
   areas: Json[];
   nearby_places: Json;
   images: PropertyImage[];
+}
+
+export interface PropertyDatabaseData {
+  id?: string;
+  title?: string;
+  price?: string;
+  address?: string;
+  bedrooms?: string;
+  bathrooms?: string;
+  sqft?: string;
+  livingArea?: string;
+  buildYear?: string;
+  garages?: string;
+  energyLabel?: string;
+  hasGarden?: boolean;
+  description?: string;
+  location_description?: string;
+  floorplans?: string[];
+  featuredImage?: string | null;
+  gridImages?: string[];
+  areaPhotos?: string[];
+  map_image?: string | null;
+  latitude?: number | null;
+  longitude?: number | null;
+  features?: Json;
+  areas?: Json[];
+  nearby_places?: Json;
+  images?: string[];
+  created_at?: string;
+  updated_at?: string;
 }

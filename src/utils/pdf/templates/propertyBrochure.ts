@@ -23,33 +23,27 @@ export async function generatePropertyBrochure(
     format: 'a4'
   });
 
-  let currentPage = 0;
+  let currentPage = 1;
 
   // Calculate total pages
   const totalPages = property.areas && property.areas.length > 0 ? 
     Math.ceil(property.areas.length / 2) + 6 : 6;
 
   // Generate pages
-  currentPage = await generateCoverPage(
+  currentPage = generateCoverPage(
     pdf,
     property,
-    settings,
-    currentPage,
-    totalPages,
-    featuredImageUrl,
-    description_background_url
+    settings
   );
 
-  currentPage = await generateDetailsPage(
+  currentPage = generateDetailsPage(
     pdf,
     property,
-    settings,
-    currentPage,
-    totalPages
+    settings
   );
 
   if (property.areas && property.areas.length > 0) {
-    currentPage = await generateAreaPages(
+    currentPage = generateAreaPages(
       pdf,
       property,
       settings,
@@ -59,7 +53,7 @@ export async function generatePropertyBrochure(
     );
   }
 
-  currentPage = await generateLocationPage(
+  currentPage = generateLocationPage(
     pdf,
     property,
     settings,
@@ -68,7 +62,7 @@ export async function generatePropertyBrochure(
     property.title
   );
 
-  await generateContactPage(
+  generateContactPage(
     pdf,
     settings,
     currentPage,
