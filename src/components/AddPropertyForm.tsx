@@ -6,6 +6,9 @@ import type { PropertyFormData, PropertySubmitData } from "@/types/property";
 import { useToast } from "@/components/ui/use-toast";
 import { PropertyFormContent } from "./property/form/PropertyFormContent";
 import { Json } from "@/integrations/supabase/types";
+import { useFeatures } from "@/hooks/useFeatures";
+import { usePropertyImages } from "@/hooks/usePropertyImages";
+import { usePropertyAreas } from "@/hooks/usePropertyAreas";
 
 const initialFormData: PropertyFormData = {
   title: "",
@@ -35,12 +38,41 @@ const initialFormData: PropertyFormData = {
 
 export function AddPropertyForm() {
   const [formData, setFormData] = useState<PropertyFormData>(initialFormData);
+  const [currentStep, setCurrentStep] = useState(1);
   const { toast } = useToast();
+
+  const { addFeature, removeFeature, updateFeature } = useFeatures(formData, setFormData);
+  const {
+    handleImageUpload,
+    handleAreaPhotosUpload,
+    handleFloorplanUpload,
+    handleRemoveImage,
+    handleRemoveAreaPhoto,
+    handleRemoveFloorplan,
+    handleSetFeaturedImage,
+    handleToggleGridImage
+  } = usePropertyImages(formData, setFormData);
+
+  const {
+    handleAreaImageUpload,
+    addArea,
+    removeArea,
+    updateArea,
+    removeAreaImage
+  } = usePropertyAreas(formData, setFormData);
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+  };
+
+  const handleMapImageDelete = async () => {
+    setFormData({ ...formData, map_image: null });
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      // Convert formData to PropertySubmitData with proper type casting
       const submitData: PropertySubmitData = {
         ...formData,
         features: formData.features as unknown as Json,
@@ -86,6 +118,25 @@ export function AddPropertyForm() {
       <PropertyFormContent 
         formData={formData}
         onSubmit={handleSubmit}
+        currentStep={currentStep}
+        addFeature={addFeature}
+        removeFeature={removeFeature}
+        updateFeature={updateFeature}
+        handleInputChange={handleInputChange}
+        handleImageUpload={handleImageUpload}
+        handleAreaPhotosUpload={handleAreaPhotosUpload}
+        handleFloorplanUpload={handleFloorplanUpload}
+        handleRemoveImage={handleRemoveImage}
+        handleRemoveAreaPhoto={handleRemoveAreaPhoto}
+        handleRemoveFloorplan={handleRemoveFloorplan}
+        handleSetFeaturedImage={handleSetFeaturedImage}
+        handleToggleGridImage={handleToggleGridImage}
+        addArea={addArea}
+        removeArea={removeArea}
+        updateArea={updateArea}
+        handleAreaImageUpload={handleAreaImageUpload}
+        removeAreaImage={removeAreaImage}
+        handleMapImageDelete={handleMapImageDelete}
       />
     </Card>
   );
