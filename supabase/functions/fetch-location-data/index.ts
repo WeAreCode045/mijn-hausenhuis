@@ -1,19 +1,15 @@
 
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.7.1'
+import { corsHeaders } from '../_shared/cors.ts'
 
-interface GooglePlacesResult {
+interface PlaceResult {
+  place_id: string;
   name: string;
   types: string[];
   vicinity: string;
   rating?: number;
   user_ratings_total?: number;
-  place_id: string;
-}
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
 serve(async (req) => {
@@ -24,98 +20,82 @@ serve(async (req) => {
   try {
     const { address, apiKey, propertyId } = await req.json()
 
-    // Create Supabase client
-    const supabaseUrl = Deno.env.get('SUPABASE_URL')
-    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
-    const supabase = createClient(supabaseUrl!, supabaseKey!)
+    if (!address) {
+      throw new Error('Address is required')
+    }
 
-    // First, geocode the address
+    // First, get coordinates from address
     const geocodeUrl = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&key=${apiKey}`
-    const geocodeResponse = await fetch(geocodeUrl)
-    const geocodeData = await geocodeResponse.json()
+    const geocodeRes = await fetch(geocodeUrl)
+    const geocodeData = await geocodeRes.json()
 
-    if (!geocodeData.results || geocodeData.results.length === 0) {
-      throw new Error('Location not found')
+    if (!geocodeData.results?.[0]?.geometry?.location) {
+      throw new Error('Could not find location for address')
     }
 
-    const location = geocodeData.results[0].geometry.location
-    const { lat, lng } = location
+    const { lat, lng } = geocodeData.results[0].geometry.location
 
-    // Get static map image
-    const mapImageUrl = `https://maps.googleapis.com/maps/api/staticmap?center=${lat},${lng}&zoom=15&size=600x300&maptype=roadmap&markers=color:red%7C${lat},${lng}&key=${apiKey}`
-    
-    // Fetch the map image
-    const mapImageResponse = await fetch(mapImageUrl)
-    const mapImageBlob = await mapImageResponse.blob()
-
-    // Generate a unique filename for the map image
-    const filename = `${propertyId}/map-${Date.now()}.png`
-
-    // Upload the map image to Supabase Storage
-    const { data: uploadData, error: uploadError } = await supabase.storage
-      .from('map_images')
-      .upload(filename, mapImageBlob, {
-        contentType: 'image/png',
-        upsert: true
-      })
-
-    if (uploadError) {
-      throw uploadError
-    }
-
-    // Get the public URL of the uploaded image
-    const { data: { publicUrl: mapPublicUrl } } = supabase.storage
-      .from('map_images')
-      .getPublicUrl(filename)
-
-    // Fetch nearby places
-    const places: { [key: string]: GooglePlacesResult[] } = {
-      education: [],
-      shopping: [],
-      train: [],
-      bus: [],
-      sports: []
-    };
-
+    // Get nearby places
     const placeTypes = [
-      { type: 'school', category: 'education' },
-      { type: 'shopping_mall', category: 'shopping' },
-      { type: 'train_station', category: 'train' },
-      { type: 'bus_station', category: 'bus' },
-      { type: 'gym', category: 'sports' }
-    ];
+      'supermarket',
+      'shopping_mall',
+      'school',
+      'park',
+      'restaurant',
+      'train_station',
+      'bus_station'
+    ]
 
-    // Fetch places for each type
-    for (const { type, category } of placeTypes) {
-      const nearbyUrl = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${lat},${lng}&radius=1500&type=${type}&key=${apiKey}`
-      const placesResponse = await fetch(nearbyUrl)
-      const placesData = await placesResponse.json()
+    const radius = 1500 // 1.5km radius
+    const placesPromises = placeTypes.map(type => {
+      const url = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${lat},${lng}&radius=${radius}&type=${type}&key=${apiKey}`
+      return fetch(url).then(res => res.json())
+    })
 
-      if (placesData.results) {
-        places[category] = placesData.results.map((place: GooglePlacesResult) => ({
+    const placesResults = await Promise.all(placesPromises)
+    
+    // Get static map image
+    const mapWidth = 800
+    const mapHeight = 400
+    const zoom = 15
+    const mapUrl = `https://maps.googleapis.com/maps/api/staticmap?center=${lat},${lng}&zoom=${zoom}&size=${mapWidth}x${mapHeight}&key=${apiKey}&markers=color:red%7C${lat},${lng}`
+    
+    const mapResponse = await fetch(mapUrl)
+    const mapBlob = await mapResponse.blob()
+    const mapBase64 = await blobToBase64(mapBlob)
+
+    // Process and combine all nearby places
+    const nearbyPlaces = placesResults.flatMap((result, index) => {
+      if (!result.results) return []
+      
+      return result.results
+        .filter((place: PlaceResult) => 
+          (place.rating || 0) >= 3.5 && 
+          (place.user_ratings_total || 0) > 5
+        )
+        .slice(0, 5)
+        .map((place: PlaceResult) => ({
           id: place.place_id,
           name: place.name,
-          type: type,
+          type: placeTypes[index],
           vicinity: place.vicinity,
-          rating: place.rating || 0,
-          user_ratings_total: place.user_ratings_total || 0
-        }));
-      }
-    }
+          rating: place.rating,
+          user_ratings_total: place.user_ratings_total
+        }))
+    })
 
-    // Filter places to include only those with ratings >= 4
-    const nearbyPlaces = Object.values(places)
-      .flat()
-      .filter(place => place.rating >= 4)
-      .slice(0, 10); // Limit to top 10 places
+    // Update property with location data
+    const supabase = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+    )
 
-    // Update the property with the new data
     const { error: updateError } = await supabase
       .from('properties')
       .update({
         latitude: lat,
         longitude: lng,
-        map_image: mapPublicUrl,
+        map_image: mapBase64,
         nearby_places: nearbyPlaces
       })
       .eq('id', propertyId)
@@ -126,22 +106,43 @@ serve(async (req) => {
 
     return new Response(
       JSON.stringify({
-        latitude: lat,
-        longitude: lng,
-        map_image: mapPublicUrl,
-        nearby_places: nearbyPlaces
+        success: true,
+        data: {
+          latitude: lat,
+          longitude: lng,
+          mapImage: mapBase64,
+          nearbyPlaces: nearbyPlaces
+        }
       }),
       {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      },
+        headers: {
+          ...corsHeaders,
+          'Content-Type': 'application/json'
+        }
+      }
     )
   } catch (error) {
+    console.error('Error:', error)
     return new Response(
-      JSON.stringify({ error: error.message }),
-      { 
+      JSON.stringify({
+        success: false,
+        error: error.message
+      }),
+      {
         status: 400,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      },
+        headers: {
+          ...corsHeaders,
+          'Content-Type': 'application/json'
+        }
+      }
     )
   }
 })
+
+async function blobToBase64(blob: Blob): Promise<string> {
+  const buffer = await blob.arrayBuffer()
+  const uint8Array = new Uint8Array(buffer)
+  let binary = ''
+  uint8Array.forEach(byte => binary += String.fromCharCode(byte))
+  return `data:image/png;base64,${btoa(binary)}`
+}
