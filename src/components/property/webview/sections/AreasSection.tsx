@@ -10,6 +10,10 @@ export function AreasSection({ property, settings }: WebViewSectionProps) {
   const startIndex = pageIndex * 2;
   const areasForThisPage = property.areas.slice(startIndex, startIndex + 2);
 
+  const getImageUrl = (imageId: string): string | undefined => {
+    return property.images.find(img => img.id === imageId)?.url;
+  };
+
   return (
     <div className="space-y-4 pb-24">
       <div className="px-6 space-y-8">
@@ -27,16 +31,21 @@ export function AreasSection({ property, settings }: WebViewSectionProps) {
               </p>
             </div>
 
-            {area.images && area.images.length > 0 && (
+            {area.imageIds && area.imageIds.length > 0 && (
               <div className="grid grid-cols-3 gap-4">
-                {area.images.map((image, imgIndex) => (
-                  <img
-                    key={imgIndex}
-                    src={image}
-                    alt={`${area.title} ${imgIndex + 1}`}
-                    className="w-full aspect-video object-cover rounded-lg"
-                  />
-                ))}
+                {area.imageIds.map((imageId, imgIndex) => {
+                  const imageUrl = getImageUrl(imageId);
+                  if (!imageUrl) return null;
+
+                  return (
+                    <img
+                      key={imgIndex}
+                      src={imageUrl}
+                      alt={`${area.title} ${imgIndex + 1}`}
+                      className="w-full aspect-video object-cover rounded-lg"
+                    />
+                  );
+                })}
               </div>
             )}
           </div>

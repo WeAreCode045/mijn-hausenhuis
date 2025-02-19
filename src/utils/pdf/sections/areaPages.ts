@@ -1,13 +1,13 @@
 
 import jsPDF from 'jspdf';
-import { PropertyArea } from '@/types/property';
+import { PropertyArea, PropertyImage } from '@/types/property';
 import { AgencySettings } from '@/types/agency';
 import { BROCHURE_STYLES } from '../constants/styles';
 import { addHeaderFooter } from '../utils/pageUtils';
 
 export const addAreaImages = async (
   pdf: jsPDF,
-  images: string[],
+  images: PropertyImage[],
   startY: number
 ): Promise<void> => {
   const { margin, gutter } = BROCHURE_STYLES.spacing;
@@ -18,7 +18,7 @@ export const addAreaImages = async (
   for (let i = 0; i < images.length; i++) {
     try {
       const img = new Image();
-      img.src = images[i];
+      img.src = images[i].url;
       await new Promise((resolve) => {
         img.onload = resolve;
       });
@@ -36,6 +36,7 @@ export const addAreaImages = async (
 export const generateAreaPages = async (
   pdf: jsPDF,
   areas: PropertyArea[],
+  images: PropertyImage[],
   settings: AgencySettings,
   currentPage: number,
   totalPages: number,
@@ -67,9 +68,10 @@ export const generateAreaPages = async (
     pdf.text(description, margin, yPos);
 
     // Area images in 3 columns
-    if (area.images?.length) {
+    if (area.imageIds?.length) {
       yPos += description.length * 7 + 10;
-      await addAreaImages(pdf, area.images, yPos);
+      const areaImages = area.imageIds.map(id => images.find(img => img.id === id)).filter(Boolean) as PropertyImage[];
+      await addAreaImages(pdf, areaImages, yPos);
     }
   }
 

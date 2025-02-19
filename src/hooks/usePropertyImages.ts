@@ -84,8 +84,85 @@ export function usePropertyImages(
     }
   };
 
+  // Additional handlers for other image types
+  const handleAreaPhotosUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files) return;
+    try {
+      const files = Array.from(e.target.files);
+      const uploadPromises = files.map(file => uploadFile(file));
+      const urls = await Promise.all(uploadPromises);
+      
+      setFormData({
+        ...formData,
+        areaPhotos: [...(formData.areaPhotos || []), ...urls]
+      });
+    } catch (error) {
+      console.error('Error uploading area photos:', error);
+      toast({
+        title: "Error",
+        description: "Failed to upload area photos",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleFloorplanUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files) return;
+    try {
+      const files = Array.from(e.target.files);
+      const uploadPromises = files.map(file => uploadFile(file));
+      const urls = await Promise.all(uploadPromises);
+      
+      setFormData({
+        ...formData,
+        floorplans: [...formData.floorplans, ...urls]
+      });
+    } catch (error) {
+      console.error('Error uploading floorplans:', error);
+      toast({
+        title: "Error",
+        description: "Failed to upload floorplans",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleRemoveAreaPhoto = (index: number) => {
+    setFormData({
+      ...formData,
+      areaPhotos: formData.areaPhotos?.filter((_, i) => i !== index) || []
+    });
+  };
+
+  const handleRemoveFloorplan = (index: number) => {
+    setFormData({
+      ...formData,
+      floorplans: formData.floorplans.filter((_, i) => i !== index)
+    });
+  };
+
+  const handleSetFeaturedImage = (url: string | null) => {
+    setFormData({
+      ...formData,
+      featuredImage: url
+    });
+  };
+
+  const handleToggleGridImage = (urls: string[]) => {
+    setFormData({
+      ...formData,
+      gridImages: urls
+    });
+  };
+
   return {
     handleImageUpload,
     handleRemoveImage,
+    handleAreaPhotosUpload,
+    handleFloorplanUpload,
+    handleRemoveAreaPhoto,
+    handleRemoveFloorplan,
+    handleSetFeaturedImage,
+    handleToggleGridImage
   };
 }

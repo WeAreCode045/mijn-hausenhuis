@@ -66,9 +66,10 @@ export interface PropertyFormData extends Omit<PropertyData, 'id'> {
   id?: string;
 }
 
-export interface PropertySubmitData extends Omit<PropertyData, 'features' | 'areas' | 'nearby_places' | 'images'> {
+export interface PropertySubmitData extends Omit<PropertyData, 'id' | 'features' | 'areas' | 'nearby_places' | 'images'> {
+  id?: string;
   features: Json;
   areas: Json[];
   nearby_places: Json;
-  images: Json;
+  images: PropertyImage[];
 }
