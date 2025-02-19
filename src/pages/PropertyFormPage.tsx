@@ -25,7 +25,7 @@ export default function PropertyFormPage() {
         features: data.features as Json,
         areas: data.areas as Json[],
         gridImages: data.gridImages,
-        images: data.images.map(img => ({ id: img.id, url: img.url })) as unknown as Json[]
+        images: data.images as unknown as Json[]
       };
 
       if (id) {

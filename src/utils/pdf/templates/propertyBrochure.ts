@@ -29,7 +29,7 @@ export async function generatePropertyBrochure(
 
   // Generate pages
   await generateCoverPage(pdf, property, totalPages);
-  await generateDetailsPage(pdf, property, totalPages);
+  await generateDetailsPage(pdf, property, settings, currentPage, totalPages);
 
   if (property.areas && property.areas.length > 0) {
     await generateAreaPages(
