@@ -16,11 +16,11 @@ export function WebViewImageGrid({ images, settings, isLocationGrid = false }: W
     : settings?.secondaryColor || '#E2E8F0';
   const overlayStyle = { backgroundColor: `${overlayColor}A6` }; // A6 adds 65% opacity
 
-  const gridClass = isLocationGrid ? "grid-cols-3" : "grid-cols-4";
+  const gridClass = isLocationGrid ? "grid-cols-3" : "grid-cols-2 sm:grid-cols-4";
 
   return (
     <div className={`grid ${gridClass} gap-4 px-6 mb-8`}>
-      {images.slice(0, 4).map((image, index) => (
+      {images.slice(0, isLocationGrid ? 3 : 4).map((image, index) => (
         <div key={index} className="relative shadow-lg rounded-lg">
           <img
             src={image}
