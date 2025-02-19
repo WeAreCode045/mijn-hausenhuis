@@ -1,39 +1,55 @@
 
 import { useToast } from "@/components/ui/use-toast";
-import { useFileUpload } from "@/hooks/useFileUpload";
 import type { PropertyArea, PropertyFormData } from "@/types/property";
-
-type SetFormDataFunction = (data: PropertyFormData | ((prev: PropertyFormData) => PropertyFormData)) => void;
+import { supabase } from "@/integrations/supabase/client";
 
 export function usePropertyAreas(
   formData: PropertyFormData,
-  setFormData: SetFormDataFunction
+  setFormData: (data: PropertyFormData) => void
 ) {
   const { toast } = useToast();
-  const { uploadFile } = useFileUpload();
+
+  const addArea = () => {
+    const newArea: PropertyArea = {
+      id: crypto.randomUUID(),
+      title: '',
+      description: '',
+      imageIds: []
+    };
+
+    setFormData(prev => ({
+      ...prev,
+      areas: [...prev.areas, newArea]
+    }));
+  };
+
+  const removeArea = (id: string) => {
+    setFormData(prev => ({
+      ...prev,
+      areas: prev.areas.filter(area => area.id !== id)
+    }));
+  };
+
+  const updateArea = (id: string, field: keyof PropertyArea, value: string | string[]) => {
+    setFormData(prev => ({
+      ...prev,
+      areas: prev.areas.map(area =>
+        area.id === id ? { ...area, [field]: value } : area
+      )
+    }));
+  };
 
   const handleAreaImageUpload = async (areaId: string, files: FileList) => {
     try {
-      const uploadPromises = Array.from(files).map(async (file) => {
-        const url = await uploadFile(file);
-        return url;
-      });
+      const area = formData.areas.find(a => a.id === areaId);
+      if (!area) return;
 
-      const uploadedUrls = await Promise.all(uploadPromises);
-
-      setFormData((prev: PropertyFormData) => ({
-        ...prev,
-        areas: prev.areas.map(area => 
-          area.id === areaId 
-            ? { ...area, images: [...area.images, ...uploadedUrls] }
-            : area
-        )
-      }));
+      const imageIds = area.imageIds || [];
+      updateArea(areaId, 'imageIds', imageIds);
 
       toast({
         title: "Success",
-        description: "Area images uploaded successfully",
-        variant: "default",
+        description: "Area images updated successfully",
       });
     } catch (error) {
       console.error('Error uploading area images:', error);
@@ -45,53 +61,33 @@ export function usePropertyAreas(
     }
   };
 
-  const addArea = () => {
-    setFormData((prev: PropertyFormData) => ({
-      ...prev,
-      areas: [
-        ...prev.areas,
-        {
-          id: crypto.randomUUID(),
-          title: '',
-          description: '',
-          images: []
-        }
-      ]
-    }));
-  };
+  const removeAreaImage = async (areaId: string, imageId: string) => {
+    try {
+      const area = formData.areas.find(a => a.id === areaId);
+      if (!area) return;
 
-  const removeArea = (id: string) => {
-    setFormData((prev: PropertyFormData) => ({
-      ...prev,
-      areas: prev.areas.filter(area => area.id !== id)
-    }));
-  };
+      const imageIds = area.imageIds.filter(id => id !== imageId);
+      updateArea(areaId, 'imageIds', imageIds);
 
-  const updateArea = (id: string, field: keyof PropertyArea, value: string | string[]) => {
-    setFormData((prev: PropertyFormData) => ({
-      ...prev,
-      areas: prev.areas.map(area => 
-        area.id === id ? { ...area, [field]: value } : area
-      )
-    }));
-  };
-
-  const removeAreaImage = (areaId: string, imageUrl: string) => {
-    setFormData((prev: PropertyFormData) => ({
-      ...prev,
-      areas: prev.areas.map(area => 
-        area.id === areaId
-          ? { ...area, images: area.images.filter(url => url !== imageUrl) }
-          : area
-      )
-    }));
+      toast({
+        title: "Success",
+        description: "Image removed successfully",
+      });
+    } catch (error) {
+      console.error('Error removing area image:', error);
+      toast({
+        title: "Error",
+        description: "Failed to remove image",
+        variant: "destructive",
+      });
+    }
   };
 
   return {
-    handleAreaImageUpload,
     addArea,
     removeArea,
     updateArea,
+    handleAreaImageUpload,
     removeAreaImage
   };
 }

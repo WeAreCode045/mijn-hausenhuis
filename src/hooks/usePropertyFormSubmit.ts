@@ -18,18 +18,11 @@ export function usePropertyFormSubmit(onSubmit: (data: PropertySubmitData) => vo
     }
 
     try {
-      // Ensure we have an id, generate one if it doesn't exist
       const id = formData.id || crypto.randomUUID();
-
-      // Convert places to the expected format
-      const nearby_places = formData.nearby_places?.map(place => ({
-        id: place.id,
-        name: place.name,
-        type: place.type,
-        vicinity: place.vicinity,
-        rating: place.rating,
-        user_ratings_total: place.user_ratings_total
-      })) || [];
+      const imagesToSubmit = formData.images.map(img => ({
+        id: img.id,
+        url: img.url
+      }));
 
       const submitData: PropertySubmitData = {
         id,
@@ -46,7 +39,6 @@ export function usePropertyFormSubmit(onSubmit: (data: PropertySubmitData) => vo
         hasGarden: formData.hasGarden,
         description: formData.description,
         location_description: formData.location_description,
-        images: formData.images,
         floorplans: formData.floorplans,
         featuredImage: formData.featuredImage,
         gridImages: formData.gridImages,
@@ -55,9 +47,10 @@ export function usePropertyFormSubmit(onSubmit: (data: PropertySubmitData) => vo
         map_image: formData.map_image,
         latitude: formData.latitude,
         longitude: formData.longitude,
-        features: formData.features as unknown as Json,
-        areas: formData.areas as unknown as Json[],
-        nearby_places: nearby_places as unknown as Json
+        features: formData.features as Json,
+        areas: formData.areas as Json[],
+        nearby_places: formData.nearby_places as Json,
+        images: imagesToSubmit
       };
 
       await onSubmit(submitData);
