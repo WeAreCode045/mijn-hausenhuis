@@ -1,3 +1,4 @@
+
 import { PropertyDetails } from "../PropertyDetails";
 import { PropertyDescription } from "../PropertyDescription";
 import { PropertyFeatures } from "../PropertyFeatures";
@@ -78,8 +79,10 @@ export function PropertyFormContent({
               featuredImage={formData.featuredImage}
               gridImages={formData.gridImages}
               onImageUpload={handleImageUpload}
-              onAreaPhotosUpload={() => {}}
+              onFeaturedImageUpload={handleImageUpload}
+              onGridImageUpload={handleImageUpload}
               onFloorplanUpload={() => {}}
+              onAreaPhotosUpload={() => {}}
               onRemoveImage={handleRemoveImage}
               onRemoveAreaPhoto={() => {}}
               onRemoveFloorplan={() => {}}
@@ -120,6 +123,8 @@ export function PropertyFormContent({
             featuredImage={null}
             gridImages={[]}
             onImageUpload={() => {}}
+            onFeaturedImageUpload={() => {}}
+            onGridImageUpload={() => {}}
             onAreaPhotosUpload={() => {}}
             onFloorplanUpload={handleFloorplanUpload}
             onRemoveImage={() => {}}
@@ -170,6 +175,8 @@ export function PropertyFormContent({
               featuredImage={null}
               gridImages={[]}
               onImageUpload={() => {}}
+              onFeaturedImageUpload={() => {}}
+              onGridImageUpload={() => {}}
               onAreaPhotosUpload={handleAreaPhotosUpload}
               onFloorplanUpload={() => {}}
               onRemoveImage={() => {}}
