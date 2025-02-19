@@ -1,10 +1,10 @@
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
+import { useQuery } from "@tanstack/react-query";
 
 export const useProperties = () => {
-  const [properties, setProperties] = useState<any[]>([]);
   const { toast } = useToast();
 
   const fetchProperties = async () => {
@@ -14,16 +14,16 @@ export const useProperties = () => {
       .order('created_at', { ascending: false });
 
     if (error) {
-      toast({
-        title: "Error",
-        description: "Er is een fout opgetreden bij het ophalen van de brochures",
-        variant: "destructive",
-      });
-      return;
+      throw error;
     }
 
-    setProperties(data || []);
+    return data || [];
   };
+
+  const { data: properties = [], isLoading, error } = useQuery({
+    queryKey: ['properties'],
+    queryFn: fetchProperties,
+  });
 
   const handleDelete = async (id: string) => {
     const { error } = await supabase
@@ -40,19 +40,16 @@ export const useProperties = () => {
       return;
     }
 
-    await fetchProperties();
     toast({
       title: "Brochure verwijderd",
       description: "De brochure is succesvol verwijderd",
     });
   };
 
-  useEffect(() => {
-    fetchProperties();
-  }, []);
-
   return {
     properties,
+    isLoading,
+    error,
     handleDelete,
   };
 };

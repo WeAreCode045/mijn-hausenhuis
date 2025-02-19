@@ -4,10 +4,11 @@ import { Button } from "@/components/ui/button";
 import { PlusCircle } from "lucide-react";
 import { PropertyCard } from "@/components/property/PropertyCard";
 import { useProperties } from "@/hooks/useProperties";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const Index = () => {
   const navigate = useNavigate();
-  const { properties, handleDelete } = useProperties();
+  const { properties, isLoading, handleDelete } = useProperties();
 
   return (
     <div className="min-h-screen bg-estate-50 py-12 px-4 sm:px-6 lg:px-8">
@@ -20,15 +21,31 @@ const Index = () => {
           </Button>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-          {properties.map((property) => (
-            <PropertyCard
-              key={property.id}
-              property={property}
-              onDelete={handleDelete}
-            />
-          ))}
-        </div>
+        {isLoading ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+            {[...Array(6)].map((_, i) => (
+              <div key={i} className="space-y-4">
+                <Skeleton className="h-48 w-full rounded-lg" />
+                <Skeleton className="h-6 w-3/4" />
+                <Skeleton className="h-4 w-1/2" />
+                <div className="flex gap-2">
+                  <Skeleton className="h-9 w-24" />
+                  <Skeleton className="h-9 w-24" />
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+            {properties.map((property) => (
+              <PropertyCard
+                key={property.id}
+                property={property}
+                onDelete={handleDelete}
+              />
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
