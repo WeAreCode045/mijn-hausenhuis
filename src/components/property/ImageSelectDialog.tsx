@@ -11,6 +11,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Image } from "lucide-react";
 import { usePropertyForm } from "@/hooks/usePropertyForm";
+import { useParams } from "react-router-dom";
 
 interface ImageSelectDialogProps {
   images: string[];
@@ -27,7 +28,8 @@ export function ImageSelectDialog({
 }: ImageSelectDialogProps) {
   const [open, setOpen] = useState(false);
   const [selectedImages, setSelectedImages] = useState<string[]>([]);
-  const { formData } = usePropertyForm();
+  const { id } = useParams();
+  const { formData } = usePropertyForm(id, () => {}); // Provide both required arguments
 
   const handleImageClick = (url: string) => {
     setSelectedImages(prev => {
