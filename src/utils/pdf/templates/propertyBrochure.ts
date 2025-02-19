@@ -15,7 +15,7 @@ export async function generatePropertyBrochure(
   featuredImageUrl: string | null,
   description_background_url?: string,
   locationImageUrl?: string,
-  contactImageUrl?: string,
+  contactImageUrl?: string
 ): Promise<jsPDF> {
   const pdf = new jsPDF({
     orientation: 'portrait',
@@ -29,7 +29,7 @@ export async function generatePropertyBrochure(
 
   // Generate pages
   await generateCoverPage(pdf, property, totalPages);
-  await generateDetailsPage(pdf, property, settings, currentPage, totalPages);
+  await generateDetailsPage(pdf, property, settings, totalPages);
 
   if (property.areas && property.areas.length > 0) {
     await generateAreaPages(

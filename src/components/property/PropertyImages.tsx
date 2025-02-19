@@ -34,6 +34,7 @@ export function PropertyImages({
   areaPhotos = [],
   onFloorplanUpload,
   onAreaPhotosUpload,
+  onRemoveImage,
   onRemoveFloorplan,
   onRemoveAreaPhoto,
   onSetFeaturedImage,

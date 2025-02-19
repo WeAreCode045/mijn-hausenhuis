@@ -1,10 +1,10 @@
 
 import { Card } from "@/components/ui/card";
-import { PropertyFormContent } from "./property/form/PropertyFormContent";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import type { PropertyFormData, PropertySubmitData } from "@/types/property";
 import { useToast } from "@/components/ui/use-toast";
+import { PropertyFormContent } from "./property/form/PropertyFormContent";
 
 const initialFormData: PropertyFormData = {
   title: "",
@@ -33,15 +33,24 @@ const initialFormData: PropertyFormData = {
 };
 
 export function AddPropertyForm() {
-  const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState<PropertyFormData>(initialFormData);
   const { toast } = useToast();
 
-  const handleSubmit = async (data: PropertySubmitData) => {
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
     try {
+      // Convert formData to PropertySubmitData
+      const submitData: PropertySubmitData = {
+        ...formData,
+        features: formData.features,
+        areas: formData.areas,
+        images: formData.images.map(img => img.url),
+        nearby_places: formData.nearby_places || []
+      };
+
       const { error } = await supabase
         .from('properties')
-        .insert(data);
+        .insert(submitData);
 
       if (error) throw error;
 
@@ -64,7 +73,6 @@ export function AddPropertyForm() {
       <PropertyFormContent 
         formData={formData}
         setFormData={setFormData}
-        currentStep={currentStep}
         onSubmit={handleSubmit}
       />
     </Card>
