@@ -98,7 +98,7 @@ export const PropertyCard = ({
         {property.images?.[0] && (
           <div className="relative">
             <img
-              src={property.images[0]}
+              src={property.images[0].url}
               alt={property.title}
               className="w-full h-48 object-cover rounded-lg"
             />

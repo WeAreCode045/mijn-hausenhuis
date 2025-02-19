@@ -19,10 +19,7 @@ export function usePropertyFormSubmit(onSubmit: (data: PropertySubmitData) => vo
 
     try {
       const id = formData.id || crypto.randomUUID();
-      const imagesToSubmit = formData.images.map(img => ({
-        id: img.id,
-        url: img.url
-      }));
+      const imageUrls = formData.images.map(img => img.url);
 
       const submitData: PropertySubmitData = {
         id,
@@ -50,7 +47,7 @@ export function usePropertyFormSubmit(onSubmit: (data: PropertySubmitData) => vo
         features: formData.features as unknown as Json,
         areas: formData.areas as unknown as Json[],
         nearby_places: formData.nearby_places as unknown as Json,
-        images: imagesToSubmit
+        images: imageUrls as unknown as Json[]
       };
 
       await onSubmit(submitData);

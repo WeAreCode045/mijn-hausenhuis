@@ -16,7 +16,7 @@ interface PropertyImagesProps {
   onGridImageUpload: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onFloorplanUpload: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onAreaPhotosUpload: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  onRemoveImage: (imageId: string) => void;
+  onRemoveImage: (index: number) => void;
   onRemoveFloorplan: (index: number) => void;
   onRemoveAreaPhoto: (index: number) => void;
   onSetFeaturedImage: (url: string | null) => void;
