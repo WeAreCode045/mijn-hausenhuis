@@ -2,12 +2,14 @@
 import jsPDF from 'jspdf';
 import { PropertyData } from '@/types/property';
 import { AgencySettings } from '@/types/agency';
-import { addHeaderFooter, stylePropertyDetails } from './pdf/pdfStyles';
-import { addCoverPage, addContactPage, addDetailsPage } from './pdf/pdfSections';
+import { addHeaderFooter } from './pdf/pdfStyles';
+import { addCoverPage } from './pdf/sections/coverPage';
+import { addDetailsPage } from './pdf/sections/detailsPage';
+import { addContactPage } from './pdf/sections/contactPage';
 
 export const generatePropertyPDF = async (property: PropertyData, settings?: AgencySettings) => {
   const pdf = new jsPDF('p', 'mm', 'a4');
-  const totalPages = property.areas ? property.areas.length + 3 : 3; // Cover + Details + Contact pages
+  const totalPages = property.areas ? property.areas.length + 3 : 3;
 
   // Cover Page
   await addCoverPage(pdf, property, settings);
