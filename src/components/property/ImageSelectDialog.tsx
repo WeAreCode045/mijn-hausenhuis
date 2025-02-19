@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Image } from "lucide-react";
+import { usePropertyForm } from "@/hooks/usePropertyForm";
 
 interface ImageSelectDialogProps {
   images: string[];
@@ -26,6 +27,7 @@ export function ImageSelectDialog({
 }: ImageSelectDialogProps) {
   const [open, setOpen] = useState(false);
   const [selectedImages, setSelectedImages] = useState<string[]>([]);
+  const { formData } = usePropertyForm();
 
   const handleImageClick = (url: string) => {
     setSelectedImages(prev => {
@@ -51,7 +53,7 @@ export function ImageSelectDialog({
   };
 
   return (
-    <Dialog open={open} onOpenChange={handleClose}>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button variant="outline" className="gap-2">
           <Image className="h-4 w-4" />
@@ -63,7 +65,7 @@ export function ImageSelectDialog({
           <DialogTitle>Select Images</DialogTitle>
         </DialogHeader>
         <div className="grid grid-cols-3 sm:grid-cols-4 gap-4 mt-4 max-h-[60vh] overflow-y-auto p-4">
-          {images.map((url) => (
+          {formData?.images.map((url) => (
             <div
               key={url}
               className="relative group cursor-pointer"
