@@ -1,32 +1,39 @@
-import React from 'react';
-import { PropertyForm } from '@/components/PropertyForm';
-import { PropertyFormData, PropertyImage } from '@/types/property';
 
-interface PropertyFormContentProps {
+import React from 'react';
+import { PropertyFormData, PropertyArea } from '@/types/property';
+
+export interface PropertyFormContentProps {
+  formData: PropertyFormData;
+  onSubmit: (e: React.FormEvent) => Promise<void>;
   currentStep: number;
   addFeature: () => void;
   removeFeature: (id: string) => void;
   updateFeature: (id: string, description: string) => void;
-  handleMapImageDelete: () => Promise<void>;
-  handleImageUpload: (e: React.ChangeEvent<HTMLInputElement>) => Promise<void>;
-  handleAreaPhotosUpload: (e: React.ChangeEvent<HTMLInputElement>) => Promise<void>;
-  handleFloorplanUpload: (e: React.ChangeEvent<HTMLInputElement>) => Promise<void>;
-  handleRemoveImage: (imageId: string) => Promise<void>;
+  handleInputChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => void;
+  handleImageUpload: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  handleAreaPhotosUpload: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  handleFloorplanUpload: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  handleRemoveImage: (index: number) => void;
   handleRemoveAreaPhoto: (index: number) => void;
   handleRemoveFloorplan: (index: number) => void;
   handleSetFeaturedImage: (url: string | null) => void;
   handleToggleGridImage: (urls: string[]) => void;
-  handleInputChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => void;
-  formData: PropertyFormData;
-  onSubmit: (e: React.FormEvent) => Promise<void>;
+  addArea: () => void;
+  removeArea: (id: string) => void;
+  updateArea: (id: string, field: keyof PropertyArea, value: string | string[]) => void;
+  handleAreaImageUpload: (id: string, files: FileList) => void;
+  removeAreaImage: (areaId: string, imageUrl: string) => void;
+  handleMapImageDelete: () => Promise<void>;
 }
 
 export const PropertyFormContent: React.FC<PropertyFormContentProps> = ({
+  formData,
+  onSubmit,
   currentStep,
   addFeature,
   removeFeature,
   updateFeature,
-  handleMapImageDelete,
+  handleInputChange,
   handleImageUpload,
   handleAreaPhotosUpload,
   handleFloorplanUpload,
@@ -35,9 +42,12 @@ export const PropertyFormContent: React.FC<PropertyFormContentProps> = ({
   handleRemoveFloorplan,
   handleSetFeaturedImage,
   handleToggleGridImage,
-  handleInputChange,
-  formData,
-  onSubmit,
+  addArea,
+  removeArea,
+  updateArea,
+  handleAreaImageUpload,
+  removeAreaImage,
+  handleMapImageDelete
 }) => {
   const renderStepContent = () => {
     switch (currentStep) {
