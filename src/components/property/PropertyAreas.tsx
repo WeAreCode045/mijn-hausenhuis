@@ -7,6 +7,8 @@ import { PropertyArea } from "@/types/property";
 import { PlusCircle, MinusCircle, ChevronDown, ChevronUp } from "lucide-react";
 import { useState } from "react";
 import { ImageSelectDialog } from "./ImageSelectDialog";
+import { usePropertyForm } from "@/hooks/usePropertyForm";
+import { useParams } from "react-router-dom";
 
 interface PropertyAreasProps {
   areas: PropertyArea[];
@@ -26,6 +28,8 @@ export function PropertyAreas({
   onImageRemove,
 }: PropertyAreasProps) {
   const [expandedArea, setExpandedArea] = useState<string | null>(null);
+  const { id } = useParams();
+  const { formData } = usePropertyForm(id, () => {});
 
   const toggleArea = (id: string) => {
     setExpandedArea(expandedArea === id ? null : id);
@@ -122,7 +126,7 @@ export function PropertyAreas({
                     </div>
                   ))}
                   <ImageSelectDialog
-                    images={areas.find(a => a.id === area.id)?.images || []}
+                    images={formData?.images || []}
                     onSelect={(urls) => handleImagesSelect(area.id, urls)}
                     buttonText="Foto's Toevoegen"
                     maxSelect={6}
