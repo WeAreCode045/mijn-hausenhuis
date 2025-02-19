@@ -7,7 +7,7 @@ import { usePropertyAreas } from "@/hooks/usePropertyAreas";
 import { usePropertyFormSubmit } from "@/hooks/usePropertyFormSubmit";
 import { useFeatures } from "@/hooks/useFeatures";
 import { usePropertyAutosave } from "@/hooks/usePropertyAutosave";
-import type { PropertySubmitData } from "@/types/property";
+import type { PropertyFormData } from "@/types/property";
 import { steps } from "./property/form/formSteps";
 import { FormStepNavigation } from "./property/form/FormStepNavigation";
 import { useFormSteps } from "@/hooks/useFormSteps";
@@ -15,7 +15,7 @@ import { PropertyStepContent } from "./property/form/PropertyStepContent";
 import { supabase } from "@/integrations/supabase/client";
 
 interface PropertyFormProps {
-  onSubmit: (data: PropertySubmitData) => void;
+  onSubmit: (data: PropertyFormData) => void;
 }
 
 export function PropertyForm({ onSubmit }: PropertyFormProps) {
@@ -36,7 +36,6 @@ export function PropertyForm({ onSubmit }: PropertyFormProps) {
     handleToggleGridImage
   } = usePropertyImages(formData, setFormData);
 
-  // Create an index-based wrapper for handleRemoveImage
   const handleRemoveImage = (index: number) => {
     const imageToRemove = formData.images[index];
     if (imageToRemove) {

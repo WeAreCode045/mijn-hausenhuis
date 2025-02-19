@@ -19,7 +19,7 @@ export default function PropertyFormPage() {
   const { toast } = useToast();
   const { settings } = useAgencySettings();
 
-  const handleSubmit = async (data: PropertySubmitData) => {
+  const handleDatabaseSubmit = async (data: PropertySubmitData) => {
     try {
       if (id) {
         const { error: updateError } = await supabase
@@ -58,16 +58,6 @@ export default function PropertyFormPage() {
     }
   };
 
-  const { formData, setFormData } = usePropertyForm(id, handleSubmit);
-  const {
-    handleImageUpload,
-    handleRemoveImage,
-  } = usePropertyImages(formData, setFormData);
-
-  if (!formData) {
-    return null;
-  }
-
   const handleFormSubmit = (formData: PropertyFormData) => {
     // Convert PropertyFormData to PropertySubmitData
     const submitData: PropertySubmitData = {
@@ -98,8 +88,18 @@ export default function PropertyFormPage() {
       object_id: formData.object_id,
       map_image: formData.map_image
     };
-    handleSubmit(submitData);
+    handleDatabaseSubmit(submitData);
   };
+
+  const { formData, setFormData } = usePropertyForm(id, handleFormSubmit);
+  const {
+    handleImageUpload,
+    handleRemoveImage,
+  } = usePropertyImages(formData, setFormData);
+
+  if (!formData) {
+    return null;
+  }
 
   return (
     <div className="min-h-screen bg-estate-50 py-12 px-4 sm:px-6 lg:px-8">
