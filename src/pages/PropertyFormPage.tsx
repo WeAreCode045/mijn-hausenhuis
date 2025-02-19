@@ -8,11 +8,15 @@ import { Json } from "@/integrations/supabase/types";
 import { PropertyMediaLibrary } from "@/components/property/PropertyMediaLibrary";
 import { usePropertyForm } from "@/hooks/usePropertyForm";
 import { usePropertyImages } from "@/hooks/usePropertyImages";
+import { PropertyCardActions } from "@/components/property/PropertyCardActions";
+import { Card } from "@/components/ui/card";
+import { useAgencySettings } from "@/hooks/useAgencySettings";
 
 export default function PropertyFormPage() {
   const navigate = useNavigate();
   const { id } = useParams();
   const { toast } = useToast();
+  const { settings } = useAgencySettings();
 
   const handleSubmit = async (data: PropertySubmitData) => {
     try {
@@ -66,6 +70,31 @@ export default function PropertyFormPage() {
     handleRemoveImage
   } = usePropertyImages(formData, setFormData);
 
+  const handleDelete = async (propertyId: string) => {
+    try {
+      const { error } = await supabase
+        .from('properties')
+        .delete()
+        .eq('id', propertyId);
+
+      if (error) throw error;
+
+      toast({
+        title: "Property Deleted",
+        description: "The property has been deleted successfully",
+        variant: "default",
+      });
+      navigate('/');
+    } catch (error) {
+      console.error('Error:', error);
+      toast({
+        title: "Error",
+        description: "An error occurred while deleting the property",
+        variant: "destructive",
+      });
+    }
+  };
+
   if (!formData) {
     return null;
   }
@@ -80,7 +109,18 @@ export default function PropertyFormPage() {
         </div>
         <div className="flex gap-6">
           <PropertyForm onSubmit={handleSubmit} />
-          <div className="w-80 shrink-0">
+          <div className="w-80 shrink-0 space-y-6">
+            {id && (
+              <Card className="p-4">
+                <PropertyCardActions
+                  property={formData}
+                  settings={settings}
+                  onDelete={handleDelete}
+                  unreadCount={0}
+                  onShowSubmissions={() => {}}
+                />
+              </Card>
+            )}
             <PropertyMediaLibrary
               images={formData.images}
               onImageUpload={handleImageUpload}
