@@ -4,6 +4,7 @@ import type { PropertyFormData } from "@/types/property";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
+import { Json } from "@/integrations/supabase/types";
 
 export default function AddPropertyPage() {
   const navigate = useNavigate();
