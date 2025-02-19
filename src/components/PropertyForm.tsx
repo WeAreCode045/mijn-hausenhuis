@@ -1,4 +1,3 @@
-
 import { Card } from "@/components/ui/card";
 import { useParams } from "react-router-dom";
 import { usePropertyForm } from "@/hooks/usePropertyForm";
@@ -16,7 +15,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "./ui/button";
 import { FileText } from "lucide-react";
 import { useToast } from "./ui/use-toast";
-import { PropertyMediaLibrary } from "./property/PropertyMediaLibrary";
 
 interface PropertyFormProps {
   onSubmit: (data: PropertySubmitData) => void;
@@ -113,7 +111,7 @@ export function PropertyForm({ onSubmit }: PropertyFormProps) {
   }
 
   return (
-    <Card className="w-full max-w-2xl p-6 animate-fadeIn">
+    <Card className="w-full p-6 animate-fadeIn">
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-2xl font-semibold">Property Details</h2>
         {id && (
@@ -127,14 +125,6 @@ export function PropertyForm({ onSubmit }: PropertyFormProps) {
             Generate Brochure
           </Button>
         )}
-      </div>
-      
-      <div className="mb-8">
-        <PropertyMediaLibrary
-          images={formData.images}
-          onImageUpload={handleImageUpload}
-          onRemoveImage={handleRemoveImage}
-        />
       </div>
 
       <form onSubmit={(e) => handleSubmit(e, formData)} className="space-y-6">

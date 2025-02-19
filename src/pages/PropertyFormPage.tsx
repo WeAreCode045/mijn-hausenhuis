@@ -65,7 +65,16 @@ export default function PropertyFormPage() {
             {id ? "Edit Property" : "New Property"}
           </h1>
         </div>
-        <PropertyForm onSubmit={handleSubmit} />
+        <div className="flex gap-6">
+          <PropertyForm onSubmit={handleSubmit} />
+          <div className="w-80 shrink-0">
+            <PropertyMediaLibrary
+              images={formData.images}
+              onImageUpload={handleImageUpload}
+              onRemoveImage={handleRemoveImage}
+            />
+          </div>
+        </div>
       </div>
     </div>
   );
