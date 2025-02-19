@@ -114,10 +114,11 @@ class PropertyBrochure {
         const coverHeight = height * 0.7;
         this.pdf.addImage(img, 'JPEG', 0, 0, width, coverHeight);
 
-        // Gradient overlay
+        // Gradient overlay - Fixed the GState issue
         this.pdf.setFillColor(0, 0, 0);
-        this.pdf.setGState(new this.pdf.GState({ opacity: 0.5 }));
+        const gState = this.pdf.setGState({ opacity: 0.5 });
         this.pdf.rect(0, coverHeight - 100, width, 100, 'F');
+        this.pdf.setGState(gState);
 
         // Property title and price
         this.pdf.setTextColor(255, 255, 255);
