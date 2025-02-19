@@ -3,7 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { PropertyForm } from "@/components/PropertyForm";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
-import type { PropertySubmitData, PropertyFormData } from "@/types/property";
+import type { PropertySubmitData, PropertyFormData, PropertyImage } from "@/types/property";
 import { Json } from "@/integrations/supabase/types";
 import { PropertyMediaLibrary } from "@/components/property/PropertyMediaLibrary";
 import { usePropertyForm } from "@/hooks/usePropertyForm";
@@ -19,42 +19,12 @@ export default function PropertyFormPage() {
   const { toast } = useToast();
   const { settings } = useAgencySettings();
 
-  const handleSubmit = async (formData: PropertyFormData) => {
+  const handleSubmit = async (data: PropertySubmitData) => {
     try {
-      // Convert PropertyFormData to PropertySubmitData
-      const submitData: PropertySubmitData = {
-        id: formData.id,
-        title: formData.title,
-        price: formData.price,
-        address: formData.address,
-        bedrooms: formData.bedrooms,
-        bathrooms: formData.bathrooms,
-        sqft: formData.sqft,
-        livingArea: formData.livingArea,
-        buildYear: formData.buildYear,
-        garages: formData.garages,
-        energyLabel: formData.energyLabel,
-        hasGarden: formData.hasGarden,
-        description: formData.description,
-        location_description: formData.location_description,
-        floorplans: formData.floorplans,
-        featuredImage: formData.featuredImage,
-        gridImages: formData.gridImages,
-        areaPhotos: formData.areaPhotos,
-        features: formData.features as unknown as Json,
-        areas: formData.areas as unknown as Json[],
-        nearby_places: formData.nearby_places as unknown as Json,
-        images: formData.images.map(img => img.url),
-        latitude: formData.latitude,
-        longitude: formData.longitude,
-        object_id: formData.object_id,
-        map_image: formData.map_image
-      };
-
       if (id) {
         const { error: updateError } = await supabase
           .from('properties')
-          .update(submitData)
+          .update(data)
           .eq('id', id);
         
         if (updateError) throw updateError;
@@ -67,7 +37,7 @@ export default function PropertyFormPage() {
       } else {
         const { error: insertError } = await supabase
           .from('properties')
-          .insert(submitData);
+          .insert(data);
         
         if (insertError) throw insertError;
 
@@ -88,7 +58,7 @@ export default function PropertyFormPage() {
     }
   };
 
-  const { formData, setFormData } = usePropertyForm(id, () => {});
+  const { formData, setFormData } = usePropertyForm(id, handleSubmit);
   const {
     handleImageUpload,
     handleRemoveImage,
@@ -98,6 +68,39 @@ export default function PropertyFormPage() {
     return null;
   }
 
+  const handleFormSubmit = (formData: PropertyFormData) => {
+    // Convert PropertyFormData to PropertySubmitData
+    const submitData: PropertySubmitData = {
+      id: formData.id,
+      title: formData.title,
+      price: formData.price,
+      address: formData.address,
+      bedrooms: formData.bedrooms,
+      bathrooms: formData.bathrooms,
+      sqft: formData.sqft,
+      livingArea: formData.livingArea,
+      buildYear: formData.buildYear,
+      garages: formData.garages,
+      energyLabel: formData.energyLabel,
+      hasGarden: formData.hasGarden,
+      description: formData.description,
+      location_description: formData.location_description,
+      floorplans: formData.floorplans,
+      featuredImage: formData.featuredImage,
+      gridImages: formData.gridImages,
+      areaPhotos: formData.areaPhotos,
+      features: formData.features as unknown as Json,
+      areas: formData.areas as unknown as Json[],
+      nearby_places: formData.nearby_places as unknown as Json,
+      images: formData.images.map(img => img.url),
+      latitude: formData.latitude,
+      longitude: formData.longitude,
+      object_id: formData.object_id,
+      map_image: formData.map_image
+    };
+    handleSubmit(submitData);
+  };
+
   return (
     <div className="min-h-screen bg-estate-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
@@ -105,13 +108,13 @@ export default function PropertyFormPage() {
           <h1 className="text-4xl font-bold text-estate-800">
             {id ? "Edit Property" : "New Property"}
           </h1>
-          <Button onClick={() => handleSubmit(formData)} className="gap-2">
+          <Button onClick={() => handleFormSubmit(formData)} className="gap-2">
             <Save className="h-4 w-4" />
             Save Property
           </Button>
         </div>
         <div className="flex gap-6">
-          <PropertyForm onSubmit={handleSubmit} />
+          <PropertyForm onSubmit={handleFormSubmit} />
           <div className="w-80 shrink-0">
             <PropertyMediaLibrary
               images={formData.images.map(img => img.url)}
