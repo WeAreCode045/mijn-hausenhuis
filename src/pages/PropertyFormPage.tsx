@@ -5,11 +5,19 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import type { PropertySubmitData } from "@/types/property";
 import { Json } from "@/integrations/supabase/types";
+import { PropertyMediaLibrary } from "@/components/property/PropertyMediaLibrary";
+import { usePropertyForm } from "@/hooks/usePropertyForm";
+import { usePropertyImages } from "@/hooks/usePropertyImages";
 
 export default function PropertyFormPage() {
   const navigate = useNavigate();
   const { id } = useParams();
   const { toast } = useToast();
+  const { formData, setFormData } = usePropertyForm(id, onSubmit);
+  const {
+    handleImageUpload,
+    handleRemoveImage
+  } = usePropertyImages(formData, setFormData);
 
   const handleSubmit = async (data: PropertySubmitData) => {
     try {
@@ -56,6 +64,10 @@ export default function PropertyFormPage() {
       });
     }
   };
+
+  if (!formData) {
+    return null;
+  }
 
   return (
     <div className="min-h-screen bg-estate-50 py-12 px-4 sm:px-6 lg:px-8">
