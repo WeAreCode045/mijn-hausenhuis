@@ -29,7 +29,7 @@ export function PropertyMediaLibrary({
             multiple
           />
         </div>
-        <div className="grid grid-cols-2 gap-2">
+        <div className="grid grid-cols-4 gap-2">
           {images.map((url, index) => (
             <div key={url} className="relative group">
               <img
@@ -41,7 +41,7 @@ export function PropertyMediaLibrary({
                 type="button"
                 variant="destructive"
                 size="icon"
-                className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity w-6 h-6"
+                className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity w-5 h-5"
                 onClick={() => onRemoveImage(index)}
               >
                 <Trash2 className="h-3 w-3" />
