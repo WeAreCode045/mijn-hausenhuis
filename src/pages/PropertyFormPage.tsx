@@ -3,7 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { PropertyForm } from "@/components/PropertyForm";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
-import type { PropertySubmitData } from "@/types/property";
+import type { PropertySubmitData, PropertyData } from "@/types/property";
 import { Json } from "@/integrations/supabase/types";
 import { PropertyMediaLibrary } from "@/components/property/PropertyMediaLibrary";
 import { usePropertyForm } from "@/hooks/usePropertyForm";
@@ -99,6 +99,12 @@ export default function PropertyFormPage() {
     return null;
   }
 
+  // Add type assertion here since we know formData will have an id when used with PropertyCardActions
+  const propertyData: PropertyData = {
+    ...formData,
+    id: formData.id || '', // Provide a default empty string if id is undefined
+  };
+
   return (
     <div className="min-h-screen bg-estate-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
@@ -113,7 +119,7 @@ export default function PropertyFormPage() {
             {id && (
               <Card className="p-4">
                 <PropertyCardActions
-                  property={formData}
+                  property={propertyData}
                   settings={settings}
                   onDelete={handleDelete}
                   unreadCount={0}

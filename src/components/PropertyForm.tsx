@@ -1,4 +1,3 @@
-
 import { Card } from "@/components/ui/card";
 import { useParams } from "react-router-dom";
 import { usePropertyForm } from "@/hooks/usePropertyForm";
@@ -12,6 +11,7 @@ import { steps } from "./property/form/formSteps";
 import { FormStepNavigation } from "./property/form/FormStepNavigation";
 import { useFormSteps } from "@/hooks/useFormSteps";
 import { PropertyStepContent } from "./property/form/PropertyStepContent";
+import { supabase } from "@/integrations/supabase/client";
 
 interface PropertyFormProps {
   onSubmit: (data: PropertySubmitData) => void;
