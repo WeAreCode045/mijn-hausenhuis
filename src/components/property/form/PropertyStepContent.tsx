@@ -78,8 +78,10 @@ export function PropertyStepContent({
               featuredImage={formData.featuredImage}
               gridImages={formData.gridImages}
               onImageUpload={handleImageUpload}
-              onAreaPhotosUpload={() => {}}
+              onFeaturedImageUpload={handleImageUpload}
+              onGridImageUpload={handleImageUpload}
               onFloorplanUpload={() => {}}
+              onAreaPhotosUpload={() => {}}
               onRemoveImage={handleRemoveImage}
               onRemoveAreaPhoto={() => {}}
               onRemoveFloorplan={() => {}}
@@ -120,6 +122,8 @@ export function PropertyStepContent({
             featuredImage={null}
             gridImages={[]}
             onImageUpload={() => {}}
+            onFeaturedImageUpload={() => {}}
+            onGridImageUpload={() => {}}
             onAreaPhotosUpload={() => {}}
             onFloorplanUpload={handleFloorplanUpload}
             onRemoveImage={() => {}}
@@ -170,6 +174,8 @@ export function PropertyStepContent({
               featuredImage={null}
               gridImages={[]}
               onImageUpload={() => {}}
+              onFeaturedImageUpload={() => {}}
+              onGridImageUpload={() => {}}
               onAreaPhotosUpload={handleAreaPhotosUpload}
               onFloorplanUpload={() => {}}
               onRemoveImage={() => {}}

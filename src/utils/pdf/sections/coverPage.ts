@@ -22,22 +22,21 @@ export const generateCoverPage = async (
       pdf.addImage(img, 'JPEG', 0, 0, width, height / 2);
 
       // Grid images (bottom half)
+      const padding = 10; // Add padding
       const gridHeight = height / 4;
-      const imageWidth = width / 3;
+      const imageWidth = (width - (padding * 5)) / 4; // Adjust width for padding
       
-      for (let i = 0; i < Math.min(6, property.gridImages.length); i++) {
+      for (let i = 0; i < Math.min(4, property.gridImages.length); i++) {
         const img = new Image();
         img.src = property.gridImages[i];
         await new Promise((resolve) => {
           img.onload = resolve;
         });
 
-        const row = Math.floor(i / 3);
-        const col = i % 3;
-        const yPos = (height / 2) + (row * gridHeight);
-        const xPos = col * imageWidth;
+        const xPos = padding + (i * (imageWidth + padding));
+        const yPos = (height / 2) + padding;
 
-        pdf.addImage(img, 'JPEG', xPos, yPos, imageWidth, gridHeight);
+        pdf.addImage(img, 'JPEG', xPos, yPos, imageWidth, gridHeight - (padding * 2));
       }
 
       // Gradient overlay for title area

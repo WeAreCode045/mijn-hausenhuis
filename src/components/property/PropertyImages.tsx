@@ -114,37 +114,6 @@ export function PropertyImages({
               className="mt-2"
             />
           </div>
-
-          <div className="space-y-4">
-            <Label>Additional Photos</Label>
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-              {images.map((url, index) => (
-                <div key={url} className="relative group">
-                  <img
-                    src={url}
-                    alt={`Property photo ${index + 1}`}
-                    className="w-full h-32 object-cover rounded-lg"
-                  />
-                  <Button
-                    type="button"
-                    variant="destructive"
-                    size="icon"
-                    className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity w-6 h-6"
-                    onClick={() => onRemoveImage(index)}
-                  >
-                    <Trash2 className="h-3 w-3" />
-                  </Button>
-                </div>
-              ))}
-            </div>
-            <Input
-              type="file"
-              onChange={onImageUpload}
-              accept="image/*"
-              multiple
-              className="mt-2"
-            />
-          </div>
         </div>
       )}
 
