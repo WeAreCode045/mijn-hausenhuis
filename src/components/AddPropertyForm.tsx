@@ -5,10 +5,11 @@ import { usePropertyFormState } from "./property/form/usePropertyFormState";
 import { useFeatures } from "@/hooks/useFeatures";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { PropertySubmitData } from "@/types/property";
 
 export function AddPropertyForm() {
-  const formState = usePropertyFormState();
   const [currentStep, setCurrentStep] = useState(1);
+  const { formState, handleSubmit } = usePropertyFormState();
   const { addFeature, removeFeature, updateFeature } = useFeatures(formState.formData, formState.setFormData);
 
   const handleMapImageDelete = async () => {
@@ -35,6 +36,7 @@ export function AddPropertyForm() {
         removeFeature={removeFeature}
         updateFeature={updateFeature}
         handleMapImageDelete={handleMapImageDelete}
+        onSubmit={handleSubmit}
       />
     </Card>
   );

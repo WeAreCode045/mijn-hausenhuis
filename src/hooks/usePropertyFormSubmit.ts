@@ -47,9 +47,9 @@ export function usePropertyFormSubmit(onSubmit: (data: PropertySubmitData) => vo
         map_image: formData.map_image,
         latitude: formData.latitude,
         longitude: formData.longitude,
-        features: formData.features as Json,
-        areas: formData.areas as Json[],
-        nearby_places: formData.nearby_places as Json,
+        features: formData.features as unknown as Json,
+        areas: formData.areas as unknown as Json[],
+        nearby_places: formData.nearby_places as unknown as Json,
         images: imagesToSubmit
       };
 

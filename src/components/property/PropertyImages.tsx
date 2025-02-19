@@ -1,3 +1,4 @@
+
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
@@ -120,7 +121,7 @@ export function PropertyImages({
               ))}
               {gridImages.length < 4 && (
                 <ImageSelectDialog
-                  images={images.filter(img => !gridImages.includes(img))}
+                  images={images.filter(img => !gridImages.includes(img.url))}
                   onSelect={handleGridImagesSelect}
                   buttonText="Add Grid Images"
                   maxSelect={4 - gridImages.length}
