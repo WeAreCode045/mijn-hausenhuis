@@ -17,11 +17,17 @@ export const BROCHURE_STYLES = {
   },
   spacing: {
     margin: 20,
-    gutter: 10
+    gutter: 10,
+    headerHeight: 30,
+    footerHeight: 20,
+    contentPadding: {
+      top: 50,    // Space after header
+      bottom: 40  // Space before footer
+    }
   },
   imageAspectRatio: 1.5,
   pageSize: {
-    width: 210, // A4 width in mm
-    height: 297 // A4 height in mm
+    width: 210,  // A4 width in mm
+    height: 297  // A4 height in mm
   }
 };

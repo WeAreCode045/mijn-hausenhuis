@@ -1,4 +1,3 @@
-
 import jsPDF from 'jspdf';
 import { PropertyData } from '@/types/property';
 import { AgencySettings } from '@/types/agency';
@@ -134,14 +133,14 @@ class PropertyBrochure {
   }
 
   private async addLocationPage() {
-    if (!this.property.location_description && !this.property.map_image) return;
+    if (!this.property.location_description && !this.property.map_image && !this.property.nearby_places?.length) return;
 
     this.pdf.addPage();
     this.currentPage++;
     addHeaderFooter(this.pdf, this.currentPage, this.totalPages, this.settings, this.property.title);
 
-    const { margin } = BROCHURE_STYLES.spacing;
-    let yPos = 50;
+    const { margin, contentPadding } = BROCHURE_STYLES.spacing;
+    let yPos = contentPadding.top;
 
     // Location title
     this.pdf.setFillColor(this.settings.primaryColor || BROCHURE_STYLES.colors.primary);
@@ -171,7 +170,7 @@ class PropertyBrochure {
         });
 
         const maxWidth = 170;
-        const maxHeight = 120;
+        const maxHeight = 100;
         
         const imgAspectRatio = img.width / img.height;
         let finalWidth = maxWidth;
@@ -184,9 +183,46 @@ class PropertyBrochure {
 
         const xOffset = (BROCHURE_STYLES.pageSize.width - finalWidth) / 2;
         this.pdf.addImage(img, 'JPEG', xOffset, yPos, finalWidth, finalHeight);
+        yPos += finalHeight + 20;
       } catch (error) {
         console.error('Error loading map image:', error);
       }
+    }
+
+    // Nearby places
+    if (this.property.nearby_places?.length) {
+      this.pdf.setFontSize(16);
+      this.pdf.setTextColor(this.settings.primaryColor || BROCHURE_STYLES.colors.primary);
+      this.pdf.text('Voorzieningen in de buurt', margin, yPos);
+      yPos += 20;
+
+      const placesByType: { [key: string]: any[] } = {};
+      this.property.nearby_places.forEach(place => {
+        if (!placesByType[place.type]) {
+          placesByType[place.type] = [];
+        }
+        placesByType[place.type].push(place);
+      });
+
+      Object.entries(placesByType).forEach(([type, places]) => {
+        this.pdf.setFontSize(14);
+        this.pdf.setTextColor(BROCHURE_STYLES.colors.text.primary);
+        this.pdf.text(type.replace('_', ' '), margin, yPos);
+        yPos += 15;
+
+        places.forEach(place => {
+          this.pdf.setFontSize(11);
+          this.pdf.setTextColor(BROCHURE_STYLES.colors.text.secondary);
+          this.pdf.text(`• ${place.name}`, margin + 10, yPos);
+          if (place.vicinity) {
+            this.pdf.setFontSize(9);
+            yPos += 10;
+            this.pdf.text(place.vicinity, margin + 15, yPos);
+          }
+          yPos += 15;
+        });
+        yPos += 10;
+      });
     }
   }
 
