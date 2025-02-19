@@ -1,9 +1,9 @@
 
 import { PropertyForm } from "./PropertyForm";
-import type { PropertySubmitData } from "@/types/property";
+import type { PropertyFormData } from "@/types/property";
 
 interface EditPropertyFormProps {
-  onSubmit: (data: PropertySubmitData) => Promise<void>;
+  onSubmit: (data: PropertyFormData) => void;
 }
 
 export function EditPropertyForm({ onSubmit }: EditPropertyFormProps) {

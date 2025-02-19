@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -30,7 +29,7 @@ const initialFormData: PropertyFormData = {
   longitude: null
 };
 
-export function usePropertyForm(id: string | undefined, onSubmit: (data: PropertySubmitData) => void) {
+export function usePropertyForm(id: string | undefined, onSubmit: (data: PropertyFormData) => void) {
   const { toast } = useToast();
   const [formData, setFormData] = useState<PropertyFormData>(initialFormData);
   const [isLoading, setIsLoading] = useState(id ? true : false);
