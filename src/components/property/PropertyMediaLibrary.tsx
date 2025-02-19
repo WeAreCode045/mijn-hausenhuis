@@ -21,7 +21,7 @@ export function PropertyMediaLibrary({
     <Card className="p-4 sticky top-4">
       <div className="space-y-4">
         <div className="space-y-2">
-          <Label>Media Library</Label>
+          <Label>Property Photos</Label>
           <Input
             type="file"
             onChange={onImageUpload}

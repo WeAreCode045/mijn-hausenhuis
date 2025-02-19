@@ -8,7 +8,7 @@ export function useFileUpload() {
     const filePath = `properties/${propertyId}/${folder}/${fileName}`;
 
     const { error } = await supabase.storage
-      .from('agency_files')
+      .from('properties')
       .upload(filePath, file);
     
     if (error) {
@@ -17,7 +17,7 @@ export function useFileUpload() {
     }
     
     const { data: { publicUrl } } = supabase.storage
-      .from('agency_files')
+      .from('properties')
       .getPublicUrl(filePath);
     
     if (!publicUrl) {
