@@ -2,8 +2,14 @@
 import jsPDF from 'jspdf';
 import { PropertyData } from '@/types/property';
 import { AgencySettings } from '@/types/agency';
-import { addHeaderFooter } from '../pdfStyles';
-import { Home, Bed, Bath, CalendarDays, Ruler } from 'lucide-react';
+import { addHeaderFooter, stylePropertyDetails } from '../pdfStyles';
+
+const brandColors = {
+  primary: '#9b87f5',
+  secondary: '#7E69AB',
+  accent: '#D6BCFA',
+  neutral: '#F1F0FB',
+};
 
 export const addDetailsPage = async (pdf: jsPDF, property: PropertyData, settings: AgencySettings | undefined, pageNumber: number, totalPages: number) => {
   const pageWidth = pdf.internal.pageSize.getWidth();
@@ -11,18 +17,19 @@ export const addDetailsPage = async (pdf: jsPDF, property: PropertyData, setting
   const contentWidth = pageWidth - (margin * 2);
 
   addHeaderFooter(pdf, pageNumber, totalPages, settings, property.title);
+  stylePropertyDetails(pdf, margin, contentWidth, settings);
 
   // Property details
   const details = [
-    { icon: Home, label: 'Living Area', value: `${property.livingArea} m²` },
-    { icon: Ruler, label: 'Plot Size', value: `${property.sqft} m²` },
-    { icon: Bed, label: 'Bedrooms', value: property.bedrooms },
-    { icon: Bath, label: 'Bathrooms', value: property.bathrooms },
-    { icon: CalendarDays, label: 'Build Year', value: property.buildYear }
+    { label: 'Woonoppervlakte', value: `${property.livingArea} m²` },
+    { label: 'Perceeloppervlakte', value: `${property.sqft} m²` },
+    { label: 'Slaapkamers', value: property.bedrooms },
+    { label: 'Badkamers', value: property.bathrooms },
+    { label: 'Bouwjaar', value: property.buildYear }
   ];
 
   pdf.setTextColor(50, 50, 50);
-  let yPos = 45;
+  let yPos = 75;
   const columnWidth = contentWidth / 3;
   
   details.forEach((detail, index) => {
@@ -39,33 +46,27 @@ export const addDetailsPage = async (pdf: jsPDF, property: PropertyData, setting
     }
   });
 
-  await addDescription(pdf, property, settings, margin, yPos + 40, contentWidth);
-  await addFeatures(pdf, property, settings, margin, contentWidth);
-};
-
-const addDescription = async (pdf: jsPDF, property: PropertyData, settings: AgencySettings | undefined, margin: number, yPos: number, contentWidth: number) => {
+  // Description
+  yPos = 160;
   pdf.setFontSize(16);
-  pdf.setTextColor(settings?.primaryColor || '#4B5563');
-  pdf.text('Description', margin, yPos);
+  pdf.setTextColor(settings?.primaryColor || brandColors.primary);
+  pdf.text('Omschrijving', margin, yPos);
   
   pdf.setFontSize(11);
   pdf.setTextColor(70, 70, 70);
   const splitDescription = pdf.splitTextToSize(property.description, contentWidth);
   pdf.text(splitDescription, margin, yPos + 15);
-  
-  return splitDescription.length * 7 + 10;
-};
 
-const addFeatures = async (pdf: jsPDF, property: PropertyData, settings: AgencySettings | undefined, margin: number, contentWidth: number) => {
+  // Features
   if (property.features && property.features.length > 0) {
-    let yPos = 200;
+    yPos = 240;
     
     pdf.setFontSize(16);
     pdf.setTextColor(255, 255, 255);
-    pdf.setFillColor(settings?.primaryColor || '#4B5563');
+    pdf.setFillColor(settings?.primaryColor || brandColors.primary);
     
     pdf.rect(margin, yPos - 5, contentWidth, 25, 'F');
-    pdf.text('Features', margin + 10, yPos + 10);
+    pdf.text('Kenmerken', margin + 10, yPos + 10);
     
     yPos += 30;
     const colWidth = contentWidth / 2;

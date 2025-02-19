@@ -4,6 +4,13 @@ import { PropertyData } from '@/types/property';
 import { AgencySettings } from '@/types/agency';
 import QRCode from 'qrcode';
 
+const brandColors = {
+  primary: '#9b87f5',
+  secondary: '#7E69AB',
+  accent: '#D6BCFA',
+  neutral: '#F1F0FB',
+};
+
 export const addCoverPage = async (pdf: jsPDF, property: PropertyData, settings: AgencySettings | undefined) => {
   const pageWidth = pdf.internal.pageSize.getWidth();
   const pageHeight = pdf.internal.pageSize.getHeight();
@@ -39,12 +46,7 @@ export const addCoverPage = async (pdf: jsPDF, property: PropertyData, settings:
     }
   }
 
-  await addFeaturedImage(pdf, property, margin, currentY);
-  await addImageGrid(pdf, property, margin);
-  addTitleSection(pdf, property, settings, margin);
-};
-
-const addFeaturedImage = async (pdf: jsPDF, property: PropertyData, margin: number, currentY: number) => {
+  // Featured image
   if (property.featuredImage) {
     try {
       const img = new Image();
@@ -53,7 +55,6 @@ const addFeaturedImage = async (pdf: jsPDF, property: PropertyData, margin: numb
         img.onload = resolve;
       });
       
-      const pageWidth = pdf.internal.pageSize.getWidth();
       const contentWidth = pageWidth - (margin * 2);
       const maxHeight = 120;
       
@@ -67,24 +68,19 @@ const addFeaturedImage = async (pdf: jsPDF, property: PropertyData, margin: numb
       }
       
       const xOffset = (pageWidth - finalWidth) / 2;
-
-      pdf.setFillColor(255, 255, 255);
-      pdf.roundedRect(xOffset - 1, currentY - 1, finalWidth + 2, finalHeight + 2, 3, 3, 'F');
       pdf.addImage(img, 'JPEG', xOffset, currentY, finalWidth, finalHeight);
+      currentY += finalHeight + 20;
     } catch (error) {
       console.error('Error loading featured image:', error);
     }
   }
-};
 
-const addImageGrid = async (pdf: jsPDF, property: PropertyData, margin: number) => {
+  // Grid images
   if (property.gridImages && property.gridImages.length > 0) {
-    const pageWidth = pdf.internal.pageSize.getWidth();
     const imagesPerRow = 3;
     const imageWidth = (pageWidth - (margin * 2) - ((imagesPerRow - 1) * 10)) / imagesPerRow;
     const imageHeight = imageWidth * 0.75;
     let currentX = margin;
-    let currentY = 170;
     
     for (let i = 0; i < Math.min(property.gridImages.length, 6); i++) {
       try {
@@ -94,8 +90,6 @@ const addImageGrid = async (pdf: jsPDF, property: PropertyData, margin: number) 
           img.onload = resolve;
         });
         
-        pdf.setFillColor(255, 255, 255);
-        pdf.roundedRect(currentX - 1, currentY - 1, imageWidth + 2, imageHeight + 2, 3, 3, 'F');
         pdf.addImage(img, 'JPEG', currentX, currentY, imageWidth, imageHeight);
         
         currentX += imageWidth + 10;
@@ -108,13 +102,9 @@ const addImageGrid = async (pdf: jsPDF, property: PropertyData, margin: number) 
       }
     }
   }
-};
 
-const addTitleSection = (pdf: jsPDF, property: PropertyData, settings: AgencySettings | undefined, margin: number) => {
-  const pageWidth = pdf.internal.pageSize.getWidth();
-  const pageHeight = pdf.internal.pageSize.getHeight();
-
-  pdf.setFillColor(settings?.primaryColor || '#4B5563');
+  // Title and price section
+  pdf.setFillColor(settings?.primaryColor || brandColors.primary);
   pdf.rect(0, pageHeight - 60, pageWidth, 60, 'F');
 
   pdf.setTextColor(255, 255, 255);
@@ -123,7 +113,8 @@ const addTitleSection = (pdf: jsPDF, property: PropertyData, settings: AgencySet
   const title = property.title;
   pdf.text(title, margin, pageHeight - 25);
   
-  const price = property.price;
-  const priceWidth = pdf.getTextWidth(price);
-  pdf.text(price, pageWidth - margin - priceWidth, pageHeight - 25);
+  if (property.price) {
+    const priceWidth = pdf.getTextWidth(property.price);
+    pdf.text(property.price, pageWidth - margin - priceWidth, pageHeight - 25);
+  }
 };

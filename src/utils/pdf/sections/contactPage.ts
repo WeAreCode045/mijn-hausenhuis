@@ -5,6 +5,13 @@ import { AgencySettings } from '@/types/agency';
 import { addHeaderFooter } from '../pdfStyles';
 import QRCode from 'qrcode';
 
+const brandColors = {
+  primary: '#9b87f5',
+  secondary: '#7E69AB',
+  accent: '#D6BCFA',
+  neutral: '#F1F0FB',
+};
+
 export const addContactPage = async (pdf: jsPDF, settings: AgencySettings, pageNumber: number, totalPages: number, property: PropertyData) => {
   const margin = 20;
   const pageWidth = pdf.internal.pageSize.getWidth();
@@ -13,26 +20,20 @@ export const addContactPage = async (pdf: jsPDF, settings: AgencySettings, pageN
   addHeaderFooter(pdf, pageNumber, totalPages, settings, property.title);
   
   // Title section with accent
-  pdf.setFillColor(settings?.primaryColor || '#4B5563');
+  pdf.setFillColor(settings?.primaryColor || brandColors.primary);
   pdf.rect(margin, 45, 3, 20, 'F');
   
   pdf.setTextColor(50, 50, 50);
   pdf.setFontSize(24);
   pdf.setFont(undefined, 'bold');
-  pdf.text('Contact Information', margin + 10, 60);
+  pdf.text('Contact Informatie', margin + 10, 60);
   pdf.setFont(undefined, 'normal');
   
-  let contactY = await addAgencyInfo(pdf, settings, margin, contentWidth);
-  contactY = await addQRCode(pdf, property, margin, contactY);
-  await addAgents(pdf, settings, margin, contentWidth, contactY);
-};
+  let contactY = 85;
 
-const addAgencyInfo = async (pdf: jsPDF, settings: AgencySettings, margin: number, contentWidth: number) => {
-  const contactY = 85;
-
-  pdf.setFillColor(settings?.primaryColor || '#4B5563');
-  pdf.setDrawColor(settings?.primaryColor || '#4B5563');
-  pdf.roundedRect(margin, contactY, contentWidth, 60, 3, 3, 'FD');
+  // Agency info box
+  pdf.setFillColor(settings?.primaryColor || brandColors.primary);
+  pdf.roundedRect(margin, contactY, contentWidth, 60, 3, 3, 'F');
   
   pdf.setTextColor(255, 255, 255);
   pdf.setFontSize(16);
@@ -49,10 +50,8 @@ const addAgencyInfo = async (pdf: jsPDF, settings: AgencySettings, margin: numbe
     pdf.text(contactInfo, margin + 15, contactY + 50);
   }
 
-  return contactY + 80;
-};
-
-const addQRCode = async (pdf: jsPDF, property: PropertyData, margin: number, contactY: number) => {
+  // QR Code
+  contactY += 80;
   try {
     const qrUrl = await QRCode.toDataURL(`${window.location.origin}/property/view/${property.id}`);
     const qrImg = new Image();
@@ -71,38 +70,36 @@ const addQRCode = async (pdf: jsPDF, property: PropertyData, margin: number, con
     console.error('Error generating QR code:', error);
   }
 
-  return contactY + 80;
-};
-
-const addAgents = async (pdf: jsPDF, settings: AgencySettings, margin: number, contentWidth: number, contactY: number) => {
+  // Agents section
   if (settings.agents && settings.agents.length > 0) {
+    contactY += 80;
     pdf.setTextColor(50, 50, 50);
     pdf.setFontSize(18);
     pdf.setFont(undefined, 'bold');
-    pdf.text('Our Agents', margin, contactY);
-    let currentY = contactY + 20;
+    pdf.text('Onze Makelaars', margin, contactY);
+    contactY += 20;
 
     settings.agents.forEach((agent) => {
-      pdf.setFillColor(245, 245, 245);
-      pdf.roundedRect(margin, currentY, contentWidth, 50, 3, 3, 'F');
+      pdf.setFillColor(brandColors.neutral);
+      pdf.roundedRect(margin, contactY, contentWidth, 50, 3, 3, 'F');
       
       pdf.setTextColor(50, 50, 50);
       pdf.setFontSize(14);
       pdf.setFont(undefined, 'bold');
-      pdf.text(agent.name, margin + 15, currentY + 20);
+      pdf.text(agent.name, margin + 15, contactY + 20);
       
       pdf.setFontSize(11);
       pdf.setFont(undefined, 'normal');
       pdf.setTextColor(70, 70, 70);
       const contactInfo = [
-        `Phone: ${agent.phone}`,
+        `Tel: ${agent.phone}`,
         `Email: ${agent.email}`,
         agent.whatsapp ? `WhatsApp: ${agent.whatsapp}` : null
       ].filter(Boolean).join(' | ');
       
-      pdf.text(contactInfo, margin + 15, currentY + 35);
+      pdf.text(contactInfo, margin + 15, contactY + 35);
       
-      currentY += 60;
+      contactY += 60;
     });
   }
 };
