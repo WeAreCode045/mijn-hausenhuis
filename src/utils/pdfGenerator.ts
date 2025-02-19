@@ -26,7 +26,7 @@ export const generatePropertyPDF = async (property: PropertyData, settings?: Age
       addHeaderFooter(pdf, pageNumber++, totalPages, settings, property.title);
       
       // Area title with accent line
-      pdf.setFillColor(settings?.primaryColor || '#4B5563');
+      pdf.setFillColor(settings?.primaryColor || '#9b87f5');
       pdf.rect(20, 45, 3, 20, 'F');
       
       pdf.setTextColor(50, 50, 50);
@@ -79,6 +79,54 @@ export const generatePropertyPDF = async (property: PropertyData, settings?: Age
     }
   }
 
+  // Floorplans Page
+  if (property.floorplans && property.floorplans.length > 0) {
+    pdf.addPage();
+    addHeaderFooter(pdf, totalPages - 1, totalPages, settings, property.title);
+
+    pdf.setFillColor(settings?.primaryColor || '#9b87f5');
+    pdf.rect(20, 45, 3, 20, 'F');
+    
+    pdf.setTextColor(50, 50, 50);
+    pdf.setFontSize(18);
+    pdf.text('Plattegronden', 30, 60);
+
+    let currentY = 80;
+    for (const floorplanUrl of property.floorplans) {
+      try {
+        const img = new Image();
+        img.src = floorplanUrl;
+        await new Promise((resolve) => {
+          img.onload = resolve;
+        });
+
+        const maxWidth = 170;
+        const maxHeight = 120;
+        
+        const imgAspectRatio = img.width / img.height;
+        let finalWidth = maxWidth;
+        let finalHeight = finalWidth / imgAspectRatio;
+        
+        if (finalHeight > maxHeight) {
+          finalHeight = maxHeight;
+          finalWidth = finalHeight * imgAspectRatio;
+        }
+
+        if (currentY + finalHeight > pdf.internal.pageSize.getHeight() - 30) {
+          pdf.addPage();
+          addHeaderFooter(pdf, totalPages - 1, totalPages, settings, property.title);
+          currentY = 45;
+        }
+
+        const xOffset = (pdf.internal.pageSize.getWidth() - finalWidth) / 2;
+        pdf.addImage(img, 'JPEG', xOffset, currentY, finalWidth, finalHeight);
+        currentY += finalHeight + 20;
+      } catch (error) {
+        console.error('Error loading floorplan:', error);
+      }
+    }
+  }
+
   // Contact Page
   pdf.addPage();
   await addContactPage(pdf, settings || { 
@@ -86,8 +134,8 @@ export const generatePropertyPDF = async (property: PropertyData, settings?: Age
     email: '',
     phone: '',
     address: '',
-    primaryColor: '#4B5563',
-    secondaryColor: '#6B7280',
+    primaryColor: '#9b87f5',
+    secondaryColor: '#7E69AB',
     agents: []
   }, totalPages, totalPages, property);
 

@@ -2,13 +2,20 @@
 import jsPDF from 'jspdf';
 import { AgencySettings } from '@/types/agency';
 
+const brandColors = {
+  primary: '#9b87f5',
+  secondary: '#7E69AB',
+  accent: '#D6BCFA',
+  neutral: '#F1F0FB',
+};
+
 export const addHeaderFooter = (pdf: jsPDF, pageNum: number, totalPages: number, settings?: AgencySettings, propertyTitle?: string) => {
   const pageWidth = pdf.internal.pageSize.getWidth();
   const pageHeight = pdf.internal.pageSize.getHeight();
   const margin = 20;
 
-  // Header with background
-  pdf.setFillColor(settings?.primaryColor || '#4B5563');
+  // Header with brand color background
+  pdf.setFillColor(settings?.primaryColor || brandColors.primary);
   pdf.rect(0, 0, pageWidth, 30, 'F');
   
   // Add logo
@@ -34,8 +41,8 @@ export const addHeaderFooter = (pdf: jsPDF, pageNum: number, totalPages: number,
   
   pdf.text(contactDetails.join(' | '), contactX, 18);
   
-  // Footer with background
-  pdf.setFillColor(settings?.secondaryColor || '#6B7280');
+  // Footer with secondary color background
+  pdf.setFillColor(settings?.secondaryColor || brandColors.secondary);
   pdf.rect(0, pageHeight - 20, pageWidth, 20, 'F');
   
   // Footer text
@@ -43,15 +50,15 @@ export const addHeaderFooter = (pdf: jsPDF, pageNum: number, totalPages: number,
   pdf.setFontSize(8);
   
   if (propertyTitle) {
-    const maxWidth = pageWidth - 80; // Leave space for page numbers
+    const maxWidth = pageWidth - 80;
     pdf.text(propertyTitle, margin, pageHeight - 8, { maxWidth });
   }
   
-  pdf.text(`Page ${pageNum} of ${totalPages}`, pageWidth - margin - 20, pageHeight - 8);
+  pdf.text(`Pagina ${pageNum} van ${totalPages}`, pageWidth - margin - 20, pageHeight - 8);
 };
 
 export const stylePropertyDetails = (pdf: jsPDF, margin: number, contentWidth: number, settings?: AgencySettings) => {
-  pdf.setFillColor(245, 245, 245);
-  pdf.setDrawColor(200, 200, 200);
+  pdf.setFillColor(brandColors.neutral);
+  pdf.setDrawColor(settings?.primaryColor || brandColors.primary);
   pdf.roundedRect(margin, 60, contentWidth, 80, 3, 3, 'FD');
 };
