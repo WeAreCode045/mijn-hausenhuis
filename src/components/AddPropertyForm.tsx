@@ -46,12 +46,20 @@ export function AddPropertyForm() {
     handleImageUpload,
     handleAreaPhotosUpload,
     handleFloorplanUpload,
-    handleRemoveImage,
+    handleRemoveImage: handleRemoveImageById,
     handleRemoveAreaPhoto,
     handleRemoveFloorplan,
     handleSetFeaturedImage,
     handleToggleGridImage
   } = usePropertyImages(formData, setFormData);
+
+  // Create an index-based wrapper for handleRemoveImage
+  const handleRemoveImage = (index: number) => {
+    const imageToRemove = formData.images[index];
+    if (imageToRemove) {
+      handleRemoveImageById(imageToRemove.id);
+    }
+  };
 
   const {
     handleAreaImageUpload,
