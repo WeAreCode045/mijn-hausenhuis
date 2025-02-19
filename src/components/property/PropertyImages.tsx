@@ -46,6 +46,16 @@ export function PropertyImages({
   showOnlyFloorplans = false,
   showOnlyAreaPhotos = false
 }: PropertyImagesProps) {
+  const handleGridImagesSelect = (selectedUrls: string[]) => {
+    const newGridImages = [...gridImages];
+    selectedUrls.forEach(url => {
+      if (newGridImages.length < 4 && !newGridImages.includes(url)) {
+        newGridImages.push(url);
+      }
+    });
+    onToggleGridImage(newGridImages);
+  };
+
   return (
     <div className="space-y-6">
       {showOnlyPropertyImages && (
@@ -73,8 +83,9 @@ export function PropertyImages({
               ) : (
                 <ImageSelectDialog
                   images={images}
-                  onSelect={onSetFeaturedImage}
+                  onSelect={(urls) => onSetFeaturedImage(urls[0])}
                   buttonText="Select Featured Image"
+                  maxSelect={1}
                 />
               )}
             </div>
@@ -110,8 +121,9 @@ export function PropertyImages({
               {gridImages.length < 4 && (
                 <ImageSelectDialog
                   images={images.filter(img => !gridImages.includes(img))}
-                  onSelect={(url) => onToggleGridImage([...gridImages, url])}
-                  buttonText="Add Grid Image"
+                  onSelect={handleGridImagesSelect}
+                  buttonText="Add Grid Images"
+                  maxSelect={4 - gridImages.length}
                 />
               )}
             </div>
