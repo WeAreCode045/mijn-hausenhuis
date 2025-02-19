@@ -17,9 +17,8 @@ export function usePropertyImages(
     try {
       const files = Array.from(e.target.files);
       const uploadPromises = files.map(async (file) => {
-        const url = await uploadFile(file);
+        const url = await uploadFile(file, formData.id!, 'photos');
         
-        // Insert into property_images table
         const { data, error } = await supabase
           .from('property_images')
           .insert({
@@ -84,12 +83,11 @@ export function usePropertyImages(
     }
   };
 
-  // Additional handlers for other image types
   const handleAreaPhotosUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (!e.target.files) return;
+    if (!formData.id || !e.target.files) return;
     try {
       const files = Array.from(e.target.files);
-      const uploadPromises = files.map(file => uploadFile(file));
+      const uploadPromises = files.map(file => uploadFile(file, formData.id!, 'location'));
       const urls = await Promise.all(uploadPromises);
       
       setFormData({
@@ -107,10 +105,10 @@ export function usePropertyImages(
   };
 
   const handleFloorplanUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (!e.target.files) return;
+    if (!formData.id || !e.target.files) return;
     try {
       const files = Array.from(e.target.files);
-      const uploadPromises = files.map(file => uploadFile(file));
+      const uploadPromises = files.map(file => uploadFile(file, formData.id!, 'floorplans'));
       const urls = await Promise.all(uploadPromises);
       
       setFormData({

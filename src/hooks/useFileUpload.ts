@@ -2,11 +2,14 @@
 import { supabase } from "@/integrations/supabase/client";
 
 export function useFileUpload() {
-  const uploadFile = async (file: File): Promise<string> => {
-    const fileName = `${crypto.randomUUID()}-${file.name.replace(/[^\x00-\x7F]/g, '')}`;
+  const uploadFile = async (file: File, propertyId: string, folder: 'photos' | 'floorplans' | 'location'): Promise<string> => {
+    const sanitizedFileName = file.name.replace(/[^\x00-\x7F]/g, '');
+    const fileName = `${crypto.randomUUID()}-${sanitizedFileName}`;
+    const filePath = `properties/${propertyId}/${folder}/${fileName}`;
+
     const { error } = await supabase.storage
       .from('agency_files')
-      .upload(fileName, file);
+      .upload(filePath, file);
     
     if (error) {
       console.error('Upload error:', error);
@@ -15,7 +18,7 @@ export function useFileUpload() {
     
     const { data: { publicUrl } } = supabase.storage
       .from('agency_files')
-      .getPublicUrl(fileName);
+      .getPublicUrl(filePath);
     
     if (!publicUrl) {
       throw new Error('Failed to get public URL for uploaded file');
