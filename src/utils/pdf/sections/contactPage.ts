@@ -44,7 +44,7 @@ export const generateContactPage = (
   });
 
   // Social media
-  if (settings.facebook_url || settings.instagram_url) {
+  if (settings.facebookUrl || settings.instagramUrl) {
     yPos += 20;
     pdf.setFontSize(14);
     pdf.setTextColor(BROCHURE_STYLES.colors.text.primary);
@@ -54,12 +54,12 @@ export const generateContactPage = (
     pdf.setFontSize(12);
     pdf.setTextColor(BROCHURE_STYLES.colors.text.secondary);
     
-    if (settings.facebook_url) {
-      pdf.text('Facebook: ' + settings.facebook_url, margin, yPos);
+    if (settings.facebookUrl) {
+      pdf.text('Facebook: ' + settings.facebookUrl, margin, yPos);
       yPos += 15;
     }
-    if (settings.instagram_url) {
-      pdf.text('Instagram: ' + settings.instagram_url, margin, yPos);
+    if (settings.instagramUrl) {
+      pdf.text('Instagram: ' + settings.instagramUrl, margin, yPos);
     }
   }
 };
