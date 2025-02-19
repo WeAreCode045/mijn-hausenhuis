@@ -1,12 +1,12 @@
-
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Trash2 } from "lucide-react";
+import { PropertyImage } from "@/types/property";
 import { ImageSelectDialog } from "./ImageSelectDialog";
 
 interface PropertyImagesProps {
-  images: string[];
+  images: PropertyImage[];
   floorplans: string[];
   featuredImage: string | null;
   gridImages: string[];
@@ -16,11 +16,11 @@ interface PropertyImagesProps {
   onGridImageUpload: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onFloorplanUpload: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onAreaPhotosUpload: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  onRemoveImage: (index: number) => void;
+  onRemoveImage: (imageId: string) => void;
   onRemoveFloorplan: (index: number) => void;
   onRemoveAreaPhoto: (index: number) => void;
   onSetFeaturedImage: (url: string | null) => void;
-  onToggleGridImage: (gridImages: string[]) => void;
+  onToggleGridImage: (urls: string[]) => void;
   showOnlyPropertyImages?: boolean;
   showOnlyFloorplans?: boolean;
   showOnlyAreaPhotos?: boolean;

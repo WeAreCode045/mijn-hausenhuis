@@ -11,7 +11,6 @@ export function usePropertyAutosave() {
     if (!formData.id) return;
 
     try {
-      // Get current property data first to preserve sensitive fields
       const { data: currentData, error: fetchError } = await supabase
         .from('properties')
         .select('map_image, nearby_places, latitude, longitude')
@@ -20,10 +19,7 @@ export function usePropertyAutosave() {
 
       if (fetchError) throw fetchError;
 
-      // Ensure nearby_places is properly cast to Json type
-      const nearbyPlaces = formData.nearby_places 
-        ? (formData.nearby_places as unknown as Json)
-        : (currentData?.nearby_places as Json ?? []);
+      const imageUrls = formData.images.map(img => img.url);
 
       const upsertData = {
         address: formData.address || null,
@@ -40,17 +36,17 @@ export function usePropertyAutosave() {
         garages: formData.garages || null,
         gridImages: formData.gridImages || [],
         hasGarden: formData.hasGarden || false,
-        images: formData.images || [],
+        images: imageUrls,
         latitude: formData.latitude ?? currentData?.latitude ?? null,
         livingArea: formData.livingArea || null,
         longitude: formData.longitude ?? currentData?.longitude ?? null,
         map_image: formData.map_image ?? currentData?.map_image ?? null,
-        nearby_places: nearbyPlaces,
+        nearby_places: formData.nearby_places as unknown as Json,
         price: formData.price || null,
         sqft: formData.sqft || null,
         title: formData.title || null,
         id: formData.id
-      } as const;
+      };
 
       const { error } = await supabase
         .from('properties')

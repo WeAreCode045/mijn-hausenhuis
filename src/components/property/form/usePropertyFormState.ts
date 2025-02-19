@@ -1,150 +1,86 @@
 
-import { useState } from "react";
-import type { PropertyFormData, PropertyArea } from "@/types/property";
-import { usePropertyImages } from "@/hooks/usePropertyImages";
-import { usePropertySubmit } from "@/hooks/usePropertySubmit";
-import { useFileUpload } from "@/hooks/useFileUpload";
-import { useToast } from "@/components/ui/use-toast";
+import { useState } from 'react';
+import { PropertyFormData, PropertyArea, PropertyImage } from '@/types/property';
+import { usePropertyImages } from '@/hooks/usePropertyImages';
+import { usePropertyAreas } from '@/hooks/usePropertyAreas';
+import { usePropertyFormSubmit } from '@/hooks/usePropertyFormSubmit';
+import { usePropertyAutosave } from '@/hooks/usePropertyAutosave';
+import { useFeatures } from '@/hooks/useFeatures';
 
-export function usePropertyFormState() {
-  const [formData, setFormData] = useState<PropertyFormData>({
-    title: "",
-    price: "",
-    address: "",
-    bedrooms: "",
-    bathrooms: "",
-    sqft: "",
-    livingArea: "",
-    buildYear: "",
-    garages: "",
-    energyLabel: "",
-    hasGarden: false,
-    description: "",
-    features: [],
-    images: [],
-    floorplans: [],
-    featuredImage: null,
-    gridImages: [],
-    areas: [],
-    areaPhotos: [],
-  });
-
-  const { toast } = useToast();
-  const { handleSubmit } = usePropertySubmit();
-  const { uploadFile } = useFileUpload();
+export function usePropertyFormState(
+  initialData: PropertyFormData,
+  onSubmit: (data: PropertyFormData) => Promise<void>
+) {
+  const [formData, setFormData] = useState<PropertyFormData>(initialData);
+  const { addFeature, removeFeature, updateFeature } = useFeatures(formData, setFormData);
+  const { autosaveData } = usePropertyAutosave();
+  
   const {
     handleImageUpload,
+    handleRemoveImage,
     handleAreaPhotosUpload,
     handleFloorplanUpload,
-    handleRemoveImage,
     handleRemoveAreaPhoto,
     handleRemoveFloorplan,
     handleSetFeaturedImage,
     handleToggleGridImage
   } = usePropertyImages(formData, setFormData);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
+  const {
+    addArea,
+    removeArea,
+    updateArea,
+  } = usePropertyAreas(formData, setFormData);
 
-  const handleAreaImageUpload = async (areaId: string, files: FileList) => {
-    try {
-      const uploadPromises = Array.from(files).map(async (file) => {
-        const url = await uploadFile(file);
-        return url;
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+  ) => {
+    const { name, value, type } = e.target;
+    if (type === 'checkbox') {
+      const checkbox = e.target as HTMLInputElement;
+      setFormData({
+        ...formData,
+        [name]: checkbox.checked,
       });
-
-      const uploadedUrls = await Promise.all(uploadPromises);
-
-      setFormData(prev => ({
-        ...prev,
-        areas: prev.areas.map(area => 
-          area.id === areaId 
-            ? { ...area, images: [...area.images, ...uploadedUrls] }
-            : area
-        )
-      }));
-
-      toast({
-        title: "Success",
-        description: "Area images uploaded successfully",
-        variant: "default",
-      });
-    } catch (error) {
-      console.error('Error uploading area images:', error);
-      toast({
-        title: "Error",
-        description: "Failed to upload area images",
-        variant: "destructive",
+    } else {
+      setFormData({
+        ...formData,
+        [name]: value,
       });
     }
   };
 
-  const addArea = () => {
-    setFormData(prev => ({
-      ...prev,
-      areas: [
-        ...prev.areas,
-        {
-          id: crypto.randomUUID(),
-          title: '',
-          description: '',
-          images: []
-        }
-      ]
-    }));
-  };
-
-  const removeArea = (id: string) => {
-    setFormData(prev => ({
-      ...prev,
-      areas: prev.areas.filter(area => area.id !== id)
-    }));
-  };
-
-  const updateArea = (id: string, field: keyof PropertyArea, value: string | string[]) => {
-    setFormData(prev => ({
-      ...prev,
-      areas: prev.areas.map(area => 
-        area.id === id ? { ...area, [field]: value } : area
-      )
-    }));
-  };
-
-  const removeAreaImage = (areaId: string, imageUrl: string) => {
-    setFormData(prev => ({
-      ...prev,
-      areas: prev.areas.map(area => 
-        area.id === areaId
-          ? { ...area, images: area.images.filter(url => url !== imageUrl) }
-          : area
-      )
-    }));
-  };
-
-  const onSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    await handleSubmit(formData);
+    await onSubmit(formData);
+  };
+
+  const handleMapImageDelete = async () => {
+    setFormData({
+      ...formData,
+      map_image: null,
+    });
   };
 
   return {
     formData,
     setFormData,
     handleInputChange,
-    handleAreaImageUpload,
-    addArea,
-    removeArea,
-    updateArea,
-    removeAreaImage,
+    handleSubmit,
+    addFeature,
+    removeFeature,
+    updateFeature,
     handleImageUpload,
+    handleRemoveImage,
     handleAreaPhotosUpload,
     handleFloorplanUpload,
-    handleRemoveImage,
     handleRemoveAreaPhoto,
     handleRemoveFloorplan,
     handleSetFeaturedImage,
     handleToggleGridImage,
-    onSubmit
+    addArea,
+    removeArea,
+    updateArea,
+    handleMapImageDelete,
   };
 }
