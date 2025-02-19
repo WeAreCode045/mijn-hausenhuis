@@ -5,6 +5,7 @@ import { PlusCircle } from "lucide-react";
 import { PropertyCard } from "@/components/property/PropertyCard";
 import { useProperties } from "@/hooks/useProperties";
 import { Skeleton } from "@/components/ui/skeleton";
+import { PropertyData } from "@/types/property";
 
 const Index = () => {
   const navigate = useNavigate();
@@ -37,7 +38,7 @@ const Index = () => {
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-            {properties.map((property) => (
+            {properties.map((property: PropertyData) => (
               <PropertyCard
                 key={property.id}
                 property={property}

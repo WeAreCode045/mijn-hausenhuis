@@ -1,8 +1,9 @@
 
-import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { useQuery } from "@tanstack/react-query";
+import { PropertyData } from "@/types/property";
+import { transformSupabaseData } from "@/components/property/webview/utils/transformSupabaseData";
 
 export const useProperties = () => {
   const { toast } = useToast();
@@ -17,7 +18,8 @@ export const useProperties = () => {
       throw error;
     }
 
-    return data || [];
+    // Transform the data to match PropertyData type
+    return (data || []).map(item => transformSupabaseData(item));
   };
 
   const { data: properties = [], isLoading, error } = useQuery({
