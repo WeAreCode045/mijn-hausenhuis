@@ -4,26 +4,32 @@ import { useToast } from "@/components/ui/use-toast";
 import { useQuery } from "@tanstack/react-query";
 import { PropertyData } from "@/types/property";
 import { transformSupabaseData } from "@/components/property/webview/utils/transformSupabaseData";
+import { useAuth } from "@/providers/AuthProvider";
 
 export const useProperties = () => {
   const { toast } = useToast();
+  const { profile, isAdmin } = useAuth();
 
   const fetchProperties = async () => {
-    const { data, error } = await supabase
+    let query = supabase
       .from('properties')
-      .select('*')
-      .order('created_at', { ascending: false });
+      .select('*, property_images(*)');
+
+    if (!isAdmin) {
+      query = query.eq('agent_id', profile.id);
+    }
+
+    const { data, error } = await query.order('created_at', { ascending: false });
 
     if (error) {
       throw error;
     }
 
-    // Transform the data to match PropertyData type
     return (data || []).map(item => transformSupabaseData(item));
   };
 
   const { data: properties = [], isLoading, error } = useQuery({
-    queryKey: ['properties'],
+    queryKey: ['properties', profile?.id, isAdmin],
     queryFn: fetchProperties,
   });
 

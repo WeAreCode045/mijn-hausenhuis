@@ -1,67 +1,44 @@
 
-import { Home, Settings } from "lucide-react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { 
+  LayoutDashboard, 
+  Home, 
+  Settings, 
+  LogOut 
+} from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { 
   Sidebar, 
   SidebarContent, 
+  SidebarFooter,
   SidebarGroup, 
   SidebarGroupLabel, 
   SidebarMenu, 
   SidebarMenuButton, 
   SidebarMenuItem 
 } from "@/components/ui/sidebar";
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { useEffect, useState } from "react";
-import { ScrollArea } from "@/components/ui/scroll-area";
+import { useAuth } from "@/providers/AuthProvider";
+import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
-import { PropertyData } from '@/types/property';
-
-const items = [{
-  title: "Home",
-  url: "/",
-  icon: Home
-}, {
-  title: "Settings",
-  url: "/settings",
-  icon: Settings
-}];
-
-interface StoredPropertyData {
-  title: string;
-  address: string;
-  images: string[];
-  hasGarden: boolean;
-  features: any[];
-  gridImages: string[];
-  [key: string]: any;
-}
 
 export function AppSidebar() {
   const navigate = useNavigate();
-  const location = useLocation();
-  const [savedBrochures, setSavedBrochures] = useState<StoredPropertyData[]>([]);
+  const { user, profile } = useAuth();
   const { toast } = useToast();
 
-  useEffect(() => {
-    const saved = localStorage.getItem("savedBrochures");
-    if (saved) {
-      setSavedBrochures(JSON.parse(saved));
+  const handleLogout = async () => {
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      toast({
+        title: "Error",
+        description: "Failed to sign out",
+        variant: "destructive",
+      });
+    } else {
+      navigate('/auth');
     }
-  }, []);
-
-  const handleEditBrochure = (brochure: StoredPropertyData) => {
-    navigate('/', {
-      state: {
-        editBrochure: {
-          ...brochure,
-          features: brochure.features || [],
-          hasGarden: brochure.hasGarden || false,
-          gridImages: brochure.gridImages || []
-        }
-      }
-    });
   };
+
+  if (!user) return null;
 
   return (
     <Sidebar>
@@ -69,17 +46,39 @@ export function AppSidebar() {
         <SidebarGroup>
           <SidebarGroupLabel>Menu</SidebarGroupLabel>
           <SidebarMenu>
-            {items.map(item => (
-              <SidebarMenuItem key={item.title}>
-                <SidebarMenuButton onClick={() => navigate(item.url)}>
-                  <item.icon className="w-4 h-4 mr-2" />
-                  <span>{item.title}</span>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            ))}
+            <SidebarMenuItem>
+              <SidebarMenuButton onClick={() => navigate('/')}>
+                <LayoutDashboard className="w-4 h-4" />
+                <span>Dashboard</span>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+            <SidebarMenuItem>
+              <SidebarMenuButton onClick={() => navigate('/properties')}>
+                <Home className="w-4 h-4" />
+                <span>Properties</span>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+            <SidebarMenuItem>
+              <SidebarMenuButton onClick={() => navigate('/settings')}>
+                <Settings className="w-4 h-4" />
+                <span>Settings</span>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
           </SidebarMenu>
         </SidebarGroup>
       </SidebarContent>
+      <SidebarFooter>
+        <SidebarGroup>
+          <SidebarMenu>
+            <SidebarMenuItem>
+              <SidebarMenuButton onClick={handleLogout}>
+                <LogOut className="w-4 h-4" />
+                <span>Sign Out</span>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          </SidebarMenu>
+        </SidebarGroup>
+      </SidebarFooter>
     </Sidebar>
   );
 }

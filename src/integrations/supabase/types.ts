@@ -116,9 +116,37 @@ export type Database = {
           },
         ]
       }
+      profiles: {
+        Row: {
+          created_at: string
+          email: string | null
+          full_name: string | null
+          id: string
+          role: Database["public"]["Enums"]["user_role"] | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          email?: string | null
+          full_name?: string | null
+          id: string
+          role?: Database["public"]["Enums"]["user_role"] | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string | null
+          full_name?: string | null
+          id?: string
+          role?: Database["public"]["Enums"]["user_role"] | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       properties: {
         Row: {
           address: string | null
+          agent_id: string | null
           areaPhotos: string[] | null
           areas: Json[] | null
           bathrooms: string | null
@@ -149,6 +177,7 @@ export type Database = {
         }
         Insert: {
           address?: string | null
+          agent_id?: string | null
           areaPhotos?: string[] | null
           areas?: Json[] | null
           bathrooms?: string | null
@@ -179,6 +208,7 @@ export type Database = {
         }
         Update: {
           address?: string | null
+          agent_id?: string | null
           areaPhotos?: string[] | null
           areas?: Json[] | null
           bathrooms?: string | null
@@ -207,7 +237,15 @@ export type Database = {
           title?: string | null
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "properties_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       property_contact_submissions: {
         Row: {
@@ -329,7 +367,7 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      user_role: "admin" | "agent"
     }
     CompositeTypes: {
       [_ in never]: never

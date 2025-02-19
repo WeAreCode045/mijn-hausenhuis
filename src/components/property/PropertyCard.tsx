@@ -1,4 +1,3 @@
-
 import { Card } from "@/components/ui/card";
 import { useState, useEffect } from "react";
 import { getOrCreateWebViewUrl } from "@/utils/webViewUtils";
@@ -8,6 +7,8 @@ import { useAgencySettings } from "@/hooks/useAgencySettings";
 import { PropertyCardActions } from "./PropertyCardActions";
 import { PropertySubmissionsDialog } from "./PropertySubmissionsDialog";
 import { PropertyData } from "@/types/property";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
 
 interface PropertyCardProps {
   property: PropertyData;
@@ -29,16 +30,17 @@ export const PropertyCard = ({
   property,
   onDelete,
 }: PropertyCardProps) => {
+  const navigate = useNavigate();
   const [showQR, setShowQR] = useState(false);
   const [webViewUrl, setWebViewUrl] = useState<string | null>(null);
   const [showSubmissions, setShowSubmissions] = useState(false);
   const [submissions, setSubmissions] = useState<Submission[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const { settings } = useAgencySettings();
+  const { isAdmin } = useAuth();
 
   useEffect(() => {
     const fetchWebViewUrl = async () => {
-      // Generate a fallback ID if object_id is not present
       const objectId = property.object_id || `temp-${property.id}-${Date.now()}`;
       const url = await getOrCreateWebViewUrl(property.id, objectId);
       if (url) {
@@ -92,13 +94,17 @@ export const PropertyCard = ({
     fetchSubmissions();
   };
 
+  const handleCardClick = () => {
+    navigate(`/property/${property.id}/edit`);
+  };
+
   return (
     <>
-      <Card key={property.id} className="p-6 space-y-6 relative group">
-        {property.images?.[0] && (
+      <Card key={property.id} className="p-6 space-y-6 relative group cursor-pointer hover:shadow-lg transition-shadow" onClick={handleCardClick}>
+        {(property.featuredImage || property.images?.[0]) && (
           <div className="relative">
             <img
-              src={property.images[0].url}
+              src={property.featuredImage || property.images[0].url}
               alt={property.title}
               className="w-full h-48 object-cover rounded-lg"
             />

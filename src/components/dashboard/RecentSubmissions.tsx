@@ -3,19 +3,28 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { format } from "date-fns";
+import { useAuth } from "@/providers/AuthProvider";
 
 export function RecentSubmissions() {
+  const { profile, isAdmin } = useAuth();
+
   const { data: recentSubmissions = [] } = useQuery({
-    queryKey: ['recent-submissions'],
+    queryKey: ['recent-submissions', profile?.id, isAdmin],
     queryFn: async () => {
-      const { data, error } = await supabase
+      let query = supabase
         .from('property_contact_submissions')
         .select(`
           *,
-          properties(title)
+          properties(title, agent_id)
         `)
         .order('created_at', { ascending: false })
         .limit(5);
+
+      if (!isAdmin) {
+        query = query.eq('properties.agent_id', profile.id);
+      }
+
+      const { data, error } = await query;
 
       if (error) throw error;
       return data;
