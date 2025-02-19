@@ -57,7 +57,12 @@ export function GridImagesSection({
         {gridImages.length < 4 && (
           <ImageSelectDialog
             images={images.filter(img => !gridImages.includes(img.url))}
-            onSelect={handleGridImagesSelect}
+            onSelect={(selectedIds) => {
+              const selectedUrls = selectedIds.map(id => 
+                images.find(img => img.id === id)?.url
+              ).filter((url): url is string => url !== undefined);
+              handleGridImagesSelect(selectedUrls);
+            }}
             buttonText="Add Grid Images"
             maxSelect={4 - gridImages.length}
           />

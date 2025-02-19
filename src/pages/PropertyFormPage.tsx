@@ -19,36 +19,36 @@ export default function PropertyFormPage() {
   const { toast } = useToast();
   const { settings } = useAgencySettings();
 
-  const handleSubmit = async (data: PropertyFormData) => {
+  const handleSubmit = async (formData: PropertyFormData) => {
     try {
       // Convert PropertyFormData to PropertySubmitData
       const submitData: PropertySubmitData = {
-        id: data.id,
-        title: data.title,
-        price: data.price,
-        address: data.address,
-        bedrooms: data.bedrooms,
-        bathrooms: data.bathrooms,
-        sqft: data.sqft,
-        livingArea: data.livingArea,
-        buildYear: data.buildYear,
-        garages: data.garages,
-        energyLabel: data.energyLabel,
-        hasGarden: data.hasGarden,
-        description: data.description,
-        location_description: data.location_description,
-        floorplans: data.floorplans,
-        featuredImage: data.featuredImage,
-        gridImages: data.gridImages,
-        areaPhotos: data.areaPhotos,
-        features: data.features as unknown as Json,
-        areas: data.areas as unknown as Json[],
-        nearby_places: data.nearby_places as unknown as Json,
-        images: data.images.map(img => img.url), // Only send the URLs to the database
-        latitude: data.latitude,
-        longitude: data.longitude,
-        object_id: data.object_id,
-        map_image: data.map_image
+        id: formData.id,
+        title: formData.title,
+        price: formData.price,
+        address: formData.address,
+        bedrooms: formData.bedrooms,
+        bathrooms: formData.bathrooms,
+        sqft: formData.sqft,
+        livingArea: formData.livingArea,
+        buildYear: formData.buildYear,
+        garages: formData.garages,
+        energyLabel: formData.energyLabel,
+        hasGarden: formData.hasGarden,
+        description: formData.description,
+        location_description: formData.location_description,
+        floorplans: formData.floorplans,
+        featuredImage: formData.featuredImage,
+        gridImages: formData.gridImages,
+        areaPhotos: formData.areaPhotos,
+        features: formData.features as unknown as Json,
+        areas: formData.areas as unknown as Json[],
+        nearby_places: formData.nearby_places as unknown as Json,
+        images: formData.images.map(img => img.url),
+        latitude: formData.latitude,
+        longitude: formData.longitude,
+        object_id: formData.object_id,
+        map_image: formData.map_image
       };
 
       if (id) {
@@ -88,7 +88,7 @@ export default function PropertyFormPage() {
     }
   };
 
-  const { formData, setFormData } = usePropertyForm(id, handleSubmit);
+  const { formData, setFormData } = usePropertyForm(id, () => {});
   const {
     handleImageUpload,
     handleRemoveImage,

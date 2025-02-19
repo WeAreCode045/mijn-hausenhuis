@@ -17,7 +17,7 @@ export function AreaPhotosSection({
 }: AreaPhotosSectionProps) {
   return (
     <div className="space-y-4">
-      <Label>Area Photos (Max 6)</Label>
+      <Label>Area Photos (Max 15)</Label>
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
         {areaPhotos.map((url, index) => (
           <div key={url} className="relative group">
@@ -37,14 +37,17 @@ export function AreaPhotosSection({
             </Button>
           </div>
         ))}
+        {areaPhotos.length < 15 && (
+          <Input
+            type="file"
+            onChange={onAreaPhotosUpload}
+            accept="image/*"
+            multiple
+            className="mt-2"
+            disabled={areaPhotos.length >= 15}
+          />
+        )}
       </div>
-      <Input
-        type="file"
-        onChange={onAreaPhotosUpload}
-        accept="image/*"
-        multiple
-        className="mt-2"
-      />
     </div>
   );
 }
