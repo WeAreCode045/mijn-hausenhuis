@@ -66,8 +66,25 @@ export function PropertyFormContent({
             />
             <PropertyDescription
               description={formData.description}
-              location_description={formData.location_description}
               onChange={handleInputChange}
+            />
+            <PropertyImages
+              images={formData.images}
+              floorplans={formData.floorplans}
+              featuredImage={formData.featuredImage}
+              gridImages={formData.gridImages}
+              areaPhotos={formData.areaPhotos}
+              onImageUpload={handleImageUpload}
+              onFeaturedImageUpload={handleImageUpload}
+              onGridImageUpload={handleImageUpload}
+              onFloorplanUpload={handleFloorplanUpload}
+              onAreaPhotosUpload={handleAreaPhotosUpload}
+              onRemoveImage={handleRemoveImage}
+              onRemoveFloorplan={handleRemoveFloorplan}
+              onRemoveAreaPhoto={handleRemoveAreaPhoto}
+              onSetFeaturedImage={handleSetFeaturedImage}
+              onToggleGridImage={handleToggleGridImage}
+              showOnlyPropertyImages={true}
             />
           </>
         );

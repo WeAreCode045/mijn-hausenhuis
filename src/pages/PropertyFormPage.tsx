@@ -1,4 +1,3 @@
-
 import { useNavigate, useParams } from "react-router-dom";
 import { PropertyForm } from "@/components/PropertyForm";
 import { supabase } from "@/integrations/supabase/client";
@@ -15,6 +14,7 @@ import { useAgencySettings } from "@/hooks/useAgencySettings";
 import { useAuth } from "@/providers/AuthProvider";
 import { useEffect, useState } from "react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { PropertyActions } from "@/components/property/PropertyActions";
 
 export default function PropertyFormPage() {
   const navigate = useNavigate();
@@ -125,6 +125,32 @@ export default function PropertyFormPage() {
     handleRemoveImage,
   } = usePropertyImages(formData, setFormData);
 
+  const handleDeleteProperty = async () => {
+    if (!id || !window.confirm('Are you sure you want to delete this property?')) return;
+
+    try {
+      const { error } = await supabase
+        .from('properties')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+
+      toast({
+        title: "Property Deleted",
+        description: "The property has been successfully deleted",
+      });
+      navigate('/');
+    } catch (error) {
+      console.error('Error deleting property:', error);
+      toast({
+        title: "Error",
+        description: "Failed to delete the property",
+        variant: "destructive",
+      });
+    }
+  };
+
   if (!formData) {
     return null;
   }
@@ -148,6 +174,13 @@ export default function PropertyFormPage() {
         <div className="flex gap-6">
           <PropertyForm onSubmit={handleFormSubmit} />
           <div className="w-80 shrink-0 space-y-6">
+            {id && (
+              <PropertyActions
+                property={formData}
+                settings={settings}
+                onDelete={handleDeleteProperty}
+              />
+            )}
             {isAdmin && (
               <Card>
                 <CardHeader>
