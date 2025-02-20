@@ -12,6 +12,12 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface PropertyActionsProps {
   property: PropertyFormData;
@@ -54,55 +60,81 @@ export function PropertyActions({ property, settings, onDelete }: PropertyAction
         <CardTitle>Actions</CardTitle>
       </CardHeader>
       <CardContent className="grid grid-cols-2 gap-2">
-        <Button 
-          variant="outline" 
-          className="w-full"
-          onClick={() => navigate(`/property/${property.id}/webview`)}
-        >
-          <ExternalLink className="w-4 h-4 mr-2" />
-          Open Webview
-        </Button>
-        
-        <Button 
-          variant="outline" 
-          className="w-full"
-          onClick={handleDownloadPDF}
-        >
-          <Download className="w-4 h-4 mr-2" />
-          Download PDF
-        </Button>
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button 
+                variant="outline" 
+                className="w-full"
+                onClick={() => navigate(`/property/${property.id}/webview`)}
+              >
+                <ExternalLink className="w-4 h-4" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Open Webview</p>
+            </TooltipContent>
+          </Tooltip>
 
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="w-full">
-              <Share2 className="w-4 h-4 mr-2" />
-              Share
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent>
-            <DropdownMenuItem onClick={() => handleShare('whatsapp')}>
-              WhatsApp
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => handleShare('facebook')}>
-              Facebook
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => handleShare('linkedin')}>
-              LinkedIn
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => handleShare('email')}>
-              Email
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button 
+                variant="outline" 
+                className="w-full"
+                onClick={handleDownloadPDF}
+              >
+                <Download className="w-4 h-4" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Download PDF Brochure</p>
+            </TooltipContent>
+          </Tooltip>
 
-        <Button 
-          variant="destructive" 
-          className="w-full"
-          onClick={onDelete}
-        >
-          <Trash2 className="w-4 h-4 mr-2" />
-          Delete
-        </Button>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" className="w-full">
+                    <Share2 className="w-4 h-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent>
+                  <DropdownMenuItem onClick={() => handleShare('whatsapp')}>
+                    WhatsApp
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => handleShare('facebook')}>
+                    Facebook
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => handleShare('linkedin')}>
+                    LinkedIn
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => handleShare('email')}>
+                    Email
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Share Property</p>
+            </TooltipContent>
+          </Tooltip>
+
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button 
+                variant="destructive" 
+                className="w-full"
+                onClick={onDelete}
+              >
+                <Trash2 className="w-4 h-4" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Delete Property</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
       </CardContent>
     </Card>
   );
