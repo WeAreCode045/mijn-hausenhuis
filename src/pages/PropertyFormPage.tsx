@@ -46,7 +46,10 @@ export default function PropertyFormPage() {
       if (id) {
         const { error: updateError } = await supabase
           .from('properties')
-          .update(data)
+          .update({
+            ...data,
+            agent_id: data.agent_id || null // Ensure agent_id is included
+          })
           .eq('id', id);
         
         if (updateError) throw updateError;
@@ -59,7 +62,10 @@ export default function PropertyFormPage() {
       } else {
         const { error: insertError } = await supabase
           .from('properties')
-          .insert(data);
+          .insert({
+            ...data,
+            agent_id: data.agent_id || null // Ensure agent_id is included
+          });
         
         if (insertError) throw insertError;
 
@@ -81,7 +87,6 @@ export default function PropertyFormPage() {
   };
 
   const handleFormSubmit = (formData: PropertyFormData) => {
-    // Convert PropertyFormData to PropertySubmitData
     const submitData: PropertySubmitData = {
       id: formData.id,
       title: formData.title,
@@ -108,7 +113,8 @@ export default function PropertyFormPage() {
       latitude: formData.latitude,
       longitude: formData.longitude,
       object_id: formData.object_id,
-      map_image: formData.map_image
+      map_image: formData.map_image,
+      agent_id: formData.agent_id // Include agent_id in submitData
     };
     handleDatabaseSubmit(submitData);
   };
