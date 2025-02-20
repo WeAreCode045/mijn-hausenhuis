@@ -9,6 +9,35 @@ import Agents from "@/pages/Agents";
 import { Toaster } from "@/components/ui/toaster";
 import NotFound from "@/pages/NotFound";
 import AppSidebar from "@/components/AppSidebar";
+import { useAuth } from "@/providers/AuthProvider";
+
+// Protected Route wrapper component
+function ProtectedRoute({ children }: { children: React.ReactNode }) {
+  const { user, isLoading } = useAuth();
+  
+  // While checking authentication status, return null or a loading spinner
+  if (isLoading) {
+    return null;
+  }
+  
+  // If not authenticated, redirect to auth page
+  if (!user) {
+    return <Navigate to="/auth" replace />;
+  }
+
+  return <>{children}</>;
+}
+
+// Root redirect component
+function RootRedirect() {
+  const { user, isLoading } = useAuth();
+  
+  if (isLoading) {
+    return null;
+  }
+  
+  return <Navigate to={user ? "/properties" : "/auth"} replace />;
+}
 
 function App() {
   return (
@@ -18,13 +47,48 @@ function App() {
           <AppSidebar />
           <div className="flex-1 overflow-auto">
             <Routes>
-              <Route path="/" element={<Navigate to="/properties" replace />} />
-              <Route path="/properties" element={<Properties />} />
-              <Route path="/properties/new" element={<PropertyFormPage />} />
-              <Route path="/properties/:id" element={<PropertyFormPage />} />
+              <Route path="/" element={<RootRedirect />} />
               <Route path="/auth" element={<Auth />} />
-              <Route path="/settings" element={<Settings />} />
-              <Route path="/agents" element={<Agents />} />
+              <Route 
+                path="/properties" 
+                element={
+                  <ProtectedRoute>
+                    <Properties />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/properties/new" 
+                element={
+                  <ProtectedRoute>
+                    <PropertyFormPage />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/properties/:id" 
+                element={
+                  <ProtectedRoute>
+                    <PropertyFormPage />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/settings" 
+                element={
+                  <ProtectedRoute>
+                    <Settings />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/agents" 
+                element={
+                  <ProtectedRoute>
+                    <Agents />
+                  </ProtectedRoute>
+                } 
+              />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </div>
