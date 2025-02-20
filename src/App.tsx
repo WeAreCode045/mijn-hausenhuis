@@ -1,5 +1,5 @@
 
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Properties from "@/pages/Properties";
 import PropertyFormPage from "@/pages/PropertyFormPage";
 import { AuthProvider } from "@/providers/AuthProvider";
@@ -11,6 +11,7 @@ import NotFound from "@/pages/NotFound";
 import AppSidebar from "@/components/AppSidebar";
 import { useAuth } from "@/providers/AuthProvider";
 import Dashboard from "@/pages/Dashboard";
+import Index from "@/pages/Index";
 
 // Protected Route wrapper component
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -29,17 +30,6 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }
 
-// Root redirect component
-function RootRedirect() {
-  const { user, isLoading } = useAuth();
-  
-  if (isLoading) {
-    return null;
-  }
-  
-  return <Navigate to={user ? "/dashboard" : "/auth"} replace />;
-}
-
 function App() {
   return (
     <AuthProvider>
@@ -48,7 +38,7 @@ function App() {
           <AppSidebar />
           <div className="flex-1 overflow-auto">
             <Routes>
-              <Route path="/" element={<RootRedirect />} />
+              <Route path="/" element={<Index />} />
               <Route path="/auth" element={<Auth />} />
               <Route 
                 path="/dashboard" 
