@@ -8,6 +8,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/providers/AuthProvider";
+import { Database } from "@/integrations/supabase/types";
+
+type ProfilesInsert = Database["public"]["Tables"]["profiles"]["Insert"];
+type ProfilesRow = Database["public"]["Tables"]["profiles"]["Row"];
 
 interface AgentProfile {
   id: string;
@@ -18,18 +22,11 @@ interface AgentProfile {
   updated_at: string;
 }
 
-interface NewAgent {
-  full_name: string;
-  email: string;
-  role: 'agent';
-  id?: string;  // Made optional for insert operations
-  created_at?: string;
-  updated_at?: string;
-}
+type NewAgentInput = Pick<ProfilesInsert, "full_name" | "email" | "role">;
 
 export default function Agents() {
   const [agents, setAgents] = useState<AgentProfile[]>([]);
-  const [newAgent, setNewAgent] = useState<Omit<NewAgent, 'id' | 'created_at' | 'updated_at'>>({ 
+  const [newAgent, setNewAgent] = useState<NewAgentInput>({ 
     full_name: '', 
     email: '', 
     role: 'agent' 
@@ -69,7 +66,7 @@ export default function Agents() {
 
     const { data, error } = await supabase
       .from('profiles')
-      .insert([{ ...newAgent }] as NewAgent[])
+      .insert([newAgent])
       .select();
 
     if (error) {
