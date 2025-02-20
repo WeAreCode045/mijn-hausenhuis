@@ -1,3 +1,4 @@
+
 import { useNavigate, useParams } from "react-router-dom";
 import { PropertyForm } from "@/components/PropertyForm";
 import { supabase } from "@/integrations/supabase/client";
@@ -15,6 +16,8 @@ import { useAuth } from "@/providers/AuthProvider";
 import { useEffect, useState } from "react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { PropertyActions } from "@/components/property/PropertyActions";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Code } from "@/components/ui/code";
 
 export default function PropertyFormPage() {
   const navigate = useNavigate();
@@ -48,7 +51,7 @@ export default function PropertyFormPage() {
           .from('properties')
           .update({
             ...data,
-            agent_id: data.agent_id || null // Ensure agent_id is included
+            agent_id: data.agent_id || null
           })
           .eq('id', id);
         
@@ -64,7 +67,7 @@ export default function PropertyFormPage() {
           .from('properties')
           .insert({
             ...data,
-            agent_id: data.agent_id || null // Ensure agent_id is included
+            agent_id: data.agent_id || null
           });
         
         if (insertError) throw insertError;
@@ -114,7 +117,7 @@ export default function PropertyFormPage() {
       longitude: formData.longitude,
       object_id: formData.object_id,
       map_image: formData.map_image,
-      agent_id: formData.agent_id // Include agent_id in submitData
+      agent_id: formData.agent_id
     };
     handleDatabaseSubmit(submitData);
   };
@@ -159,10 +162,12 @@ export default function PropertyFormPage() {
     setFormData({ ...formData, agent_id: value });
   };
 
+  const apiEndpoint = `${window.location.origin}/api/properties/${formData.id}`;
+
   return (
     <div className="min-h-screen bg-estate-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
-        <div className="flex justify-between items-center mb-12">
+        <div className="flex justify-between items-center mb-6">
           <h1 className="text-4xl font-bold text-estate-800">
             {id ? "Edit Property" : "New Property"}
           </h1>
@@ -171,6 +176,33 @@ export default function PropertyFormPage() {
             Save Property
           </Button>
         </div>
+
+        {formData.id && (
+          <Card className="mb-6">
+            <CardHeader>
+              <CardTitle>Property Information</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <Alert>
+                <AlertDescription className="font-mono">
+                  <div className="space-y-2">
+                    <div>
+                      <span className="font-semibold">ID:</span> {formData.id}
+                    </div>
+                    <div>
+                      <span className="font-semibold">Object ID:</span> {formData.object_id || 'Not set'}
+                    </div>
+                    <div>
+                      <span className="font-semibold">API Endpoint:</span>
+                      <Code className="ml-2">{apiEndpoint}</Code>
+                    </div>
+                  </div>
+                </AlertDescription>
+              </Alert>
+            </CardContent>
+          </Card>
+        )}
+
         <div className="flex gap-6">
           <PropertyForm onSubmit={handleFormSubmit} />
           <div className="w-80 shrink-0 space-y-6">
