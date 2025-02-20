@@ -17,9 +17,13 @@ import Index from "@/pages/Index";
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user, isLoading } = useAuth();
   
-  // While checking authentication status, return null or a loading spinner
+  // While checking authentication status, show a loading spinner
   if (isLoading) {
-    return null;
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
+      </div>
+    );
   }
   
   // If not authenticated, redirect to auth page

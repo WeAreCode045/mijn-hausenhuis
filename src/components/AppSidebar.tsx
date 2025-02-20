@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/providers/AuthProvider";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "./ui/use-toast";
-import { Building2, Settings, Users } from "lucide-react";
+import { Building2, Settings, Users, LayoutDashboard } from "lucide-react";
 
 export default function AppSidebar() {
   const location = useLocation();
@@ -29,11 +29,23 @@ export default function AppSidebar() {
   return (
     <div className="w-64 bg-white border-r border-gray-200 p-4 flex flex-col h-screen">
       <div className="space-y-2 flex-1">
-        <Link to="/">
+        <Link to="/dashboard">
           <Button
             variant="ghost"
             className={`w-full justify-start ${
-              location.pathname === "/" ? "bg-slate-100" : ""
+              location.pathname === "/dashboard" ? "bg-slate-100" : ""
+            }`}
+          >
+            <LayoutDashboard className="mr-2 h-4 w-4" />
+            Dashboard
+          </Button>
+        </Link>
+
+        <Link to="/properties">
+          <Button
+            variant="ghost"
+            className={`w-full justify-start ${
+              location.pathname === "/properties" ? "bg-slate-100" : ""
             }`}
           >
             <Building2 className="mr-2 h-4 w-4" />
