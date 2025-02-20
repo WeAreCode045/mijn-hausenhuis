@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
 import { Download, ExternalLink, Share2, Trash2 } from "lucide-react";
 import { generatePropertyPDF } from "@/utils/pdfGenerator";
-import { PropertyData } from "@/types/property";
+import { PropertyFormData } from "@/types/property";
 import { AgencySettings } from "@/types/agency";
 import { 
   DropdownMenu,
@@ -14,13 +14,15 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 interface PropertyActionsProps {
-  property: PropertyData;
+  property: PropertyFormData;
   settings: AgencySettings;
   onDelete: () => void;
 }
 
 export function PropertyActions({ property, settings, onDelete }: PropertyActionsProps) {
   const navigate = useNavigate();
+  
+  if (!property.id) return null;
   
   const handleShare = (platform: string) => {
     const shareUrl = `${window.location.origin}/property/${property.id}/webview`;
@@ -43,7 +45,7 @@ export function PropertyActions({ property, settings, onDelete }: PropertyAction
   };
 
   const handleDownloadPDF = async () => {
-    await generatePropertyPDF(property, settings);
+    await generatePropertyPDF(property as PropertyFormData & { id: string }, settings);
   };
 
   return (
