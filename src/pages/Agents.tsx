@@ -9,16 +9,28 @@ import { Label } from "@/components/ui/label";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/providers/AuthProvider";
 
-interface Agent {
+interface AgentProfile {
   id: string;
+  full_name: string;
+  email: string;
+  role: 'agent' | 'admin';
+  created_at: string;
+  updated_at: string;
+}
+
+interface NewAgent {
   full_name: string;
   email: string;
   role: 'agent';
 }
 
 export default function Agents() {
-  const [agents, setAgents] = useState<Agent[]>([]);
-  const [newAgent, setNewAgent] = useState({ full_name: '', email: '' });
+  const [agents, setAgents] = useState<AgentProfile[]>([]);
+  const [newAgent, setNewAgent] = useState<NewAgent>({ 
+    full_name: '', 
+    email: '', 
+    role: 'agent' 
+  });
   const { toast } = useToast();
   const navigate = useNavigate();
   const { isAdmin } = useAuth();
@@ -54,13 +66,7 @@ export default function Agents() {
 
     const { data, error } = await supabase
       .from('profiles')
-      .insert([
-        {
-          full_name: newAgent.full_name,
-          email: newAgent.email,
-          role: 'agent'
-        }
-      ])
+      .insert(newAgent)
       .select();
 
     if (error) {
@@ -77,7 +83,7 @@ export default function Agents() {
       description: "Agent created successfully",
     });
 
-    setNewAgent({ full_name: '', email: '' });
+    setNewAgent({ full_name: '', email: '', role: 'agent' });
     fetchAgents();
   };
 
