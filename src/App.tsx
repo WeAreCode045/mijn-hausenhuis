@@ -17,16 +17,14 @@ import Index from "@/pages/Index";
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user, isLoading } = useAuth();
   
-  // While checking authentication status, show a loading spinner
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center h-screen">
+      <div className="flex items-center justify-center min-h-screen">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
       </div>
     );
   }
   
-  // If not authenticated, redirect to auth page
   if (!user) {
     return <Navigate to="/auth" replace />;
   }
@@ -35,6 +33,8 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 }
 
 function App() {
+  const { user } = useAuth();
+
   return (
     <AuthProvider>
       <Router>
@@ -42,8 +42,8 @@ function App() {
           <AppSidebar />
           <div className="flex-1 overflow-auto">
             <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/auth" element={<Auth />} />
+              <Route path="/" element={user ? <Navigate to="/dashboard" replace /> : <Index />} />
+              <Route path="/auth" element={user ? <Navigate to="/dashboard" replace /> : <Auth />} />
               <Route 
                 path="/dashboard" 
                 element={

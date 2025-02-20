@@ -1,5 +1,5 @@
 
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/providers/AuthProvider";
 import { supabase } from "@/integrations/supabase/client";
@@ -8,12 +8,16 @@ import { Building2, Settings, Users, LayoutDashboard } from "lucide-react";
 
 export default function AppSidebar() {
   const location = useLocation();
+  const navigate = useNavigate();
   const { user, isAdmin } = useAuth();
   const { toast } = useToast();
 
   const handleSignOut = async () => {
-    const { error } = await supabase.auth.signOut();
-    if (error) {
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
+      navigate('/auth');
+    } catch (error: any) {
       toast({
         title: "Error signing out",
         description: error.message,
