@@ -66,7 +66,7 @@ export default function Agents() {
 
     const { data, error } = await supabase
       .from('profiles')
-      .insert(newAgent)
+      .insert([newAgent])
       .select();
 
     if (error) {
