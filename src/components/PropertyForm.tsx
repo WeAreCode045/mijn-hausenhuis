@@ -1,3 +1,4 @@
+
 import { Card } from "@/components/ui/card";
 import { useParams } from "react-router-dom";
 import { usePropertyForm } from "@/hooks/usePropertyForm";
@@ -11,7 +12,7 @@ import { steps } from "./property/form/formSteps";
 import { FormStepNavigation } from "./property/form/FormStepNavigation";
 import { useFormSteps } from "@/hooks/useFormSteps";
 import { PropertyStepContent } from "./property/form/PropertyStepContent";
-import { supabase } from "@/integrations/supabase/client";
+import { PropertyFormContent } from "./property/form/PropertyFormContent";
 
 interface PropertyFormProps {
   onSubmit: (data: PropertyFormData) => void;
@@ -50,26 +51,6 @@ export function PropertyForm({ onSubmit }: PropertyFormProps) {
     removeAreaImage
   } = usePropertyAreas(formData, setFormData);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
-  };
-
-  const handleMapImageDelete = async () => {
-    try {
-      const { error } = await supabase
-        .from('properties')
-        .update({ map_image: null })
-        .eq('id', formData.id);
-
-      if (error) throw error;
-
-      setFormData({ ...formData, map_image: null });
-    } catch (error) {
-      console.error('Error removing map image:', error);
-    }
-  };
-
   const { currentStep, handleNext, handlePrevious, handleStepClick } = useFormSteps(
     formData,
     () => autosaveData(formData),
@@ -91,30 +72,7 @@ export function PropertyForm({ onSubmit }: PropertyFormProps) {
           onNext={handleNext}
           isUpdateMode={!!id}
         />
-        <PropertyStepContent
-          currentStep={currentStep}
-          formData={formData}
-          setFormData={setFormData}
-          handleInputChange={handleInputChange}
-          id={id}
-          handleImageUpload={handleImageUpload}
-          handleAreaPhotosUpload={handleAreaPhotosUpload}
-          handleFloorplanUpload={handleFloorplanUpload}
-          handleRemoveImage={handleRemoveImage}
-          handleRemoveAreaPhoto={handleRemoveAreaPhoto}
-          handleRemoveFloorplan={handleRemoveFloorplan}
-          handleSetFeaturedImage={handleSetFeaturedImage}
-          handleToggleGridImage={handleToggleGridImage}
-          addFeature={addFeature}
-          removeFeature={removeFeature}
-          updateFeature={updateFeature}
-          addArea={addArea}
-          removeArea={removeArea}
-          updateArea={updateArea}
-          handleAreaImageUpload={handleAreaImageUpload}
-          removeAreaImage={removeAreaImage}
-          handleMapImageDelete={handleMapImageDelete}
-        />
+        <PropertyFormContent />
       </form>
     </Card>
   );

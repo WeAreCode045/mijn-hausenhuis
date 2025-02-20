@@ -12,11 +12,13 @@ import { PropertyImages } from "../PropertyImages";
 import { PropertyAreas } from "../PropertyAreas";
 import { usePropertyForm } from "@/hooks/usePropertyForm";
 import { PropertyFormData } from "@/types/property";
+import { useParams } from "react-router-dom";
 
 export function PropertyFormContent() {
+  const { id } = useParams();
   const { profile, isAdmin } = useAuth();
   const [agents, setAgents] = useState<Array<{ id: string; full_name: string }>>([]);
-  const { formData, setFormData, id } = usePropertyForm(id, () => {}); // Add required arguments
+  const { formData, setFormData } = usePropertyForm(id, () => {});
   
   useEffect(() => {
     const fetchAgents = async () => {
@@ -46,27 +48,19 @@ export function PropertyFormContent() {
     }
   };
 
+  if (!formData) return null;
+
   return (
     <div className="grid grid-cols-1 lg:grid-cols-[1fr,300px] gap-6">
       <div className="space-y-6">
         <PropertyDetails
-          id={formData.id}
-          title={formData.title}
-          price={formData.price}
-          address={formData.address}
-          buildYear={formData.buildYear}
-          sqft={formData.sqft}
-          livingArea={formData.livingArea}
-          bedrooms={formData.bedrooms}
-          bathrooms={formData.bathrooms}
-          garages={formData.garages}
-          energyLabel={formData.energyLabel}
-          hasGarden={formData.hasGarden}
+          {...formData}
           onChange={handleInputChange}
         />
 
         <PropertyDescription
           description={formData.description}
+          location_description={formData.location_description}
           onChange={handleInputChange}
         />
 
@@ -109,9 +103,9 @@ export function PropertyFormContent() {
 
         <PropertyAreas
           areas={formData.areas}
-          onAreaAdd={() => {}}
-          onAreaRemove={() => {}}
-          onAreaUpdate={() => {}}
+          onAdd={() => {}}
+          onRemove={() => {}}
+          onUpdate={() => {}}
           onImageUpload={() => {}}
           onImageRemove={() => {}}
         />
