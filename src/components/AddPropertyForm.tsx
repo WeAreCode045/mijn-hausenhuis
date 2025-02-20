@@ -31,9 +31,7 @@ const initialFormData: PropertyFormData = {
   gridImages: [],
   areas: [],
   map_image: null,
-  nearby_places: [],
-  latitude: null,
-  longitude: null
+  nearby_places: []
 };
 
 export function AddPropertyForm() {
@@ -53,7 +51,6 @@ export function AddPropertyForm() {
     handleToggleGridImage
   } = usePropertyImages(formData, setFormData);
 
-  // Create an index-based wrapper for handleRemoveImage
   const handleRemoveImage = (index: number) => {
     const imageToRemove = formData.images[index];
     if (imageToRemove) {
@@ -68,15 +65,6 @@ export function AddPropertyForm() {
     updateArea,
     removeAreaImage
   } = usePropertyAreas(formData, setFormData);
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
-  };
-
-  const handleMapImageDelete = async () => {
-    setFormData({ ...formData, map_image: null });
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -123,29 +111,9 @@ export function AddPropertyForm() {
 
   return (
     <Card className="w-full max-w-2xl p-6 space-y-6 animate-fadeIn">
-      <PropertyFormContent 
-        formData={formData}
-        onSubmit={handleSubmit}
-        currentStep={currentStep}
-        addFeature={addFeature}
-        removeFeature={removeFeature}
-        updateFeature={updateFeature}
-        handleInputChange={handleInputChange}
-        handleImageUpload={handleImageUpload}
-        handleAreaPhotosUpload={handleAreaPhotosUpload}
-        handleFloorplanUpload={handleFloorplanUpload}
-        handleRemoveImage={handleRemoveImage}
-        handleRemoveAreaPhoto={handleRemoveAreaPhoto}
-        handleRemoveFloorplan={handleRemoveFloorplan}
-        handleSetFeaturedImage={handleSetFeaturedImage}
-        handleToggleGridImage={handleToggleGridImage}
-        addArea={addArea}
-        removeArea={removeArea}
-        updateArea={updateArea}
-        handleAreaImageUpload={handleAreaImageUpload}
-        removeAreaImage={removeAreaImage}
-        handleMapImageDelete={handleMapImageDelete}
-      />
+      <form onSubmit={handleSubmit} className="space-y-6">
+        <PropertyFormContent />
+      </form>
     </Card>
   );
 }
