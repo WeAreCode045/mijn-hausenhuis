@@ -22,11 +22,14 @@ interface NewAgent {
   full_name: string;
   email: string;
   role: 'agent';
+  id?: string;  // Made optional for insert operations
+  created_at?: string;
+  updated_at?: string;
 }
 
 export default function Agents() {
   const [agents, setAgents] = useState<AgentProfile[]>([]);
-  const [newAgent, setNewAgent] = useState<NewAgent>({ 
+  const [newAgent, setNewAgent] = useState<Omit<NewAgent, 'id' | 'created_at' | 'updated_at'>>({ 
     full_name: '', 
     email: '', 
     role: 'agent' 
@@ -66,7 +69,7 @@ export default function Agents() {
 
     const { data, error } = await supabase
       .from('profiles')
-      .insert([newAgent])
+      .insert([{ ...newAgent }] as NewAgent[])
       .select();
 
     if (error) {
