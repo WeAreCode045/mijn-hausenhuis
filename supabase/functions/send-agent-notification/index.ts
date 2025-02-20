@@ -1,8 +1,5 @@
 
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import { Resend } from "npm:resend@2.0.0";
-
-const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -29,32 +26,51 @@ serve(async (req) => {
 
   try {
     const submission: ContactSubmission = await req.json();
-
-    const emailResponse = await resend.emails.send({
-      from: "Property Inquiry <onboarding@resend.dev>",
-      to: [submission.agent_email],
-      subject: `New inquiry for ${submission.property_title}`,
-      html: `
-        <h2>New Property Inquiry</h2>
-        <p>Dear ${submission.agent_name},</p>
-        <p>You have received a new inquiry for property: ${submission.property_title}</p>
-        <h3>Contact Details:</h3>
-        <ul>
-          <li>Name: ${submission.name}</li>
-          <li>Email: ${submission.email}</li>
-          <li>Phone: ${submission.phone}</li>
-          <li>Inquiry Type: ${submission.inquiry_type}</li>
-        </ul>
-        <h3>Message:</h3>
-        <p>${submission.message}</p>
-      `,
+    
+    // EmailEngine API call
+    const response = await fetch(`${Deno.env.get("EMAILENGINE_API_URL")}/api/v1/submit`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-API-Key": Deno.env.get("EMAILENGINE_API_KEY") || "",
+      },
+      body: JSON.stringify({
+        to: submission.agent_email,
+        subject: `New inquiry for ${submission.property_title}`,
+        html: `
+          <h2>New Property Inquiry</h2>
+          <p>Dear ${submission.agent_name},</p>
+          <p>You have received a new inquiry for property: ${submission.property_title}</p>
+          <h3>Contact Details:</h3>
+          <ul>
+            <li>Name: ${submission.name}</li>
+            <li>Email: ${submission.email}</li>
+            <li>Phone: ${submission.phone}</li>
+            <li>Inquiry Type: ${submission.inquiry_type}</li>
+          </ul>
+          <h3>Message:</h3>
+          <p>${submission.message}</p>
+        `,
+        from: {
+          name: "Property Inquiry",
+          address: Deno.env.get("EMAILENGINE_FROM_ADDRESS") || "noreply@yourdomain.com"
+        }
+      }),
     });
 
-    return new Response(JSON.stringify(emailResponse), {
+    if (!response.ok) {
+      throw new Error(`EmailEngine API error: ${response.statusText}`);
+    }
+
+    const result = await response.json();
+    console.log("Email sent successfully:", result);
+
+    return new Response(JSON.stringify(result), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 200,
     });
   } catch (error) {
+    console.error("Error sending email:", error);
     return new Response(JSON.stringify({ error: error.message }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 500,
