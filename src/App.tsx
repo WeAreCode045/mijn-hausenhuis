@@ -10,6 +10,7 @@ import { Toaster } from "@/components/ui/toaster";
 import NotFound from "@/pages/NotFound";
 import AppSidebar from "@/components/AppSidebar";
 import { useAuth } from "@/providers/AuthProvider";
+import Dashboard from "@/pages/Dashboard";
 
 // Protected Route wrapper component
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -36,7 +37,7 @@ function RootRedirect() {
     return null;
   }
   
-  return <Navigate to={user ? "/properties" : "/auth"} replace />;
+  return <Navigate to={user ? "/dashboard" : "/auth"} replace />;
 }
 
 function App() {
@@ -49,6 +50,14 @@ function App() {
             <Routes>
               <Route path="/" element={<RootRedirect />} />
               <Route path="/auth" element={<Auth />} />
+              <Route 
+                path="/dashboard" 
+                element={
+                  <ProtectedRoute>
+                    <Dashboard />
+                  </ProtectedRoute>
+                } 
+              />
               <Route 
                 path="/properties" 
                 element={
