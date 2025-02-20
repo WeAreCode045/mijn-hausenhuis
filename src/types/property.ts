@@ -1,4 +1,3 @@
-
 import { Json } from "@/integrations/supabase/types";
 
 export interface PropertyFeature {
@@ -65,6 +64,7 @@ export interface PropertyData {
 
 export interface PropertyFormData extends Omit<PropertyData, 'id'> {
   id?: string;
+  agent_id?: string; // Add this line
 }
 
 export interface PropertySubmitData {

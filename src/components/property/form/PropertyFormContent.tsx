@@ -1,19 +1,22 @@
+
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useAuth } from "@/providers/AuthProvider";
+import { supabase } from "@/integrations/supabase/client";
 import { PropertyDetails } from "../PropertyDetails";
 import { PropertyDescription } from "../PropertyDescription";
 import { PropertyLocation } from "../PropertyLocation";
 import { PropertyFeatures } from "../PropertyFeatures";
 import { PropertyImages } from "../PropertyImages";
-import { useAuth } from "@/providers/AuthProvider";
-import { useState, useEffect } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { PropertyAreas } from "../PropertyAreas";
 import { usePropertyForm } from "@/hooks/usePropertyForm";
+import { PropertyFormData } from "@/types/property";
 
 export function PropertyFormContent() {
   const { profile, isAdmin } = useAuth();
   const [agents, setAgents] = useState<Array<{ id: string; full_name: string }>>([]);
-  const { formData, setFormData } = usePropertyForm();
+  const { formData, setFormData, id } = usePropertyForm(id, () => {}); // Add required arguments
   
   useEffect(() => {
     const fetchAgents = async () => {
@@ -32,116 +35,86 @@ export function PropertyFormContent() {
     }
   }, [isAdmin]);
 
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    const { name, value, type } = e.target;
+    
+    if (type === 'checkbox') {
+      const target = e.target as HTMLInputElement;
+      setFormData({ ...formData, [name]: target.checked });
+    } else {
+      setFormData({ ...formData, [name]: value });
+    }
+  };
+
   return (
     <div className="grid grid-cols-1 lg:grid-cols-[1fr,300px] gap-6">
       <div className="space-y-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>Details</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <PropertyDetails
-              id={formData.id}
-              title={formData.title}
-              price={formData.price}
-              address={formData.address}
-              buildYear={formData.buildYear}
-              sqft={formData.sqft}
-              livingArea={formData.livingArea}
-              bedrooms={formData.bedrooms}
-              bathrooms={formData.bathrooms}
-              garages={formData.garages}
-              energyLabel={formData.energyLabel}
-              hasGarden={formData.hasGarden}
-              onChange={(e) => {
-                const { name, value, type, checked } = e.target;
-                setFormData({
-                  ...formData,
-                  [name]: type === 'checkbox' ? checked : value,
-                });
-              }}
-            />
-          </CardContent>
-        </Card>
+        <PropertyDetails
+          id={formData.id}
+          title={formData.title}
+          price={formData.price}
+          address={formData.address}
+          buildYear={formData.buildYear}
+          sqft={formData.sqft}
+          livingArea={formData.livingArea}
+          bedrooms={formData.bedrooms}
+          bathrooms={formData.bathrooms}
+          garages={formData.garages}
+          energyLabel={formData.energyLabel}
+          hasGarden={formData.hasGarden}
+          onChange={handleInputChange}
+        />
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Description</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <PropertyDescription
-              description={formData.description}
-              location_description={formData.location_description}
-              onChange={(e) => {
-                const { name, value } = e.target;
-                setFormData({
-                  ...formData,
-                  [name]: value,
-                });
-              }}
-            />
-          </CardContent>
-        </Card>
+        <PropertyDescription
+          description={formData.description}
+          onChange={handleInputChange}
+        />
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Location</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <PropertyLocation
-              address={formData.address}
-              latitude={formData.latitude}
-              longitude={formData.longitude}
-              map_image={formData.map_image}
-              onChange={(e) => {
-                const { name, value } = e.target;
-                setFormData({
-                  ...formData,
-                  [name]: value,
-                });
-              }}
-            />
-          </CardContent>
-        </Card>
+        <PropertyLocation
+          id={formData.id}
+          address={formData.address}
+          description={formData.description}
+          location_description={formData.location_description}
+          map_image={formData.map_image}
+          nearby_places={formData.nearby_places}
+          onChange={handleInputChange}
+          onLocationFetch={async () => {}}
+          onMapImageDelete={async () => {}}
+        />
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Features</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <PropertyFeatures
-              features={formData.features}
-              onFeaturesChange={(newFeatures) => {
-                setFormData({
-                  ...formData,
-                  features: newFeatures,
-                });
-              }}
-            />
-          </CardContent>
-        </Card>
+        <PropertyFeatures
+          features={formData.features}
+          onAdd={() => {}}
+          onRemove={(id: string) => {}}
+          onUpdate={(id: string, description: string) => {}}
+        />
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Images</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <PropertyImages
-              images={formData.images}
-              floorplans={formData.floorplans}
-              featuredImage={formData.featuredImage}
-              gridImages={formData.gridImages}
-              areaPhotos={formData.areaPhotos}
-              onFloorplanUpload={() => {}}
-              onAreaPhotosUpload={() => {}}
-              onRemoveImage={() => {}}
-              onRemoveFloorplan={() => {}}
-              onRemoveAreaPhoto={() => {}}
-              onSetFeaturedImage={() => {}}
-              onToggleGridImage={() => {}}
-            />
-          </CardContent>
-        </Card>
+        <PropertyImages
+          images={formData.images}
+          floorplans={formData.floorplans}
+          featuredImage={formData.featuredImage}
+          gridImages={formData.gridImages}
+          areaPhotos={formData.areaPhotos}
+          onImageUpload={() => {}}
+          onFeaturedImageUpload={() => {}}
+          onGridImageUpload={() => {}}
+          onFloorplanUpload={() => {}}
+          onAreaPhotosUpload={() => {}}
+          onRemoveImage={() => {}}
+          onRemoveFloorplan={() => {}}
+          onRemoveAreaPhoto={() => {}}
+          onSetFeaturedImage={() => {}}
+          onToggleGridImage={() => {}}
+        />
+
+        <PropertyAreas
+          areas={formData.areas}
+          onAreaAdd={() => {}}
+          onAreaRemove={() => {}}
+          onAreaUpdate={() => {}}
+          onImageUpload={() => {}}
+          onImageRemove={() => {}}
+        />
       </div>
       
       <div className="space-y-6">
@@ -153,7 +126,7 @@ export function PropertyFormContent() {
             <CardContent>
               <Select
                 value={formData.agent_id || ''}
-                onValueChange={(value) => setFormData({ ...formData, agent_id: value })}
+                onValueChange={(value) => setFormData(prev => ({ ...prev, agent_id: value }))}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Select an agent" />
@@ -169,15 +142,6 @@ export function PropertyFormContent() {
             </CardContent>
           </Card>
         )}
-        
-        <Card>
-          <CardHeader>
-            <CardTitle>Property Areas</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div>Areas</div>
-          </CardContent>
-        </Card>
       </div>
     </div>
   );
