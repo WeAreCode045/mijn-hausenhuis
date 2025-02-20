@@ -45,7 +45,11 @@ export function RecentProperties() {
       <CardContent>
         <div className="space-y-4">
           {recentProperties.map((property: PropertyData) => (
-            <div key={property.id} className="flex items-center gap-4">
+            <div 
+              key={property.id} 
+              className="flex items-center gap-4 cursor-pointer hover:bg-gray-50 p-2 rounded-lg transition-colors"
+              onClick={() => navigate(`/property/${property.id}/edit`)}
+            >
               <img
                 src={property.images?.[0]?.url || '/placeholder.svg'}
                 alt={property.title}

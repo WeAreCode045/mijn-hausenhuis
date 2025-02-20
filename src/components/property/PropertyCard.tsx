@@ -101,10 +101,10 @@ export const PropertyCard = ({
   return (
     <>
       <Card key={property.id} className="p-6 space-y-6 relative group cursor-pointer hover:shadow-lg transition-shadow" onClick={handleCardClick}>
-        {(property.featuredImage || property.images?.[0]) && (
+        {(property.images?.[0]?.url || property.featuredImage) && (
           <div className="relative">
             <img
-              src={property.featuredImage || property.images[0].url}
+              src={property.images?.[0]?.url || property.featuredImage || '/placeholder.svg'}
               alt={property.title}
               className="w-full h-48 object-cover rounded-lg"
             />
