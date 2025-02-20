@@ -10,15 +10,57 @@ import { PropertyLocation } from "../PropertyLocation";
 import { PropertyFeatures } from "../PropertyFeatures";
 import { PropertyImages } from "../PropertyImages";
 import { PropertyAreas } from "../PropertyAreas";
-import { usePropertyForm } from "@/hooks/usePropertyForm";
-import { PropertyFormData } from "@/types/property";
-import { useParams } from "react-router-dom";
+import { PropertyFormData, PropertyArea } from "@/types/property";
 
-export function PropertyFormContent() {
-  const { id } = useParams();
-  const { profile, isAdmin } = useAuth();
+interface PropertyFormContentProps {
+  formData: PropertyFormData;
+  onSubmit: (e: React.FormEvent) => Promise<void>;
+  currentStep: number;
+  addFeature: () => void;
+  removeFeature: (id: string) => void;
+  updateFeature: (id: string, description: string) => void;
+  handleInputChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => void;
+  handleImageUpload: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  handleAreaPhotosUpload: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  handleFloorplanUpload: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  handleRemoveImage: (index: number) => void;
+  handleRemoveAreaPhoto: (index: number) => void;
+  handleRemoveFloorplan: (index: number) => void;
+  handleSetFeaturedImage: (url: string | null) => void;
+  handleToggleGridImage: (images: string[]) => void;
+  addArea: () => void;
+  removeArea: (id: string) => void;
+  updateArea: (id: string, field: keyof PropertyArea, value: string | string[]) => void;
+  handleAreaImageUpload: (id: string, files: FileList) => void;
+  removeAreaImage: (id: string, imageId: string) => void;
+  handleMapImageDelete: () => Promise<void>;
+}
+
+export function PropertyFormContent({
+  formData,
+  onSubmit,
+  currentStep,
+  addFeature,
+  removeFeature,
+  updateFeature,
+  handleInputChange,
+  handleImageUpload,
+  handleAreaPhotosUpload,
+  handleFloorplanUpload,
+  handleRemoveImage,
+  handleRemoveAreaPhoto,
+  handleRemoveFloorplan,
+  handleSetFeaturedImage,
+  handleToggleGridImage,
+  addArea,
+  removeArea,
+  updateArea,
+  handleAreaImageUpload,
+  removeAreaImage,
+  handleMapImageDelete
+}: PropertyFormContentProps) {
+  const { isAdmin } = useAuth();
   const [agents, setAgents] = useState<Array<{ id: string; full_name: string }>>([]);
-  const { formData, setFormData } = usePropertyForm(id, () => {});
   
   useEffect(() => {
     const fetchAgents = async () => {
@@ -36,17 +78,6 @@ export function PropertyFormContent() {
       fetchAgents();
     }
   }, [isAdmin]);
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    const { name, value, type } = e.target;
-    
-    if (type === 'checkbox') {
-      const target = e.target as HTMLInputElement;
-      setFormData({ ...formData, [name]: target.checked });
-    } else {
-      setFormData({ ...formData, [name]: value });
-    }
-  };
 
   if (!formData) return null;
 
@@ -73,14 +104,14 @@ export function PropertyFormContent() {
           nearby_places={formData.nearby_places}
           onChange={handleInputChange}
           onLocationFetch={async () => {}}
-          onMapImageDelete={async () => {}}
+          onMapImageDelete={handleMapImageDelete}
         />
 
         <PropertyFeatures
           features={formData.features}
-          onAdd={() => {}}
-          onRemove={(id: string) => {}}
-          onUpdate={(id: string, description: string) => {}}
+          onAdd={addFeature}
+          onRemove={removeFeature}
+          onUpdate={updateFeature}
         />
 
         <PropertyImages
@@ -89,25 +120,25 @@ export function PropertyFormContent() {
           featuredImage={formData.featuredImage}
           gridImages={formData.gridImages}
           areaPhotos={formData.areaPhotos}
-          onImageUpload={() => {}}
-          onFeaturedImageUpload={() => {}}
-          onGridImageUpload={() => {}}
-          onFloorplanUpload={() => {}}
-          onAreaPhotosUpload={() => {}}
-          onRemoveImage={() => {}}
-          onRemoveFloorplan={() => {}}
-          onRemoveAreaPhoto={() => {}}
-          onSetFeaturedImage={() => {}}
-          onToggleGridImage={() => {}}
+          onImageUpload={handleImageUpload}
+          onFeaturedImageUpload={handleImageUpload}
+          onGridImageUpload={handleImageUpload}
+          onFloorplanUpload={handleFloorplanUpload}
+          onAreaPhotosUpload={handleAreaPhotosUpload}
+          onRemoveImage={handleRemoveImage}
+          onRemoveFloorplan={handleRemoveFloorplan}
+          onRemoveAreaPhoto={handleRemoveAreaPhoto}
+          onSetFeaturedImage={handleSetFeaturedImage}
+          onToggleGridImage={handleToggleGridImage}
         />
 
         <PropertyAreas
           areas={formData.areas}
-          onAdd={() => {}}
-          onRemove={() => {}}
-          onUpdate={() => {}}
-          onImageUpload={() => {}}
-          onImageRemove={() => {}}
+          onAdd={addArea}
+          onRemove={removeArea}
+          onUpdate={updateArea}
+          onImageUpload={handleAreaImageUpload}
+          onImageRemove={removeAreaImage}
         />
       </div>
       
@@ -120,7 +151,9 @@ export function PropertyFormContent() {
             <CardContent>
               <Select
                 value={formData.agent_id || ''}
-                onValueChange={(value) => setFormData(prev => ({ ...prev, agent_id: value }))}
+                onValueChange={(value) => handleInputChange({ 
+                  target: { name: 'agent_id', value } 
+                } as React.ChangeEvent<HTMLSelectElement>)}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Select an agent" />
