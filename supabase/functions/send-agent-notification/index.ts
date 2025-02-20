@@ -27,6 +27,13 @@ serve(async (req) => {
   try {
     const submission: ContactSubmission = await req.json();
     
+    // Add some logging to help with debugging
+    console.log("Processing submission:", {
+      to: submission.agent_email,
+      subject: `New inquiry for ${submission.property_title}`,
+      from_address: Deno.env.get("EMAILENGINE_FROM_ADDRESS")
+    });
+    
     // EmailEngine API call
     const response = await fetch(`${Deno.env.get("EMAILENGINE_API_URL")}/api/v1/submit`, {
       method: "POST",
@@ -59,6 +66,8 @@ serve(async (req) => {
     });
 
     if (!response.ok) {
+      const errorText = await response.text();
+      console.error("EmailEngine API error response:", errorText);
       throw new Error(`EmailEngine API error: ${response.statusText}`);
     }
 
