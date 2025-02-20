@@ -42,7 +42,7 @@ function App() {
           <AppSidebar />
           <div className="flex-1 overflow-auto">
             <Routes>
-              <Route path="/" element={user ? <Navigate to="/dashboard" replace /> : <Index />} />
+              <Route path="/" element={<Index />} />
               <Route path="/auth" element={user ? <Navigate to="/dashboard" replace /> : <Auth />} />
               <Route 
                 path="/dashboard" 
