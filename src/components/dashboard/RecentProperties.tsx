@@ -8,30 +8,81 @@ import { Button } from "@/components/ui/button";
 import { ArrowUpRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/providers/AuthProvider";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export function RecentProperties() {
   const navigate = useNavigate();
   const { profile, isAdmin } = useAuth();
   
-  const { data: recentProperties = [] } = useQuery({
+  const { data: recentProperties, isLoading, error } = useQuery({
     queryKey: ['recent-properties', profile?.id, isAdmin],
     queryFn: async () => {
-      let query = supabase
-        .from('properties')
-        .select('*, property_images(*)')
-        .order('created_at', { ascending: false })
-        .limit(3);
+      try {
+        let query = supabase
+          .from('properties')
+          .select('*, property_images(*)')
+          .order('created_at', { ascending: false })
+          .limit(3);
 
-      if (!isAdmin && profile) {
-        query = query.eq('agent_id', profile.id);
+        if (!isAdmin && profile) {
+          query = query.eq('agent_id', profile.id);
+        }
+
+        const { data, error } = await query;
+
+        if (error) {
+          console.error('Supabase query error:', error);
+          throw error;
+        }
+
+        return (data || []).map(item => transformSupabaseData(item));
+      } catch (err) {
+        console.error('Error fetching properties:', err);
+        throw err;
       }
-
-      const { data, error } = await query;
-
-      if (error) throw error;
-      return (data || []).map(item => transformSupabaseData(item));
     },
+    retry: 2,
+    staleTime: 30000, // Data remains fresh for 30 seconds
+    cacheTime: 300000, // Cache data for 5 minutes
   });
+
+  if (error) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Recent Properties</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="text-sm text-red-500">
+            Error loading properties. Please try again later.
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (isLoading) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Recent Properties</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            {[1, 2, 3].map((index) => (
+              <div key={index} className="flex items-center gap-4">
+                <Skeleton className="w-16 h-16 rounded-lg" />
+                <div className="space-y-2 flex-1">
+                  <Skeleton className="h-4 w-3/4" />
+                  <Skeleton className="h-4 w-1/2" />
+                </div>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card>
@@ -44,7 +95,7 @@ export function RecentProperties() {
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
-          {recentProperties.map((property: PropertyData) => (
+          {(recentProperties || []).map((property: PropertyData) => (
             <div 
               key={property.id} 
               className="flex items-center gap-4 cursor-pointer hover:bg-gray-50 p-2 rounded-lg transition-colors"
