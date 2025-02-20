@@ -1,8 +1,4 @@
-import { useState, useEffect } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useAuth } from "@/providers/AuthProvider";
-import { supabase } from "@/integrations/supabase/client";
+
 import { PropertyDetails } from "../PropertyDetails";
 import { PropertyDescription } from "../PropertyDescription";
 import { PropertyLocation } from "../PropertyLocation";
@@ -37,7 +33,6 @@ interface PropertyFormContentProps {
 
 export function PropertyFormContent({
   formData,
-  onSubmit,
   currentStep,
   addFeature,
   removeFeature,
@@ -60,64 +55,85 @@ export function PropertyFormContent({
 }: PropertyFormContentProps) {
   if (!formData) return null;
 
+  const renderStepContent = () => {
+    switch (currentStep) {
+      case 1: // General Info
+        return (
+          <>
+            <PropertyDetails
+              {...formData}
+              onChange={handleInputChange}
+            />
+            <PropertyDescription
+              description={formData.description}
+              location_description={formData.location_description}
+              onChange={handleInputChange}
+            />
+          </>
+        );
+      case 2: // Features
+        return (
+          <PropertyFeatures
+            features={formData.features}
+            onAdd={addFeature}
+            onRemove={removeFeature}
+            onUpdate={updateFeature}
+          />
+        );
+      case 3: // Areas
+        return (
+          <PropertyAreas
+            areas={formData.areas}
+            onAdd={addArea}
+            onRemove={removeArea}
+            onUpdate={updateArea}
+            onImageUpload={handleAreaImageUpload}
+            onImageRemove={removeAreaImage}
+          />
+        );
+      case 4: // Floorplans
+        return (
+          <PropertyImages
+            images={formData.images}
+            floorplans={formData.floorplans}
+            featuredImage={formData.featuredImage}
+            gridImages={formData.gridImages}
+            areaPhotos={formData.areaPhotos}
+            onImageUpload={handleImageUpload}
+            onFeaturedImageUpload={handleImageUpload}
+            onGridImageUpload={handleImageUpload}
+            onFloorplanUpload={handleFloorplanUpload}
+            onAreaPhotosUpload={handleAreaPhotosUpload}
+            onRemoveImage={handleRemoveImage}
+            onRemoveFloorplan={handleRemoveFloorplan}
+            onRemoveAreaPhoto={handleRemoveAreaPhoto}
+            onSetFeaturedImage={handleSetFeaturedImage}
+            onToggleGridImage={handleToggleGridImage}
+            showOnlyFloorplans={true}
+          />
+        );
+      case 5: // Location
+        return (
+          <PropertyLocation
+            id={formData.id}
+            address={formData.address}
+            description={formData.description}
+            location_description={formData.location_description}
+            map_image={formData.map_image}
+            nearby_places={formData.nearby_places}
+            onChange={handleInputChange}
+            onLocationFetch={async () => {}}
+            onMapImageDelete={handleMapImageDelete}
+          />
+        );
+      default:
+        return null;
+    }
+  };
+
   return (
     <div className="space-y-6">
-      <PropertyDetails
-        {...formData}
-        onChange={handleInputChange}
-      />
-
-      <PropertyDescription
-        description={formData.description}
-        location_description={formData.location_description}
-        onChange={handleInputChange}
-      />
-
-      <PropertyLocation
-        id={formData.id}
-        address={formData.address}
-        description={formData.description}
-        location_description={formData.location_description}
-        map_image={formData.map_image}
-        nearby_places={formData.nearby_places}
-        onChange={handleInputChange}
-        onLocationFetch={async () => {}}
-        onMapImageDelete={handleMapImageDelete}
-      />
-
-      <PropertyFeatures
-        features={formData.features}
-        onAdd={addFeature}
-        onRemove={removeFeature}
-        onUpdate={updateFeature}
-      />
-
-      <PropertyImages
-        images={formData.images}
-        floorplans={formData.floorplans}
-        featuredImage={formData.featuredImage}
-        gridImages={formData.gridImages}
-        areaPhotos={formData.areaPhotos}
-        onImageUpload={handleImageUpload}
-        onFeaturedImageUpload={handleImageUpload}
-        onGridImageUpload={handleImageUpload}
-        onFloorplanUpload={handleFloorplanUpload}
-        onAreaPhotosUpload={handleAreaPhotosUpload}
-        onRemoveImage={handleRemoveImage}
-        onRemoveFloorplan={handleRemoveFloorplan}
-        onRemoveAreaPhoto={handleRemoveAreaPhoto}
-        onSetFeaturedImage={handleSetFeaturedImage}
-        onToggleGridImage={handleToggleGridImage}
-      />
-
-      <PropertyAreas
-        areas={formData.areas}
-        onAdd={addArea}
-        onRemove={removeArea}
-        onUpdate={updateArea}
-        onImageUpload={handleAreaImageUpload}
-        onImageRemove={removeAreaImage}
-      />
+      {renderStepContent()}
     </div>
   );
 }
