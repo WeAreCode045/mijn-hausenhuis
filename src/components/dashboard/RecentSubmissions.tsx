@@ -6,6 +6,7 @@ import { format } from "date-fns";
 import { useAuth } from "@/providers/AuthProvider";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useState } from "react";
+import { Skeleton } from "@/components/ui/skeleton";
 
 type Submission = {
   id: string;
@@ -24,14 +25,16 @@ export function RecentSubmissions() {
   const { profile, isAdmin } = useAuth();
   const [selectedSubmission, setSelectedSubmission] = useState<Submission | null>(null);
 
-  const { data: recentSubmissions = [] } = useQuery({
+  const { data: recentSubmissions = [], isLoading } = useQuery({
     queryKey: ['recent-submissions', profile?.id, isAdmin],
     queryFn: async () => {
       let query = supabase
         .from('property_contact_submissions')
         .select(`
-          *,
-          properties(title, agent_id)
+          id,
+          name,
+          created_at,
+          properties(title)
         `)
         .order('created_at', { ascending: false })
         .limit(5);
@@ -45,7 +48,42 @@ export function RecentSubmissions() {
       if (error) throw error;
       return data;
     },
+    staleTime: 1000 * 60 * 5, // Cache for 5 minutes
   });
+
+  const fetchFullSubmission = async (id: string) => {
+    const { data, error } = await supabase
+      .from('property_contact_submissions')
+      .select('*, properties(title)')
+      .eq('id', id)
+      .single();
+
+    if (error) throw error;
+    return data;
+  };
+
+  if (isLoading) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Recent Contact Form Submissions</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            {[1, 2, 3, 4, 5].map((i) => (
+              <div key={i} className="flex justify-between items-center">
+                <div className="space-y-2">
+                  <Skeleton className="h-4 w-[150px]" />
+                  <Skeleton className="h-3 w-[100px]" />
+                </div>
+                <Skeleton className="h-4 w-[100px]" />
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <>
@@ -59,7 +97,10 @@ export function RecentSubmissions() {
               <div 
                 key={submission.id} 
                 className="flex items-center justify-between cursor-pointer hover:bg-gray-50 p-2 rounded-lg transition-colors"
-                onClick={() => setSelectedSubmission(submission)}
+                onClick={async () => {
+                  const fullSubmission = await fetchFullSubmission(submission.id);
+                  setSelectedSubmission(fullSubmission);
+                }}
               >
                 <div>
                   <h3 className="font-medium">{submission.name}</h3>

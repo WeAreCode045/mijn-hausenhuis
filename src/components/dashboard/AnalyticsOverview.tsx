@@ -2,10 +2,10 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { transformSupabaseData } from "@/components/property/webview/utils/transformSupabaseData";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export function AnalyticsOverview() {
-  const { data: viewStats = [] } = useQuery({
+  const { data: viewStats = [], isLoading } = useQuery({
     queryKey: ['property-views'],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -13,7 +13,6 @@ export function AnalyticsOverview() {
         .select(`
           id,
           title,
-          object_id,
           property_web_views(count)
         `)
         .order('created_at', { ascending: false })
@@ -22,7 +21,28 @@ export function AnalyticsOverview() {
       if (error) throw error;
       return data;
     },
+    staleTime: 1000 * 60 * 5, // Cache for 5 minutes
   });
+
+  if (isLoading) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Analytics Overview</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            {[1, 2, 3, 4, 5].map((i) => (
+              <div key={i} className="flex justify-between items-center">
+                <Skeleton className="h-4 w-[200px]" />
+                <Skeleton className="h-4 w-[50px]" />
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card>
