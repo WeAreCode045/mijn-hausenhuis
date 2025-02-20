@@ -1,3 +1,4 @@
+
 import { Json } from "@/integrations/supabase/types";
 
 export interface PropertyFeature {
@@ -94,6 +95,7 @@ export interface PropertySubmitData {
   areas: Json[];
   nearby_places: Json;
   images: string[]; // Change to string[] to match database expectation
+  agent_id?: string; // Add this line to fix the TypeScript error
 }
 
 export interface PropertyDatabaseData {
