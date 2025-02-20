@@ -1,5 +1,5 @@
 
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import Properties from "@/pages/Properties";
 import PropertyFormPage from "@/pages/PropertyFormPage";
 import { AuthProvider } from "@/providers/AuthProvider";
