@@ -8,16 +8,38 @@ import { Json } from "@/integrations/supabase/types";
 import { PropertyMediaLibrary } from "@/components/property/PropertyMediaLibrary";
 import { usePropertyForm } from "@/hooks/usePropertyForm";
 import { usePropertyImages } from "@/hooks/usePropertyImages";
-import { Card } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Save } from "lucide-react";
 import { useAgencySettings } from "@/hooks/useAgencySettings";
+import { useAuth } from "@/providers/AuthProvider";
+import { useEffect, useState } from "react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 export default function PropertyFormPage() {
   const navigate = useNavigate();
   const { id } = useParams();
   const { toast } = useToast();
   const { settings } = useAgencySettings();
+  const { isAdmin } = useAuth();
+  const [agents, setAgents] = useState<Array<{ id: string; full_name: string }>>([]);
+
+  useEffect(() => {
+    const fetchAgents = async () => {
+      if (isAdmin) {
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('id, full_name')
+          .eq('role', 'agent');
+        
+        if (!error && data) {
+          setAgents(data);
+        }
+      }
+    };
+    
+    fetchAgents();
+  }, [isAdmin]);
 
   const handleDatabaseSubmit = async (data: PropertySubmitData) => {
     try {
@@ -101,6 +123,10 @@ export default function PropertyFormPage() {
     return null;
   }
 
+  const handleAgentChange = (value: string) => {
+    setFormData({ ...formData, agent_id: value });
+  };
+
   return (
     <div className="min-h-screen bg-estate-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
@@ -115,7 +141,31 @@ export default function PropertyFormPage() {
         </div>
         <div className="flex gap-6">
           <PropertyForm onSubmit={handleFormSubmit} />
-          <div className="w-80 shrink-0">
+          <div className="w-80 shrink-0 space-y-6">
+            {isAdmin && (
+              <Card>
+                <CardHeader>
+                  <CardTitle>Assign Agent</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <Select
+                    value={formData.agent_id || ''}
+                    onValueChange={handleAgentChange}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select an agent" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {agents.map((agent) => (
+                        <SelectItem key={agent.id} value={agent.id}>
+                          {agent.full_name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </CardContent>
+              </Card>
+            )}
             <PropertyMediaLibrary
               images={formData.images.map(img => img.url)}
               onImageUpload={handleImageUpload}
