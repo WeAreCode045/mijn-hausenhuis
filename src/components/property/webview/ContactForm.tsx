@@ -9,12 +9,9 @@ import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
 interface ContactFormProps {
-  agencyName?: string;
-  agencyAddress?: string;
-  agencyPhone?: string;
-  agencyEmail?: string;
-  secondaryColor?: string;
   propertyId: string;
+  propertyTitle: string;
+  agentId: string | undefined;
 }
 
 const INQUIRY_TYPES = [
@@ -23,14 +20,7 @@ const INQUIRY_TYPES = [
   { value: "offer", label: "Een bod uitbrengen" }
 ];
 
-export function ContactForm({ 
-  agencyName, 
-  agencyAddress, 
-  agencyPhone, 
-  agencyEmail,
-  secondaryColor,
-  propertyId
-}: ContactFormProps) {
+export function ContactForm({ propertyId, propertyTitle, agentId }: ContactFormProps) {
   const { toast } = useToast();
   const [formData, setFormData] = useState({
     name: "",
@@ -44,18 +34,48 @@ export function ContactForm({
     e.preventDefault();
     
     try {
-      const { error } = await supabase
+      // First, get the agent's details
+      const { data: agentData, error: agentError } = await supabase
+        .from('profiles')
+        .select('email, full_name')
+        .eq('id', agentId)
+        .single();
+
+      if (agentError) throw agentError;
+
+      // Save the submission to the database
+      const { data: submission, error } = await supabase
         .from('property_contact_submissions')
-        .insert([{
+        .insert({
           property_id: propertyId,
           name: formData.name,
           email: formData.email,
           phone: formData.phone,
           inquiry_type: formData.inquiryType,
           message: formData.message,
-        }]);
+          agent_id: agentId
+        })
+        .select()
+        .single();
 
       if (error) throw error;
+
+      // Send email notification to agent
+      const { error: emailError } = await supabase.functions.invoke('send-agent-notification', {
+        body: {
+          id: submission.id,
+          name: formData.name,
+          email: formData.email,
+          phone: formData.phone,
+          message: formData.message,
+          inquiry_type: formData.inquiryType,
+          property_title: propertyTitle,
+          agent_email: agentData.email,
+          agent_name: agentData.full_name
+        }
+      });
+
+      if (emailError) throw emailError;
 
       toast({
         title: "Bericht verzonden",
