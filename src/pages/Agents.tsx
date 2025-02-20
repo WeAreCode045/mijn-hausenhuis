@@ -10,9 +10,10 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/providers/AuthProvider";
 import { Database } from "@/integrations/supabase/types";
 
-type ProfilesInsert = Database["public"]["Tables"]["profiles"]["Insert"];
-type ProfilesRow = Database["public"]["Tables"]["profiles"]["Row"];
+// Define the base profile type from the database
+type Profile = Database["public"]["Tables"]["profiles"]["Row"];
 
+// Define what we need for an agent profile display
 interface AgentProfile {
   id: string;
   full_name: string;
@@ -22,7 +23,13 @@ interface AgentProfile {
   updated_at: string;
 }
 
-type NewAgentInput = Pick<ProfilesInsert, "full_name" | "email" | "role">;
+// Define what we need for creating a new agent
+// These are the only fields we need to provide, the rest are generated
+type NewAgentInput = {
+  full_name: string;
+  email: string;
+  role: 'agent';
+};
 
 export default function Agents() {
   const [agents, setAgents] = useState<AgentProfile[]>([]);
@@ -64,9 +71,10 @@ export default function Agents() {
   const handleAddAgent = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    // Type assertion to tell TypeScript this is valid for insertion
     const { data, error } = await supabase
       .from('profiles')
-      .insert([newAgent])
+      .insert([newAgent] as unknown as Profile[])
       .select();
 
     if (error) {
