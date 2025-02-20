@@ -14,7 +14,7 @@ export function RecentProperties() {
   const navigate = useNavigate();
   const { profile, isAdmin } = useAuth();
   
-  const { data: recentProperties, isLoading, error } = useQuery({
+  const { data: recentProperties, isLoading, error } = useQuery<PropertyData[]>({
     queryKey: ['recent-properties', profile?.id, isAdmin],
     queryFn: async () => {
       try {
@@ -43,7 +43,7 @@ export function RecentProperties() {
     },
     retry: 2,
     staleTime: 30000, // Data remains fresh for 30 seconds
-    cacheTime: 300000, // Cache data for 5 minutes
+    gcTime: 300000, // Time before unused data is garbage collected (replaces cacheTime)
   });
 
   if (error) {
