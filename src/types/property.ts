@@ -61,10 +61,12 @@ export interface PropertyData {
   nearby_places?: PropertyPlaceType[];
   latitude?: number;
   longitude?: number;
+  agent_id?: string; // Add this line
 }
 
 export interface PropertyFormData extends Omit<PropertyData, 'id'> {
   id?: string;
+  agent_id?: string;
 }
 
 export interface PropertySubmitData {
@@ -93,7 +95,8 @@ export interface PropertySubmitData {
   features: Json;
   areas: Json[];
   nearby_places: Json;
-  images: string[]; // Change to string[] to match database expectation
+  images: string[];
+  agent_id?: string;
 }
 
 export interface PropertyDatabaseData {

@@ -95,11 +95,8 @@ export function ContactSection({ property, settings }: WebViewSectionProps) {
         <h3 className="text-xl font-semibold mb-6">Interesse in deze woning?</h3>
         <ContactForm 
           propertyId={property.id}
-          agencyName={settings?.name}
-          agencyAddress={settings?.address}
-          agencyPhone={settings?.phone}
-          agencyEmail={settings?.email}
-          secondaryColor={settings?.secondaryColor}
+          propertyTitle={property.title}
+          agentId={property.agent_id}
         />
       </div>
     </div>

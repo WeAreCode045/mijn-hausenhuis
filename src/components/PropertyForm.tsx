@@ -1,3 +1,4 @@
+
 import { Card } from "@/components/ui/card";
 import { useParams } from "react-router-dom";
 import { usePropertyForm } from "@/hooks/usePropertyForm";
@@ -10,8 +11,7 @@ import type { PropertyFormData } from "@/types/property";
 import { steps } from "./property/form/formSteps";
 import { FormStepNavigation } from "./property/form/FormStepNavigation";
 import { useFormSteps } from "@/hooks/useFormSteps";
-import { PropertyStepContent } from "./property/form/PropertyStepContent";
-import { supabase } from "@/integrations/supabase/client";
+import { PropertyFormContent } from "./property/form/PropertyFormContent";
 
 interface PropertyFormProps {
   onSubmit: (data: PropertyFormData) => void;
@@ -19,7 +19,7 @@ interface PropertyFormProps {
 
 export function PropertyForm({ onSubmit }: PropertyFormProps) {
   const { id } = useParams();
-  const { formData, setFormData } = usePropertyForm(id, onSubmit);
+  const { formData, setFormData, isLoading } = usePropertyForm(id, onSubmit);
   const { addFeature, removeFeature, updateFeature } = useFeatures(formData, setFormData);
   const { handleSubmit } = usePropertyFormSubmit(onSubmit);
   const { autosaveData } = usePropertyAutosave();
@@ -50,33 +50,22 @@ export function PropertyForm({ onSubmit }: PropertyFormProps) {
     removeAreaImage
   } = usePropertyAreas(formData, setFormData);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
-  };
-
-  const handleMapImageDelete = async () => {
-    try {
-      const { error } = await supabase
-        .from('properties')
-        .update({ map_image: null })
-        .eq('id', formData.id);
-
-      if (error) throw error;
-
-      setFormData({ ...formData, map_image: null });
-    } catch (error) {
-      console.error('Error removing map image:', error);
-    }
-  };
-
   const { currentStep, handleNext, handlePrevious, handleStepClick } = useFormSteps(
     formData,
     () => autosaveData(formData),
     steps.length
   );
 
-  if (!formData) {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+  };
+
+  const handleMapImageDelete = async () => {
+    setFormData({ ...formData, map_image: null });
+  };
+
+  if (!formData || isLoading) {
     return null;
   }
 
@@ -91,12 +80,14 @@ export function PropertyForm({ onSubmit }: PropertyFormProps) {
           onNext={handleNext}
           isUpdateMode={!!id}
         />
-        <PropertyStepContent
-          currentStep={currentStep}
+        <PropertyFormContent 
           formData={formData}
-          setFormData={setFormData}
+          onSubmit={(e) => handleSubmit(e, formData)}
+          currentStep={currentStep}
+          addFeature={addFeature}
+          removeFeature={removeFeature}
+          updateFeature={updateFeature}
           handleInputChange={handleInputChange}
-          id={id}
           handleImageUpload={handleImageUpload}
           handleAreaPhotosUpload={handleAreaPhotosUpload}
           handleFloorplanUpload={handleFloorplanUpload}
@@ -105,9 +96,6 @@ export function PropertyForm({ onSubmit }: PropertyFormProps) {
           handleRemoveFloorplan={handleRemoveFloorplan}
           handleSetFeaturedImage={handleSetFeaturedImage}
           handleToggleGridImage={handleToggleGridImage}
-          addFeature={addFeature}
-          removeFeature={removeFeature}
-          updateFeature={updateFeature}
           addArea={addArea}
           removeArea={removeArea}
           updateArea={updateArea}
