@@ -1,5 +1,4 @@
 
-import { AnalyticsOverview } from "@/components/dashboard/AnalyticsOverview";
 import { RecentProperties } from "@/components/dashboard/RecentProperties";
 import { RecentSubmissions } from "@/components/dashboard/RecentSubmissions";
 
@@ -12,8 +11,7 @@ export default function Dashboard() {
           <p className="text-estate-600 mt-2">Welcome to your real estate management dashboard</p>
         </div>
 
-        <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-          <AnalyticsOverview />
+        <div className="grid gap-8 md:grid-cols-2">
           <RecentProperties />
           <RecentSubmissions />
         </div>
