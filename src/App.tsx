@@ -11,6 +11,10 @@ import NotFound from "@/pages/NotFound";
 import AppSidebar from "@/components/AppSidebar";
 import Dashboard from "@/pages/Dashboard";
 import Index from "@/pages/Index";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+
+// Create a client
+const queryClient = new QueryClient();
 
 // Protected Route wrapper component
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -98,12 +102,14 @@ function AppRoutes() {
 
 function App() {
   return (
-    <AuthProvider>
-      <Router>
-        <AppRoutes />
-        <Toaster />
-      </Router>
-    </AuthProvider>
+    <QueryClientProvider client={queryClient}>
+      <AuthProvider>
+        <Router>
+          <AppRoutes />
+          <Toaster />
+        </Router>
+      </AuthProvider>
+    </QueryClientProvider>
   );
 }
 
