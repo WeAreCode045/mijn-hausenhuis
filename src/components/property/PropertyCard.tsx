@@ -8,7 +8,7 @@ import { PropertyCardActions } from "./PropertyCardActions";
 import { PropertySubmissionsDialog } from "./PropertySubmissionsDialog";
 import { PropertyData } from "@/types/property";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "@/providers/AuthProvider";
+import { useAuth } from "@/hooks/useAuth";
 
 interface PropertyCardProps {
   property: PropertyData;
@@ -101,10 +101,10 @@ export const PropertyCard = ({
   return (
     <>
       <Card key={property.id} className="p-6 space-y-6 relative group cursor-pointer hover:shadow-lg transition-shadow" onClick={handleCardClick}>
-        {(property.images?.[0]?.url || property.featuredImage) && (
+        {(property.featuredImage || property.images?.[0]) && (
           <div className="relative">
             <img
-              src={property.images?.[0]?.url || property.featuredImage || '/placeholder.svg'}
+              src={property.featuredImage || property.images[0].url}
               alt={property.title}
               className="w-full h-48 object-cover rounded-lg"
             />

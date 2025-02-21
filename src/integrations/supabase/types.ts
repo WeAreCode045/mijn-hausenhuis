@@ -249,7 +249,6 @@ export type Database = {
       }
       property_contact_submissions: {
         Row: {
-          agent_id: string | null
           created_at: string | null
           email: string
           id: string
@@ -262,7 +261,6 @@ export type Database = {
           updated_at: string | null
         }
         Insert: {
-          agent_id?: string | null
           created_at?: string | null
           email: string
           id?: string
@@ -275,7 +273,6 @@ export type Database = {
           updated_at?: string | null
         }
         Update: {
-          agent_id?: string | null
           created_at?: string | null
           email?: string
           id?: string
@@ -288,13 +285,6 @@ export type Database = {
           updated_at?: string | null
         }
         Relationships: [
-          {
-            foreignKeyName: "property_contact_submissions_agent_id_fkey"
-            columns: ["agent_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
           {
             foreignKeyName: "property_contact_submissions_property_id_fkey"
             columns: ["property_id"]

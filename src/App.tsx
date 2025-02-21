@@ -1,116 +1,77 @@
 
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
-import Properties from "@/pages/Properties";
-import PropertyFormPage from "@/pages/PropertyFormPage";
-import { AuthProvider, useAuth } from "@/providers/AuthProvider";
-import Auth from "@/pages/Auth";
-import Settings from "@/pages/Settings";
-import Agents from "@/pages/Agents";
 import { Toaster } from "@/components/ui/toaster";
-import NotFound from "@/pages/NotFound";
-import AppSidebar from "@/components/AppSidebar";
-import Dashboard from "@/pages/Dashboard";
-import Index from "@/pages/Index";
+import { Toaster as Sonner } from "@/components/ui/sonner";
+import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { BrowserRouter as Router, Route, Routes, Navigate } from "react-router-dom";
+import { SidebarProvider } from "@/components/ui/sidebar";
+import { AuthProvider } from "@/providers/AuthProvider";
+import Index from "./pages/Index";
+import Properties from "./pages/Properties";
+import PropertyFormPage from "./pages/PropertyFormPage";
+import Settings from "./pages/Settings";
+import NotFound from "./pages/NotFound";
+import Auth from "./pages/Auth";
+import { AppSidebar } from "./components/AppSidebar";
+import { PropertyWebView } from "./components/property/PropertyWebView";
+import { useAuth } from "@/providers/AuthProvider";
 
-// Create a client
 const queryClient = new QueryClient();
 
-// Protected Route wrapper component
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user, isLoading } = useAuth();
-  
+
   if (isLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
-      </div>
-    );
+    return <div>Loading...</div>;
   }
-  
+
   if (!user) {
-    return <Navigate to="/auth" replace />;
+    return <Navigate to="/auth" />;
   }
 
-  return <>{children}</>;
+  return children;
 }
 
-function AppRoutes() {
-  const { user } = useAuth();
-
-  return (
-    <div className="flex h-screen">
-      <AppSidebar />
-      <div className="flex-1 overflow-auto">
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/auth" element={user ? <Navigate to="/dashboard" replace /> : <Auth />} />
-          <Route 
-            path="/dashboard" 
-            element={
-              <ProtectedRoute>
-                <Dashboard />
-              </ProtectedRoute>
-            } 
-          />
-          <Route 
-            path="/properties" 
-            element={
-              <ProtectedRoute>
-                <Properties />
-              </ProtectedRoute>
-            } 
-          />
-          <Route 
-            path="/properties/new" 
-            element={
-              <ProtectedRoute>
-                <PropertyFormPage />
-              </ProtectedRoute>
-            } 
-          />
-          <Route 
-            path="/properties/:id" 
-            element={
-              <ProtectedRoute>
-                <PropertyFormPage />
-              </ProtectedRoute>
-            } 
-          />
-          <Route 
-            path="/settings" 
-            element={
-              <ProtectedRoute>
-                <Settings />
-              </ProtectedRoute>
-            } 
-          />
-          <Route 
-            path="/agents" 
-            element={
-              <ProtectedRoute>
-                <Agents />
-              </ProtectedRoute>
-            } 
-          />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </div>
-    </div>
-  );
-}
-
-function App() {
-  return (
-    <QueryClientProvider client={queryClient}>
-      <AuthProvider>
+const App = () => (
+  <QueryClientProvider client={queryClient}>
+    <AuthProvider>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
         <Router>
-          <AppRoutes />
-          <Toaster />
+          <SidebarProvider>
+            <Routes>
+              <Route path="/auth" element={<Auth />} />
+              <Route
+                path="/property/:id/webview"
+                element={<PropertyWebView />}
+              />
+              <Route
+                path="*"
+                element={
+                  <ProtectedRoute>
+                    <div className="min-h-screen flex w-full">
+                      <AppSidebar />
+                      <main className="flex-1 p-4">
+                        <Routes>
+                          <Route path="/" element={<Index />} />
+                          <Route path="/properties" element={<Properties />} />
+                          <Route path="/property/new" element={<PropertyFormPage />} />
+                          <Route path="/property/:id/edit" element={<PropertyFormPage />} />
+                          <Route path="/settings" element={<Settings />} />
+                          <Route path="*" element={<NotFound />} />
+                        </Routes>
+                      </main>
+                    </div>
+                  </ProtectedRoute>
+                }
+              />
+            </Routes>
+          </SidebarProvider>
         </Router>
-      </AuthProvider>
-    </QueryClientProvider>
-  );
-}
+      </TooltipProvider>
+    </AuthProvider>
+  </QueryClientProvider>
+);
 
 export default App;

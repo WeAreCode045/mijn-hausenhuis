@@ -16,7 +16,7 @@ export default function Properties() {
       <div className="max-w-[1600px] mx-auto">
         <div className="flex justify-between items-center mb-12">
           <h1 className="text-4xl font-bold text-estate-800">Woning Brochures</h1>
-          <Button onClick={() => navigate('/properties/new')}>
+          <Button onClick={() => navigate('/property/new')}>
             <PlusCircle className="w-4 h-4 mr-2" />
             Nieuwe Brochure
           </Button>

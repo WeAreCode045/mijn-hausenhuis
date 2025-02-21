@@ -3,69 +3,27 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { PropertyData } from "@/types/property";
+import { transformSupabaseData } from "@/components/property/webview/utils/transformSupabaseData";
 import { Button } from "@/components/ui/button";
 import { ArrowUpRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "@/providers/AuthProvider";
-import { Skeleton } from "@/components/ui/skeleton";
 
 export function RecentProperties() {
   const navigate = useNavigate();
-  const { profile, isAdmin } = useAuth();
   
-  const { data: recentProperties, isLoading } = useQuery({
-    queryKey: ['recent-properties', profile?.id, isAdmin],
+  const { data: recentProperties = [] } = useQuery({
+    queryKey: ['recent-properties'],
     queryFn: async () => {
-      try {
-        let query = supabase
-          .from('properties')
-          .select(`
-            id,
-            title,
-            price,
-            images:property_images(url)
-          `)
-          .order('created_at', { ascending: false })
-          .limit(3);
+      const { data, error } = await supabase
+        .from('properties')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(3);
 
-        if (!isAdmin && profile) {
-          query = query.eq('agent_id', profile.id);
-        }
-
-        const { data, error } = await query;
-
-        if (error) throw error;
-        return data;
-      } catch (err) {
-        console.error('Error fetching properties:', err);
-        throw err;
-      }
+      if (error) throw error;
+      return (data || []).map(item => transformSupabaseData(item));
     },
-    staleTime: 1000 * 60 * 5, // Cache for 5 minutes
   });
-
-  if (isLoading) {
-    return (
-      <Card>
-        <CardHeader>
-          <CardTitle>Recent Properties</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            {[1, 2, 3].map((index) => (
-              <div key={index} className="flex items-center gap-4">
-                <Skeleton className="w-16 h-16 rounded-lg" />
-                <div className="space-y-2 flex-1">
-                  <Skeleton className="h-4 w-3/4" />
-                  <Skeleton className="h-4 w-1/2" />
-                </div>
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
-    );
-  }
 
   return (
     <Card>
@@ -78,12 +36,8 @@ export function RecentProperties() {
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
-          {(recentProperties || []).map((property) => (
-            <div 
-              key={property.id} 
-              className="flex items-center gap-4 cursor-pointer hover:bg-gray-50 p-2 rounded-lg transition-colors"
-              onClick={() => navigate(`/properties/${property.id}`)}
-            >
+          {recentProperties.map((property: PropertyData) => (
+            <div key={property.id} className="flex items-center gap-4">
               <img
                 src={property.images?.[0]?.url || '/placeholder.svg'}
                 alt={property.title}

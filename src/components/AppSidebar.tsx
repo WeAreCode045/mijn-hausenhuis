@@ -1,93 +1,84 @@
 
-import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Button } from "@/components/ui/button";
+import { 
+  LayoutDashboard, 
+  Home, 
+  Settings, 
+  LogOut 
+} from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { 
+  Sidebar, 
+  SidebarContent, 
+  SidebarFooter,
+  SidebarGroup, 
+  SidebarGroupLabel, 
+  SidebarMenu, 
+  SidebarMenuButton, 
+  SidebarMenuItem 
+} from "@/components/ui/sidebar";
 import { useAuth } from "@/providers/AuthProvider";
 import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "./ui/use-toast";
-import { Building2, Settings, Users, LayoutDashboard } from "lucide-react";
+import { useToast } from "@/components/ui/use-toast";
 
-export default function AppSidebar() {
-  const location = useLocation();
+export function AppSidebar() {
   const navigate = useNavigate();
-  const { user, isAdmin } = useAuth();
+  const { user, profile } = useAuth();
   const { toast } = useToast();
 
-  const handleSignOut = async () => {
-    try {
-      const { error } = await supabase.auth.signOut();
-      if (error) throw error;
-      navigate('/auth');
-    } catch (error: any) {
+  const handleLogout = async () => {
+    const { error } = await supabase.auth.signOut();
+    if (error) {
       toast({
-        title: "Error signing out",
-        description: error.message,
+        title: "Error",
+        description: "Failed to sign out",
         variant: "destructive",
       });
+    } else {
+      navigate('/auth');
     }
   };
 
-  if (!user) {
-    return null;
-  }
+  if (!user) return null;
 
   return (
-    <div className="w-64 bg-white border-r border-gray-200 p-4 flex flex-col h-screen">
-      <div className="space-y-2 flex-1">
-        <Link to="/dashboard">
-          <Button
-            variant="ghost"
-            className={`w-full justify-start ${
-              location.pathname === "/dashboard" ? "bg-slate-100" : ""
-            }`}
-          >
-            <LayoutDashboard className="mr-2 h-4 w-4" />
-            Dashboard
-          </Button>
-        </Link>
-
-        <Link to="/properties">
-          <Button
-            variant="ghost"
-            className={`w-full justify-start ${
-              location.pathname === "/properties" ? "bg-slate-100" : ""
-            }`}
-          >
-            <Building2 className="mr-2 h-4 w-4" />
-            Properties
-          </Button>
-        </Link>
-        
-        {isAdmin && (
-          <>
-            <Link to="/agents">
-              <Button
-                variant="ghost"
-                className={`w-full justify-start ${
-                  location.pathname === "/agents" ? "bg-slate-100" : ""
-                }`}
-              >
-                <Users className="mr-2 h-4 w-4" />
-                Agents
-              </Button>
-            </Link>
-            <Link to="/settings">
-              <Button
-                variant="ghost"
-                className={`w-full justify-start ${
-                  location.pathname === "/settings" ? "bg-slate-100" : ""
-                }`}
-              >
-                <Settings className="mr-2 h-4 w-4" />
-                Settings
-              </Button>
-            </Link>
-          </>
-        )}
-      </div>
-      
-      <Button variant="ghost" onClick={handleSignOut} className="w-full">
-        Sign Out
-      </Button>
-    </div>
+    <Sidebar>
+      <SidebarContent>
+        <SidebarGroup>
+          <SidebarGroupLabel>Menu</SidebarGroupLabel>
+          <SidebarMenu>
+            <SidebarMenuItem>
+              <SidebarMenuButton onClick={() => navigate('/')}>
+                <LayoutDashboard className="w-4 h-4" />
+                <span>Dashboard</span>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+            <SidebarMenuItem>
+              <SidebarMenuButton onClick={() => navigate('/properties')}>
+                <Home className="w-4 h-4" />
+                <span>Properties</span>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+            <SidebarMenuItem>
+              <SidebarMenuButton onClick={() => navigate('/settings')}>
+                <Settings className="w-4 h-4" />
+                <span>Settings</span>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          </SidebarMenu>
+        </SidebarGroup>
+      </SidebarContent>
+      <SidebarFooter>
+        <SidebarGroup>
+          <SidebarMenu>
+            <SidebarMenuItem>
+              <SidebarMenuButton onClick={handleLogout}>
+                <LogOut className="w-4 h-4" />
+                <span>Sign Out</span>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          </SidebarMenu>
+        </SidebarGroup>
+      </SidebarFooter>
+    </Sidebar>
   );
 }

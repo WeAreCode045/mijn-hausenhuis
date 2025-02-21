@@ -13,19 +13,7 @@ export const useProperties = () => {
   const fetchProperties = async () => {
     let query = supabase
       .from('properties')
-      .select(`
-        id,
-        title,
-        price,
-        agent_id,
-        created_at,
-        featuredImage,
-        property_images!inner (
-          id,
-          url
-        )
-      `)
-      .limit(1, { foreignTable: 'property_images' }); // Limit to just one image per property
+      .select('*, property_images(*)');
 
     if (!isAdmin) {
       query = query.eq('agent_id', profile.id);
@@ -43,8 +31,6 @@ export const useProperties = () => {
   const { data: properties = [], isLoading, error } = useQuery({
     queryKey: ['properties', profile?.id, isAdmin],
     queryFn: fetchProperties,
-    staleTime: 1000 * 60 * 5, // Cache data for 5 minutes
-    retry: 1, // Only retry once on failure
   });
 
   const handleDelete = async (id: string) => {
