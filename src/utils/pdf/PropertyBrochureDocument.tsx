@@ -14,20 +14,25 @@ const styles = StyleSheet.create({
   heading: {
     fontSize: 24,
     marginBottom: 10,
+    fontWeight: 'bold',
+    color: '#1a1a1a',
   },
   subheading: {
     fontSize: 18,
     marginBottom: 8,
+    color: '#2a2a2a',
   },
   text: {
     fontSize: 12,
     lineHeight: 1.5,
+    color: '#4a4a4a',
   },
   image: {
     width: '100%',
     height: 300,
     objectFit: 'cover',
     marginVertical: 10,
+    borderRadius: 4,
   },
   featuresGrid: {
     flexDirection: 'row',
@@ -87,11 +92,54 @@ const styles = StyleSheet.create({
     width: '31%',
     height: 100,
     objectFit: 'cover',
+    borderRadius: 4,
   },
   content: {
     marginTop: 70, // Space for header
     marginBottom: 50, // Space for footer
   },
+  areaContent: {
+    flex: 1,
+  },
+  areaDescription: {
+    marginVertical: 15,
+    padding: 15,
+    backgroundColor: '#f8f9fa',
+    borderRadius: 8,
+  },
+  areaImageGrid: {
+    marginTop: 20,
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 15,
+  },
+  areaImage: {
+    width: '48%',
+    height: 200,
+    objectFit: 'cover',
+    borderRadius: 8,
+  },
+  keyInfo: {
+    marginTop: 15,
+    padding: 15,
+    backgroundColor: '#f8f9fa',
+    borderRadius: 8,
+  },
+  keyInfoItem: {
+    flexDirection: 'row',
+    marginBottom: 8,
+    alignItems: 'center',
+  },
+  keyInfoLabel: {
+    width: 100,
+    fontSize: 12,
+    color: '#666',
+  },
+  keyInfoValue: {
+    flex: 1,
+    fontSize: 12,
+    color: '#333',
+  }
 });
 
 interface PropertyBrochureDocumentProps {
@@ -152,6 +200,32 @@ export const PropertyBrochureDocument = ({ property, settings }: PropertyBrochur
           <Text style={styles.text}>{property.description}</Text>
         </View>
 
+        <View style={styles.keyInfo}>
+          <Text style={styles.subheading}>Key Information</Text>
+          <View style={styles.keyInfoItem}>
+            <Text style={styles.keyInfoLabel}>Living Area:</Text>
+            <Text style={styles.keyInfoValue}>{property.livingArea} m²</Text>
+          </View>
+          <View style={styles.keyInfoItem}>
+            <Text style={styles.keyInfoLabel}>Plot Size:</Text>
+            <Text style={styles.keyInfoValue}>{property.sqft} m²</Text>
+          </View>
+          <View style={styles.keyInfoItem}>
+            <Text style={styles.keyInfoLabel}>Bedrooms:</Text>
+            <Text style={styles.keyInfoValue}>{property.bedrooms}</Text>
+          </View>
+          <View style={styles.keyInfoItem}>
+            <Text style={styles.keyInfoLabel}>Bathrooms:</Text>
+            <Text style={styles.keyInfoValue}>{property.bathrooms}</Text>
+          </View>
+          {property.buildYear && (
+            <View style={styles.keyInfoItem}>
+              <Text style={styles.keyInfoLabel}>Build Year:</Text>
+              <Text style={styles.keyInfoValue}>{property.buildYear}</Text>
+            </View>
+          )}
+        </View>
+
         <View style={styles.section}>
           <Text style={styles.subheading}>Features</Text>
           <View style={styles.featuresGrid}>
@@ -162,45 +236,35 @@ export const PropertyBrochureDocument = ({ property, settings }: PropertyBrochur
             ))}
           </View>
         </View>
-
-        <View style={styles.section}>
-          <Text style={styles.subheading}>Key Information</Text>
-          <Text style={styles.text}>Living Area: {property.livingArea} m²</Text>
-          <Text style={styles.text}>Plot Size: {property.sqft} m²</Text>
-          <Text style={styles.text}>Bedrooms: {property.bedrooms}</Text>
-          <Text style={styles.text}>Bathrooms: {property.bathrooms}</Text>
-          {property.buildYear && (
-            <Text style={styles.text}>Build Year: {property.buildYear}</Text>
-          )}
-        </View>
       </View>
       <PageFooter title={property.title} pageNumber={2} settings={settings} />
     </Page>
 
-    {/* Areas Pages */}
-    {property.areas && property.areas.length > 0 && (
-      <Page size="A4" style={styles.page}>
+    {/* Individual Area Pages */}
+    {property.areas?.map((area, index) => (
+      <Page key={area.id} size="A4" style={styles.page}>
         <PageHeader settings={settings} />
         <View style={styles.content}>
-          <Text style={styles.heading}>Areas</Text>
-          {property.areas.map((area, index) => (
-            <View key={index} style={styles.section}>
-              <Text style={styles.subheading}>{area.title}</Text>
-              <Text style={styles.text}>{area.description}</Text>
-              <View style={styles.grid}>
-                {area.imageIds
-                  .map(id => property.images.find(img => img.id === id))
-                  .filter(Boolean)
-                  .map((img, imgIndex) => (
-                    <Image key={imgIndex} src={img!.url} style={styles.gridImage} />
-                  ))}
-              </View>
-            </View>
-          ))}
+          <Text style={styles.heading}>{area.title}</Text>
+          <View style={styles.areaDescription}>
+            <Text style={styles.text}>{area.description}</Text>
+          </View>
+          <View style={styles.areaImageGrid}>
+            {area.imageIds
+              .map(id => property.images.find(img => img.id === id))
+              .filter(Boolean)
+              .map((img, imgIndex) => (
+                <Image key={imgIndex} src={img!.url} style={styles.areaImage} />
+              ))}
+          </View>
         </View>
-        <PageFooter title={property.title} pageNumber={3} settings={settings} />
+        <PageFooter 
+          title={property.title} 
+          pageNumber={3 + index} 
+          settings={settings} 
+        />
       </Page>
-    )}
+    ))}
 
     {/* Location Page */}
     {(property.location_description || property.map_image || property.nearby_places?.length > 0) && (
@@ -210,7 +274,7 @@ export const PropertyBrochureDocument = ({ property, settings }: PropertyBrochur
           <Text style={styles.heading}>Location</Text>
           
           {property.location_description && (
-            <View style={styles.section}>
+            <View style={styles.areaDescription}>
               <Text style={styles.text}>{property.location_description}</Text>
             </View>
           )}
@@ -223,7 +287,7 @@ export const PropertyBrochureDocument = ({ property, settings }: PropertyBrochur
             <View style={styles.section}>
               <Text style={styles.subheading}>Nearby Places</Text>
               {property.nearby_places.map((place, index) => (
-                <View key={index} style={{ marginBottom: 5 }}>
+                <View key={index} style={styles.keyInfoItem}>
                   <Text style={styles.text}>
                     {place.name} - {place.vicinity}
                   </Text>
@@ -232,7 +296,11 @@ export const PropertyBrochureDocument = ({ property, settings }: PropertyBrochur
             </View>
           )}
         </View>
-        <PageFooter title={property.title} pageNumber={4} settings={settings} />
+        <PageFooter 
+          title={property.title} 
+          pageNumber={3 + (property.areas?.length || 0)} 
+          settings={settings} 
+        />
       </Page>
     )}
 
@@ -247,13 +315,15 @@ export const PropertyBrochureDocument = ({ property, settings }: PropertyBrochur
             <Image src={settings.logoUrl} style={{ width: 200, marginBottom: 20 }} />
           )}
 
-          <Text style={styles.text}>{settings.name}</Text>
-          <Text style={styles.text}>{settings.address}</Text>
-          <Text style={styles.text}>Phone: {settings.phone}</Text>
-          <Text style={styles.text}>Email: {settings.email}</Text>
+          <View style={styles.keyInfo}>
+            <Text style={styles.text}>{settings.name}</Text>
+            <Text style={styles.text}>{settings.address}</Text>
+            <Text style={styles.text}>Phone: {settings.phone}</Text>
+            <Text style={styles.text}>Email: {settings.email}</Text>
+          </View>
 
           {(settings.facebookUrl || settings.instagramUrl) && (
-            <View style={{ marginTop: 20 }}>
+            <View style={[styles.keyInfo, { marginTop: 20 }]}>
               <Text style={styles.subheading}>Follow Us</Text>
               {settings.facebookUrl && (
                 <Text style={styles.text}>Facebook: {settings.facebookUrl}</Text>
@@ -265,7 +335,11 @@ export const PropertyBrochureDocument = ({ property, settings }: PropertyBrochur
           )}
         </View>
       </View>
-      <PageFooter title={property.title} pageNumber={5} settings={settings} />
+      <PageFooter 
+        title={property.title} 
+        pageNumber={4 + (property.areas?.length || 0)} 
+        settings={settings} 
+      />
     </Page>
   </Document>
 );
