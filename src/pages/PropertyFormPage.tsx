@@ -26,6 +26,7 @@ export default function PropertyFormPage() {
   const { settings } = useAgencySettings();
   const { isAdmin } = useAuth();
   const [agents, setAgents] = useState<Array<{ id: string; full_name: string }>>([]);
+  const [selectedAgent, setSelectedAgent] = useState<string>("");
 
   useEffect(() => {
     const fetchAgents = async () => {
@@ -51,7 +52,7 @@ export default function PropertyFormPage() {
           .from('properties')
           .update({
             ...data,
-            agent_id: data.agent_id || null
+            agent_id: selectedAgent || null
           })
           .eq('id', id);
         
@@ -67,7 +68,7 @@ export default function PropertyFormPage() {
           .from('properties')
           .insert({
             ...data,
-            agent_id: data.agent_id || null
+            agent_id: selectedAgent || null
           });
         
         if (insertError) throw insertError;
@@ -117,16 +118,22 @@ export default function PropertyFormPage() {
       longitude: formData.longitude,
       object_id: formData.object_id,
       map_image: formData.map_image,
-      agent_id: formData.agent_id
+      agent_id: selectedAgent || null
     };
     handleDatabaseSubmit(submitData);
   };
 
-  const { formData, setFormData } = usePropertyForm(id, handleFormSubmit);
+  const { formData, setFormData, isLoading } = usePropertyForm(id, handleFormSubmit);
   const {
     handleImageUpload,
     handleRemoveImage,
   } = usePropertyImages(formData, setFormData);
+
+  useEffect(() => {
+    if (formData?.agent_id) {
+      setSelectedAgent(formData.agent_id);
+    }
+  }, [formData?.agent_id]);
 
   const handleDeleteProperty = async () => {
     if (!id || !window.confirm('Are you sure you want to delete this property?')) return;
@@ -157,10 +164,6 @@ export default function PropertyFormPage() {
   if (!formData) {
     return null;
   }
-
-  const handleAgentChange = (value: string) => {
-    setFormData({ ...formData, agent_id: value });
-  };
 
   const apiEndpoint = `${window.location.origin}/api/properties/${formData.id}`;
 
@@ -220,8 +223,8 @@ export default function PropertyFormPage() {
                 </CardHeader>
                 <CardContent>
                   <Select
-                    value={formData.agent_id || ''}
-                    onValueChange={handleAgentChange}
+                    value={selectedAgent}
+                    onValueChange={setSelectedAgent}
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="Select an agent" />
@@ -253,3 +256,4 @@ export default function PropertyFormPage() {
     </div>
   );
 }
+
