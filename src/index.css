@@ -108,4 +108,9 @@
   .webview-container {
     width: 100%;
   }
+  
+  .max-w-\[800px\] {
+    max-width: 800px;
+    min-width: 800px;
+  }
 }
