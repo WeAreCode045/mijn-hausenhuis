@@ -1,17 +1,11 @@
 
 import { PropertyData } from '@/types/property';
 import { AgencySettings } from '@/types/agency';
-import { generatePropertyBrochure } from './pdf/templates/propertyBrochure';
+import { pdf } from '@react-pdf/renderer';
+import { PropertyBrochureDocument } from './pdf/PropertyBrochureDocument';
 
 export const generatePropertyPDF = async (property: PropertyData, settings: AgencySettings) => {
-  const propertyImages = property.images.map(img => img.url);
-  await generatePropertyBrochure(
-    property,
-    settings,
-    propertyImages,
-    property.featuredImage,
-    undefined, // description_background_url
-    property.map_image || undefined, // locationImageUrl
-    undefined // contactImageUrl
-  );
+  const blob = await pdf(PropertyBrochureDocument({ property, settings })).toBlob();
+  const url = URL.createObjectURL(blob);
+  window.open(url, '_blank');
 };
