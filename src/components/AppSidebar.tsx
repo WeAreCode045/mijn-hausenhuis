@@ -3,7 +3,8 @@ import {
   LayoutDashboard, 
   Home, 
   Settings, 
-  LogOut 
+  LogOut,
+  Users as UsersIcon
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { 
@@ -22,7 +23,7 @@ import { useToast } from "@/components/ui/use-toast";
 
 export function AppSidebar() {
   const navigate = useNavigate();
-  const { user, profile } = useAuth();
+  const { user, profile, isAdmin } = useAuth();
   const { toast } = useToast();
 
   const handleLogout = async () => {
@@ -58,6 +59,14 @@ export function AppSidebar() {
                 <span>Properties</span>
               </SidebarMenuButton>
             </SidebarMenuItem>
+            {isAdmin && (
+              <SidebarMenuItem>
+                <SidebarMenuButton onClick={() => navigate('/users')}>
+                  <UsersIcon className="w-4 h-4" />
+                  <span>Users</span>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            )}
             <SidebarMenuItem>
               <SidebarMenuButton onClick={() => navigate('/settings')}>
                 <Settings className="w-4 h-4" />

@@ -1,4 +1,3 @@
-
 import { Suspense, lazy } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -18,6 +17,7 @@ const Settings = lazy(() => import("./pages/Settings"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const Auth = lazy(() => import("./pages/Auth"));
 const PropertyWebView = lazy(() => import("./components/property/PropertyWebView").then(module => ({ default: module.PropertyWebView })));
+const Users = lazy(() => import("./pages/Users"));
 
 const LoadingSpinner = () => (
   <div className="min-h-screen flex items-center justify-center">
@@ -84,6 +84,7 @@ const App = () => (
                             <Route path="/property/new" element={<PropertyFormPage />} />
                             <Route path="/property/:id/edit" element={<PropertyFormPage />} />
                             <Route path="/settings" element={<Settings />} />
+                            <Route path="/users" element={<Users />} />
                             <Route path="*" element={<NotFound />} />
                           </Routes>
                         </Suspense>
