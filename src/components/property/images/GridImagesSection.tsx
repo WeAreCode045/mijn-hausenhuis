@@ -17,13 +17,18 @@ export function GridImagesSection({
   onToggleGridImage,
 }: GridImagesSectionProps) {
   const handleGridImagesSelect = (selectedUrls: string[]) => {
-    const newGridImages = [...gridImages];
+    // Get current grid images
+    const currentGridImages = [...gridImages];
+    
+    // Add new selected images while respecting the 4 image limit
     selectedUrls.forEach(url => {
-      if (newGridImages.length < 4 && !newGridImages.includes(url)) {
-        newGridImages.push(url);
+      if (currentGridImages.length < 4 && !currentGridImages.includes(url)) {
+        currentGridImages.push(url);
       }
     });
-    onToggleGridImage(newGridImages);
+
+    // Update grid images
+    onToggleGridImage(currentGridImages);
   };
 
   return (
@@ -31,7 +36,7 @@ export function GridImagesSection({
       <Label>Grid Images (4 images)</Label>
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         {gridImages.map((url, index) => (
-          <div key={url} className="relative group">
+          <div key={`${url}-${index}`} className="relative group">
             <img
               src={url}
               alt={`Grid photo ${index + 1}`}
@@ -44,8 +49,7 @@ export function GridImagesSection({
                 size="icon"
                 className="absolute top-2 right-2 w-6 h-6"
                 onClick={() => {
-                  const newGridImages = [...gridImages];
-                  newGridImages.splice(index, 1);
+                  const newGridImages = gridImages.filter((_, i) => i !== index);
                   onToggleGridImage(newGridImages);
                 }}
               >
@@ -58,9 +62,9 @@ export function GridImagesSection({
           <ImageSelectDialog
             images={images.filter(img => !gridImages.includes(img.url))}
             onSelect={(selectedIds) => {
-              const selectedUrls = selectedIds.map(id => 
-                images.find(img => img.id === id)?.url
-              ).filter((url): url is string => url !== undefined);
+              const selectedUrls = selectedIds
+                .map(id => images.find(img => img.id === id)?.url)
+                .filter((url): url is string => url !== undefined);
               handleGridImagesSelect(selectedUrls);
             }}
             buttonText="Add Grid Images"
