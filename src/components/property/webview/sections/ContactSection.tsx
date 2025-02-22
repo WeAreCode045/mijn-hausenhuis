@@ -10,7 +10,7 @@ export function ContactSection({ property, settings }: WebViewSectionProps) {
   };
 
   return (
-    <div className="space-y-4 pb-24">
+    <div className="p-8 space-y-6">
       <div className="grid gap-6 md:grid-cols-2">
         {/* Agency Contact Details */}
         <div className="rounded-xl shadow-lg p-8" style={{ backgroundColor: settings?.primaryColor }}>
