@@ -11,7 +11,7 @@ export function ContactSection({ property, settings }: WebViewSectionProps) {
 
   return (
     <div className="w-full max-w-full overflow-hidden">
-      <div className="container mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+      <div className="container mx-auto max-w-5xl sm:min-w-[800px] px-4 sm:px-6 lg:px-8 py-8 space-y-6">
         <div className="grid gap-6 md:grid-cols-2">
           {/* Agency Contact Details */}
           <div className="w-full rounded-xl shadow-lg p-8" style={{ backgroundColor: settings?.primaryColor }}>
