@@ -10,11 +10,11 @@ export function ContactSection({ property, settings }: WebViewSectionProps) {
   };
 
   return (
-    <div className="sm:min-w-[800px]">
-      <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+    <div className="w-full max-w-full overflow-hidden">
+      <div className="container mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-8 space-y-6">
         <div className="grid gap-6 md:grid-cols-2">
           {/* Agency Contact Details */}
-          <div className="rounded-xl shadow-lg p-8" style={{ backgroundColor: settings?.primaryColor }}>
+          <div className="w-full rounded-xl shadow-lg p-8" style={{ backgroundColor: settings?.primaryColor }}>
             <div className="flex items-center gap-3 mb-6">
               <Building2 className="w-5 h-5 text-white" />
               <h3 className="text-xl font-semibold text-white">Contact Agency</h3>
@@ -51,7 +51,7 @@ export function ContactSection({ property, settings }: WebViewSectionProps) {
 
           {/* Agent Details */}
           {settings?.agents && settings.agents.length > 0 && (
-            <div className="rounded-xl shadow-lg p-8" style={{ backgroundColor: settings?.primaryColor }}>
+            <div className="w-full rounded-xl shadow-lg p-8" style={{ backgroundColor: settings?.primaryColor }}>
               <h4 className="text-xl font-semibold mb-6 text-white">Contact Agent</h4>
               <div className="space-y-4">
                 {settings.agents.map((agent, index) => (
@@ -92,7 +92,7 @@ export function ContactSection({ property, settings }: WebViewSectionProps) {
         </div>
 
         {/* Contact Form */}
-        <div className="rounded-xl shadow-lg p-8 text-white" style={{ backgroundColor: settings?.secondaryColor }}>
+        <div className="w-full rounded-xl shadow-lg p-8 text-white" style={{ backgroundColor: settings?.secondaryColor }}>
           <h3 className="text-xl font-semibold mb-6">Interesse in deze woning?</h3>
           <ContactForm 
             propertyId={property.id}
