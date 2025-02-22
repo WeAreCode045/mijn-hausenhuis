@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
@@ -41,11 +40,16 @@ export default function Users() {
   const { toast } = useToast();
   const { isAdmin } = useAuth();
   const [users, setUsers] = useState<User[]>([]);
-  const [newUser, setNewUser] = useState({
+  const [newUser, setNewUser] = useState<{
+    email: string;
+    password: string;
+    fullName: string;
+    role: 'admin' | 'agent';
+  }>({
     email: '',
     password: '',
     fullName: '',
-    role: 'agent' as const
+    role: 'agent'
   });
   const [isLoading, setIsLoading] = useState(false);
 

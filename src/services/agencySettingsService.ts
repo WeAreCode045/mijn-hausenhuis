@@ -23,7 +23,6 @@ interface AgencySettingsData {
   instagram_url?: string;
   youtube_url?: string;
   facebook_url?: string;
-  agents: any[];
 }
 
 export const agencySettingsService = {
@@ -76,8 +75,7 @@ export const agencySettingsService = {
       xml_import_url: data.xmlImportUrl,
       instagram_url: data.instagramUrl,
       youtube_url: data.youtubeUrl,
-      facebook_url: data.facebookUrl,
-      agents: data.agents
+      facebook_url: data.facebookUrl
     };
 
     const { error } = await supabase

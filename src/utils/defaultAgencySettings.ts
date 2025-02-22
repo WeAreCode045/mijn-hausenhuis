@@ -17,7 +17,6 @@ export const defaultAgencySettings: AgencySettings = {
   iconLivingSpace: "home",
   googleMapsApiKey: "",
   xmlImportUrl: "",
-  agents: [],
   instagramUrl: "",
   youtubeUrl: "",
   facebookUrl: ""

@@ -1,8 +1,7 @@
 
 import { supabase } from "@/integrations/supabase/client";
-import { AgencySettings, Agent } from "@/types/agency";
+import { AgencySettings } from "@/types/agency";
 import { defaultAgencySettings } from "./defaultAgencySettings";
-import { Json } from "@/integrations/supabase/types";
 
 export async function fetchAgencySettings(): Promise<AgencySettings | null> {
   const { data, error } = await supabase
@@ -17,16 +16,6 @@ export async function fetchAgencySettings(): Promise<AgencySettings | null> {
 
   if (!data) return null;
 
-  // Ensure agents is an array and has the correct shape
-  const agents: Agent[] = Array.isArray(data.agents) 
-    ? (data.agents as Json[]).map((agent: any) => ({
-        name: agent.name || "",
-        phone: agent.phone || "",
-        email: agent.email || "",
-        whatsapp: agent.whatsapp || ""
-      }))
-    : [];
-
   return {
     id: String(data.id),
     name: data.name || defaultAgencySettings.name,
@@ -39,7 +28,6 @@ export async function fetchAgencySettings(): Promise<AgencySettings | null> {
     instagramUrl: data.instagram_url || defaultAgencySettings.instagramUrl,
     youtubeUrl: data.youtube_url || defaultAgencySettings.youtubeUrl,
     facebookUrl: data.facebook_url || defaultAgencySettings.facebookUrl,
-    agents: agents,
     iconBuildYear: data.icon_build_year || defaultAgencySettings.iconBuildYear,
     iconBedrooms: data.icon_bedrooms || defaultAgencySettings.iconBedrooms,
     iconBathrooms: data.icon_bathrooms || defaultAgencySettings.iconBathrooms,

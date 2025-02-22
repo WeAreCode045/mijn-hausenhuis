@@ -1,12 +1,11 @@
 
 import { useState, useEffect } from "react";
-import { AgencySettings, Agent } from "@/types/agency";
+import { AgencySettings } from "@/types/agency";
 import { useToast } from "@/components/ui/use-toast";
 import { fetchAgencySettings } from "@/utils/fetchAgencySettings";
 import { defaultAgencySettings } from "@/utils/defaultAgencySettings";
 import { agencySettingsService } from "@/services/agencySettingsService";
 import { useLogoUpload } from "./useLogoUpload";
-import { Json } from "@/integrations/supabase/types";
 
 export const useAgencySettings = () => {
   const { toast } = useToast();
@@ -52,8 +51,7 @@ export const useAgencySettings = () => {
           icon_sqft: settings.iconSqft,
           icon_living_space: settings.iconLivingSpace,
           google_maps_api_key: settings.googleMapsApiKey,
-          xml_import_url: settings.xmlImportUrl,
-          agents: settings.agents
+          xml_import_url: settings.xmlImportUrl
         };
         await agencySettingsService.createSettings(createData);
       }
@@ -91,13 +89,6 @@ export const useAgencySettings = () => {
     setSettings((prev) => ({
       ...prev,
       [name]: value,
-    }));
-  };
-
-  const handleAgentChange = (agents: Agent[]) => {
-    setSettings((prev) => ({
-      ...prev,
-      agents,
     }));
   };
 
@@ -160,7 +151,6 @@ export const useAgencySettings = () => {
     handleSubmit,
     handleChange,
     handleSelectChange,
-    handleAgentChange,
     handleLogoUpload,
     handleDescriptionBackgroundUpload,
   };
