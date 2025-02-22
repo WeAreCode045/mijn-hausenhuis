@@ -16,7 +16,6 @@ const Settings = () => {
     handleSubmit,
     handleChange,
     handleSelectChange,
-    handleAgentChange,
     handleLogoUpload,
     handleDescriptionBackgroundUpload,
   } = useAgencySettings();
@@ -52,7 +51,6 @@ const Settings = () => {
             logoPreview={logoPreview}
             onChange={handleChange}
             onLogoUpload={handleLogoUpload}
-            onAgentChange={handleAgentChange}
           />
         )}
         

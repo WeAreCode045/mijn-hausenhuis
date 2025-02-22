@@ -88,29 +88,4 @@ export const generateContactPage = async (
       pdf.text('Instagram: ' + settings.instagramUrl, margin + 10, socialYPos);
     }
   }
-
-  // Add agents if available
-  if (settings.agents?.length) {
-    yPos += 70;
-    pdf.setTextColor(BROCHURE_STYLES.colors.text.primary);
-    pdf.setFontSize(16);
-    pdf.text('Onze makelaars', margin, yPos);
-
-    yPos += 20;
-    settings.agents.forEach((agent, index) => {
-      pdf.setFillColor(BROCHURE_STYLES.colors.neutral);
-      pdf.roundedRect(margin, yPos, 170, 60, 3, 3, 'F');
-
-      pdf.setTextColor(BROCHURE_STYLES.colors.text.primary);
-      pdf.setFontSize(14);
-      pdf.text(agent.name, margin + 10, yPos + 20);
-
-      pdf.setFontSize(11);
-      pdf.setTextColor(BROCHURE_STYLES.colors.text.secondary);
-      if (agent.phone) pdf.text('📞 ' + agent.phone, margin + 10, yPos + 35);
-      if (agent.email) pdf.text('✉️ ' + agent.email, margin + 10, yPos + 50);
-
-      yPos += 70;
-    });
-  }
 };
