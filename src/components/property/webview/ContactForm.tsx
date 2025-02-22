@@ -100,85 +100,92 @@ export function ContactForm({ propertyId, propertyTitle, agentId }: ContactFormP
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      <div className="space-y-2">
-        <Label htmlFor="name" className="text-sm font-medium text-white/90">
-          Naam
-        </Label>
-        <Input
-          id="name"
-          name="name"
-          value={formData.name}
-          onChange={handleChange}
-          className="text-sm bg-white/10 border-white/20 text-white placeholder:text-white/60"
-          required
-        />
-      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Left Column - Contact Details */}
+        <div className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="name" className="text-sm font-medium text-white/90">
+              Naam
+            </Label>
+            <Input
+              id="name"
+              name="name"
+              value={formData.name}
+              onChange={handleChange}
+              className="text-sm bg-white/10 border-white/20 text-white placeholder:text-white/60"
+              required
+            />
+          </div>
 
-      <div className="space-y-2">
-        <Label htmlFor="inquiryType" className="text-sm font-medium text-white/90">
-          Ik wil
-        </Label>
-        <Select
-          value={formData.inquiryType}
-          onValueChange={(value) => setFormData(prev => ({ ...prev, inquiryType: value }))}
-        >
-          <SelectTrigger className="text-sm bg-white/10 border-white/20 text-white">
-            <SelectValue placeholder="Selecteer een optie" />
-          </SelectTrigger>
-          <SelectContent>
-            {INQUIRY_TYPES.map((type) => (
-              <SelectItem key={type.value} value={type.value}>
-                {type.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
+          <div className="space-y-2">
+            <Label htmlFor="email" className="text-sm font-medium text-white/90">
+              E-mail
+            </Label>
+            <Input
+              id="email"
+              name="email"
+              type="email"
+              value={formData.email}
+              onChange={handleChange}
+              className="text-sm bg-white/10 border-white/20 text-white placeholder:text-white/60"
+              required
+            />
+          </div>
 
-      <div className="grid gap-6 md:grid-cols-2">
-        <div className="space-y-2">
-          <Label htmlFor="email" className="text-sm font-medium text-white/90">
-            E-mail
-          </Label>
-          <Input
-            id="email"
-            name="email"
-            type="email"
-            value={formData.email}
-            onChange={handleChange}
-            className="text-sm bg-white/10 border-white/20 text-white placeholder:text-white/60"
-            required
-          />
+          <div className="space-y-2">
+            <Label htmlFor="phone" className="text-sm font-medium text-white/90">
+              Telefoonnummer
+            </Label>
+            <Input
+              id="phone"
+              name="phone"
+              type="tel"
+              value={formData.phone}
+              onChange={handleChange}
+              className="text-sm bg-white/10 border-white/20 text-white placeholder:text-white/60"
+              required
+            />
+          </div>
         </div>
-        <div className="space-y-2">
-          <Label htmlFor="phone" className="text-sm font-medium text-white/90">
-            Telefoonnummer
-          </Label>
-          <Input
-            id="phone"
-            name="phone"
-            type="tel"
-            value={formData.phone}
-            onChange={handleChange}
-            className="text-sm bg-white/10 border-white/20 text-white placeholder:text-white/60"
-            required
-          />
-        </div>
-      </div>
 
-      <div className="space-y-2">
-        <Label htmlFor="message" className="text-sm font-medium text-white/90">
-          Bericht
-        </Label>
-        <Textarea
-          id="message"
-          name="message"
-          value={formData.message}
-          onChange={handleChange}
-          placeholder="Uw bericht..."
-          className="text-sm min-h-[120px] bg-white/10 border-white/20 text-white placeholder:text-white/60"
-          required
-        />
+        {/* Right Column - Message */}
+        <div className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="inquiryType" className="text-sm font-medium text-white/90">
+              Ik wil
+            </Label>
+            <Select
+              value={formData.inquiryType}
+              onValueChange={(value) => setFormData(prev => ({ ...prev, inquiryType: value }))}
+            >
+              <SelectTrigger className="text-sm bg-white/10 border-white/20 text-white">
+                <SelectValue placeholder="Selecteer een optie" />
+              </SelectTrigger>
+              <SelectContent>
+                {INQUIRY_TYPES.map((type) => (
+                  <SelectItem key={type.value} value={type.value}>
+                    {type.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="message" className="text-sm font-medium text-white/90">
+              Bericht
+            </Label>
+            <Textarea
+              id="message"
+              name="message"
+              value={formData.message}
+              onChange={handleChange}
+              placeholder="Uw bericht..."
+              className="text-sm h-[140px] bg-white/10 border-white/20 text-white placeholder:text-white/60"
+              required
+            />
+          </div>
+        </div>
       </div>
 
       <Button 
