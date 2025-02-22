@@ -20,17 +20,16 @@ export function ContactSection({ property, settings }: WebViewSectionProps) {
       if (property.agent_id) {
         const { data, error } = await supabase
           .from('profiles')
-          .select('id, full_name, email')
+          .select('id, full_name, email, phone')
           .eq('id', property.agent_id)
           .single();
         
         if (!error && data) {
-          // Convert the data to match the Agent interface
           setAgent({
             id: data.id,
             full_name: data.full_name || '',
             email: data.email || '',
-            phone: '' // Since phone doesn't exist in profiles yet
+            phone: data.phone || ''
           });
         }
       }
