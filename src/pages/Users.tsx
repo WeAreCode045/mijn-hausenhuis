@@ -34,6 +34,7 @@ interface User {
   email: string;
   full_name: string | null;
   phone: string | null;
+  whatsapp_number: string | null;
   role: "admin" | "agent" | null;
 }
 
@@ -48,6 +49,7 @@ const Users = () => {
     password: "",
     fullName: "",
     phone: "",
+    whatsappNumber: "",
     role: "agent" as "admin" | "agent"
   });
 
@@ -81,13 +83,14 @@ const Users = () => {
 
       if (authError) throw authError;
 
-      // Update profile with role and phone
+      // Update profile with role, phone and whatsapp number
       if (authData.user) {
         const { error: profileError } = await supabase
           .from("profiles")
           .update({
             role: newUser.role,
-            phone: newUser.phone
+            phone: newUser.phone,
+            whatsapp_number: newUser.whatsappNumber
           })
           .eq("id", authData.user.id);
 
@@ -106,6 +109,7 @@ const Users = () => {
         password: "",
         fullName: "",
         phone: "",
+        whatsappNumber: "",
         role: "agent"
       });
     } catch (error: any) {
@@ -128,6 +132,7 @@ const Users = () => {
         .update({
           full_name: newUser.fullName,
           phone: newUser.phone,
+          whatsapp_number: newUser.whatsappNumber,
           role: newUser.role
         })
         .eq("id", selectedUser.id);
@@ -177,6 +182,7 @@ const Users = () => {
       password: "", // We don't show/edit password for existing users
       fullName: user.full_name || "",
       phone: user.phone || "",
+      whatsappNumber: user.whatsapp_number || "",
       role: user.role as "admin" | "agent" || "agent"
     });
     setIsEditMode(true);
@@ -190,6 +196,7 @@ const Users = () => {
       password: "",
       fullName: "",
       phone: "",
+      whatsappNumber: "",
       role: "agent"
     });
     setIsEditMode(false);
@@ -259,6 +266,17 @@ const Users = () => {
               />
             </div>
             <div className="space-y-2">
+              <Label htmlFor="whatsappNumber">WhatsApp Number</Label>
+              <Input
+                id="whatsappNumber"
+                type="tel"
+                value={newUser.whatsappNumber}
+                onChange={(e) =>
+                  setNewUser((prev) => ({ ...prev, whatsappNumber: e.target.value }))
+                }
+              />
+            </div>
+            <div className="space-y-2">
               <Label htmlFor="role">Role</Label>
               <Select
                 value={newUser.role}
@@ -289,6 +307,7 @@ const Users = () => {
               <TableHead>Name</TableHead>
               <TableHead>Email</TableHead>
               <TableHead>Phone</TableHead>
+              <TableHead>WhatsApp</TableHead>
               <TableHead>Role</TableHead>
               <TableHead>Actions</TableHead>
             </TableRow>
@@ -299,6 +318,7 @@ const Users = () => {
                 <TableCell>{user.full_name}</TableCell>
                 <TableCell>{user.email}</TableCell>
                 <TableCell>{user.phone}</TableCell>
+                <TableCell>{user.whatsapp_number}</TableCell>
                 <TableCell className="capitalize">{user.role}</TableCell>
                 <TableCell>
                   <div className="flex gap-2">
