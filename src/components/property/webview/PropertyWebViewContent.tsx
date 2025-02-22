@@ -48,7 +48,7 @@ export function PropertyWebViewContent({
       </div>
 
       {/* Content Section */}
-      <div className="flex-1 overflow-y-auto">
+      <div className="flex-1 overflow-y-auto overflow-x-hidden">
         <div className="h-full">
           {sections[currentPage]?.content}
         </div>
