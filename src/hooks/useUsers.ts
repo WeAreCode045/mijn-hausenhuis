@@ -16,7 +16,19 @@ export function useUsers() {
         .order("created_at", { ascending: false });
 
       if (error) throw error;
-      return data as User[];
+      
+      // Transform the data to match the User type
+      const transformedData: User[] = data.map(user => ({
+        id: user.id,
+        email: user.email,
+        full_name: user.full_name,
+        phone: user.phone,
+        whatsapp_number: user.whatsapp_number,
+        role: user.role,
+        agent_photo: user.agent_photo || null
+      }));
+
+      return transformedData;
     },
   });
 
