@@ -65,15 +65,15 @@ export function PropertyActions({ property, settings, onDelete, onSave }: Proper
           <Tooltip>
             <TooltipTrigger asChild>
               <Button 
-                variant="default" 
+                variant="destructive" 
                 className="w-full"
-                onClick={onSave}
+                onClick={onDelete}
               >
-                <Save className="w-4 h-4" />
+                <Trash2 className="w-4 h-4" />
               </Button>
             </TooltipTrigger>
             <TooltipContent>
-              <p>Save Property</p>
+              <p>Delete Property</p>
             </TooltipContent>
           </Tooltip>
 
@@ -139,15 +139,15 @@ export function PropertyActions({ property, settings, onDelete, onSave }: Proper
           <Tooltip>
             <TooltipTrigger asChild>
               <Button 
-                variant="destructive" 
+                variant="default" 
                 className="w-full col-span-2"
-                onClick={onDelete}
+                onClick={onSave}
               >
-                <Trash2 className="w-4 h-4" />
+                <Save className="w-4 h-4" />
               </Button>
             </TooltipTrigger>
             <TooltipContent>
-              <p>Delete Property</p>
+              <p>Save Property</p>
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>
