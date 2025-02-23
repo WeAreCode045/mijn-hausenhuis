@@ -1,5 +1,4 @@
-
-import { Document, Page, View, Text, Image, StyleSheet } from '@react-pdf/renderer';
+import { Document, Page, View, Text, Image, StyleSheet, Svg, Path } from '@react-pdf/renderer';
 import { PropertyData } from '@/types/property';
 import { AgencySettings } from '@/types/agency';
 
@@ -99,21 +98,39 @@ const styles = StyleSheet.create({
     backgroundColor: '#f8f9fa',
     borderRadius: 8,
   },
-  keyInfoItem: {
+  keyInfoGrid: {
     flexDirection: 'row',
-    marginBottom: 8,
+    flexWrap: 'wrap',
+    gap: 10,
+    marginTop: 15,
+  },
+  keyInfoBox: {
+    width: '48%',
+    padding: 15,
+    backgroundColor: '#f8f9fa',
+    borderRadius: 8,
+    marginBottom: 10,
+    flexDirection: 'row',
     alignItems: 'center',
+    gap: 10,
   },
-  keyInfoLabel: {
-    width: 100,
-    fontSize: 12,
-    color: '#666',
+  iconContainer: {
+    width: 24,
+    height: 24,
   },
-  keyInfoValue: {
+  keyInfoContent: {
     flex: 1,
-    fontSize: 12,
-    color: '#333',
   },
+  keyInfoBoxLabel: {
+    fontSize: 10,
+    color: '#666',
+    marginBottom: 4,
+  },
+  keyInfoBoxValue: {
+    fontSize: 14,
+    color: '#333',
+    fontWeight: 'bold',
+  }
 });
 
 interface PropertyBrochureDocumentProps {
@@ -135,8 +152,51 @@ const PageHeader = ({ settings }: { settings: AgencySettings }) => (
   </View>
 );
 
+const RulerIcon = () => (
+  <Svg viewBox="0 0 24 24" width={24} height={24}>
+    <Path
+      d="M3 21V3h18v18H3z M3 16.5h18 M3 12h18 M3 7.5h18"
+      stroke="#666"
+      strokeWidth={1.5}
+      fill="none"
+    />
+  </Svg>
+);
+
+const BedIcon = () => (
+  <Svg viewBox="0 0 24 24" width={24} height={24}>
+    <Path
+      d="M2 20v-8a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v8 M4 10V6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v4"
+      stroke="#666"
+      strokeWidth={1.5}
+      fill="none"
+    />
+  </Svg>
+);
+
+const BathIcon = () => (
+  <Svg viewBox="0 0 24 24" width={24} height={24}>
+    <Path
+      d="M4 12h16a1 1 0 0 1 1 1v2a4 4 0 0 1-4 4h-10a4 4 0 0 1-4-4v-2a1 1 0 0 1 1-1z M6 12V5a2 2 0 0 1 2-2h3v2.25"
+      stroke="#666"
+      strokeWidth={1.5}
+      fill="none"
+    />
+  </Svg>
+);
+
+const CalendarIcon = () => (
+  <Svg viewBox="0 0 24 24" width={24} height={24}>
+    <Path
+      d="M8 2v4M16 2v4M3 10h18M5 4h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"
+      stroke="#666"
+      strokeWidth={1.5}
+      fill="none"
+    />
+  </Svg>
+);
+
 export const PropertyBrochureDocument = ({ property, settings }: PropertyBrochureDocumentProps) => {
-  // Ensure all array properties exist and have fallbacks
   const {
     gridImages = [],
     features = [],
@@ -147,7 +207,6 @@ export const PropertyBrochureDocument = ({ property, settings }: PropertyBrochur
 
   return (
     <Document>
-      {/* Cover Page */}
       <Page size="A4" style={styles.page}>
         <PageHeader settings={settings} />
         
@@ -173,7 +232,6 @@ export const PropertyBrochureDocument = ({ property, settings }: PropertyBrochur
         </Text>
       </Page>
 
-      {/* Details Page */}
       <Page size="A4" style={styles.page}>
         <PageHeader settings={settings} />
         
@@ -183,28 +241,56 @@ export const PropertyBrochureDocument = ({ property, settings }: PropertyBrochur
             <Text style={styles.text}>{property.description || ''}</Text>
           </View>
 
-          <View style={styles.keyInfo}>
-            <Text style={styles.subheading}>Key Information</Text>
-            <View style={styles.keyInfoItem}>
-              <Text style={styles.keyInfoLabel}>Living Area:</Text>
-              <Text style={styles.keyInfoValue}>{property.livingArea || '0'} m²</Text>
+          <View style={styles.keyInfoGrid}>
+            <View style={styles.keyInfoBox}>
+              <View style={styles.iconContainer}>
+                <RulerIcon />
+              </View>
+              <View style={styles.keyInfoContent}>
+                <Text style={styles.keyInfoBoxLabel}>Living Area</Text>
+                <Text style={styles.keyInfoBoxValue}>{property.livingArea || '0'} m²</Text>
+              </View>
             </View>
-            <View style={styles.keyInfoItem}>
-              <Text style={styles.keyInfoLabel}>Plot Size:</Text>
-              <Text style={styles.keyInfoValue}>{property.sqft || '0'} m²</Text>
+
+            <View style={styles.keyInfoBox}>
+              <View style={styles.iconContainer}>
+                <RulerIcon />
+              </View>
+              <View style={styles.keyInfoContent}>
+                <Text style={styles.keyInfoBoxLabel}>Plot Size</Text>
+                <Text style={styles.keyInfoBoxValue}>{property.sqft || '0'} m²</Text>
+              </View>
             </View>
-            <View style={styles.keyInfoItem}>
-              <Text style={styles.keyInfoLabel}>Bedrooms:</Text>
-              <Text style={styles.keyInfoValue}>{property.bedrooms || '0'}</Text>
+
+            <View style={styles.keyInfoBox}>
+              <View style={styles.iconContainer}>
+                <BedIcon />
+              </View>
+              <View style={styles.keyInfoContent}>
+                <Text style={styles.keyInfoBoxLabel}>Bedrooms</Text>
+                <Text style={styles.keyInfoBoxValue}>{property.bedrooms || '0'}</Text>
+              </View>
             </View>
-            <View style={styles.keyInfoItem}>
-              <Text style={styles.keyInfoLabel}>Bathrooms:</Text>
-              <Text style={styles.keyInfoValue}>{property.bathrooms || '0'}</Text>
+
+            <View style={styles.keyInfoBox}>
+              <View style={styles.iconContainer}>
+                <BathIcon />
+              </View>
+              <View style={styles.keyInfoContent}>
+                <Text style={styles.keyInfoBoxLabel}>Bathrooms</Text>
+                <Text style={styles.keyInfoBoxValue}>{property.bathrooms || '0'}</Text>
+              </View>
             </View>
+
             {property.buildYear && (
-              <View style={styles.keyInfoItem}>
-                <Text style={styles.keyInfoLabel}>Build Year:</Text>
-                <Text style={styles.keyInfoValue}>{property.buildYear}</Text>
+              <View style={styles.keyInfoBox}>
+                <View style={styles.iconContainer}>
+                  <CalendarIcon />
+                </View>
+                <View style={styles.keyInfoContent}>
+                  <Text style={styles.keyInfoBoxLabel}>Build Year</Text>
+                  <Text style={styles.keyInfoBoxValue}>{property.buildYear}</Text>
+                </View>
               </View>
             )}
           </View>
@@ -224,7 +310,6 @@ export const PropertyBrochureDocument = ({ property, settings }: PropertyBrochur
         </View>
       </Page>
 
-      {/* Location Page */}
       {(property.location_description || property.map_image) && (
         <Page size="A4" style={styles.page}>
           <PageHeader settings={settings} />
@@ -257,7 +342,6 @@ export const PropertyBrochureDocument = ({ property, settings }: PropertyBrochur
         </Page>
       )}
 
-      {/* Areas Pages */}
       {areas.length > 0 && areas.slice(0, 4).map((area, index) => (
         <Page key={area.id || index} size="A4" style={styles.page}>
           <PageHeader settings={settings} />
@@ -279,7 +363,6 @@ export const PropertyBrochureDocument = ({ property, settings }: PropertyBrochur
         </Page>
       ))}
 
-      {/* Contact Page */}
       <Page size="A4" style={styles.page}>
         <PageHeader settings={settings} />
         <View style={styles.content}>
