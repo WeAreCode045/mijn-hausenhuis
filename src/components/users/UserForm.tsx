@@ -35,16 +35,17 @@ export function UserForm({ isEditMode, initialData, onSuccess }: UserFormProps) 
     e.preventDefault();
 
     try {
-      if (isEditMode) {
+      if (isEditMode && initialData?.id) {
         const { error } = await supabase
           .from("profiles")
           .update({
             full_name: formData.fullName,
             phone: formData.phone,
             whatsapp_number: formData.whatsappNumber,
-            role: formData.role
+            role: formData.role,
+            updated_at: new Date().toISOString()
           })
-          .eq("id", initialData?.id);
+          .eq("id", initialData.id);
 
         if (error) throw error;
 
@@ -69,9 +70,11 @@ export function UserForm({ isEditMode, initialData, onSuccess }: UserFormProps) 
           const { error: profileError } = await supabase
             .from("profiles")
             .update({
+              full_name: formData.fullName,
               role: formData.role,
               phone: formData.phone,
-              whatsapp_number: formData.whatsappNumber
+              whatsapp_number: formData.whatsappNumber,
+              updated_at: new Date().toISOString()
             })
             .eq("id", authData.user.id);
 
@@ -86,6 +89,7 @@ export function UserForm({ isEditMode, initialData, onSuccess }: UserFormProps) 
 
       onSuccess();
     } catch (error: any) {
+      console.error('Error submitting form:', error);
       toast({
         title: "Error",
         description: error.message,
