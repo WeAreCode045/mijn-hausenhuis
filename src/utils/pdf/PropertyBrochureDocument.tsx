@@ -14,7 +14,6 @@ const styles = StyleSheet.create({
   heading: {
     fontSize: 24,
     marginBottom: 10,
-    fontWeight: 'bold',
     color: '#1a1a1a',
   },
   subheading: {
@@ -47,10 +46,6 @@ const styles = StyleSheet.create({
     borderRadius: 4,
   },
   header: {
-    position: 'absolute',
-    top: 20,
-    left: 30,
-    right: 30,
     flexDirection: 'row',
     alignItems: 'center',
     gap: 20,
@@ -68,20 +63,14 @@ const styles = StyleSheet.create({
     fontSize: 8,
     color: '#666',
   },
-  footer: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: '10px 30px',
-    color: 'white',
-  },
   footerText: {
     fontSize: 10,
-    color: 'white',
+    color: '#666',
+    position: 'absolute',
+    bottom: 30,
+    left: 30,
+    right: 30,
+    textAlign: 'center',
   },
   grid: {
     flexDirection: 'row',
@@ -95,28 +84,13 @@ const styles = StyleSheet.create({
     borderRadius: 4,
   },
   content: {
-    marginTop: 70, // Space for header
-    marginBottom: 50, // Space for footer
-  },
-  areaContent: {
-    flex: 1,
+    marginTop: 20,
+    marginBottom: 50,
   },
   areaDescription: {
     marginVertical: 15,
     padding: 15,
     backgroundColor: '#f8f9fa',
-    borderRadius: 8,
-  },
-  areaImageGrid: {
-    marginTop: 20,
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 15,
-  },
-  areaImage: {
-    width: '48%',
-    height: 200,
-    objectFit: 'cover',
     borderRadius: 8,
   },
   keyInfo: {
@@ -139,7 +113,7 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 12,
     color: '#333',
-  }
+  },
 });
 
 interface PropertyBrochureDocumentProps {
@@ -161,20 +135,16 @@ const PageHeader = ({ settings }: { settings: AgencySettings }) => (
   </View>
 );
 
-const PageFooter = ({ title, pageNumber, settings }: { title: string; pageNumber: number; settings: AgencySettings }) => (
-  <View style={[styles.footer, { backgroundColor: settings.primaryColor || '#9b87f5' }]}>
-    <Text style={styles.footerText}>{title}</Text>
-    <Text style={styles.footerText}>Page {pageNumber}</Text>
-  </View>
-);
-
 export const PropertyBrochureDocument = ({ property, settings }: PropertyBrochureDocumentProps) => (
   <Document>
-    {/* Cover Page - No header/footer */}
+    {/* Cover Page */}
     <Page size="A4" style={styles.page}>
+      <PageHeader settings={settings} />
+      
       {property.featuredImage && (
         <Image src={property.featuredImage} style={styles.image} />
       )}
+      
       <View style={styles.section}>
         <Text style={styles.heading}>{property.title}</Text>
         <Text style={styles.subheading}>{property.price}</Text>
@@ -186,7 +156,7 @@ export const PropertyBrochureDocument = ({ property, settings }: PropertyBrochur
         ))}
       </View>
 
-      <Text style={[styles.footerText, { color: '#666', position: 'absolute', bottom: 30, left: 30, right: 30, textAlign: 'center' }]}>
+      <Text style={styles.footerText}>
         {settings.name} - {settings.phone} - {settings.email}
       </Text>
     </Page>
@@ -194,6 +164,7 @@ export const PropertyBrochureDocument = ({ property, settings }: PropertyBrochur
     {/* Details Page */}
     <Page size="A4" style={styles.page}>
       <PageHeader settings={settings} />
+      
       <View style={styles.content}>
         <View style={styles.section}>
           <Text style={styles.heading}>Property Details</Text>
@@ -226,48 +197,23 @@ export const PropertyBrochureDocument = ({ property, settings }: PropertyBrochur
           )}
         </View>
 
-        <View style={styles.section}>
-          <Text style={styles.subheading}>Features</Text>
-          <View style={styles.featuresGrid}>
-            {(property.features || []).map((feature, index) => (
-              <View key={index} style={styles.featureItem}>
-                <Text style={styles.text}>{feature.description}</Text>
-              </View>
-            ))}
+        {property.features && property.features.length > 0 && (
+          <View style={styles.section}>
+            <Text style={styles.subheading}>Features</Text>
+            <View style={styles.featuresGrid}>
+              {property.features.map((feature, index) => (
+                <View key={index} style={styles.featureItem}>
+                  <Text style={styles.text}>{feature.description}</Text>
+                </View>
+              ))}
+            </View>
           </View>
-        </View>
+        )}
       </View>
-      <PageFooter title={property.title} pageNumber={2} settings={settings} />
     </Page>
 
-    {/* Individual Area Pages */}
-    {(property.areas || []).map((area, index) => (
-      <Page key={area.id} size="A4" style={styles.page}>
-        <PageHeader settings={settings} />
-        <View style={styles.content}>
-          <Text style={styles.heading}>{area.title}</Text>
-          <View style={styles.areaDescription}>
-            <Text style={styles.text}>{area.description}</Text>
-          </View>
-          <View style={styles.areaImageGrid}>
-            {(area.imageIds || [])
-              .map(id => (property.images || []).find(img => img.id === id))
-              .filter(Boolean)
-              .map((img, imgIndex) => (
-                <Image key={imgIndex} src={img!.url} style={styles.areaImage} />
-              ))}
-          </View>
-        </View>
-        <PageFooter 
-          title={property.title} 
-          pageNumber={3 + index} 
-          settings={settings} 
-        />
-      </Page>
-    ))}
-
     {/* Location Page */}
-    {(property.location_description || property.map_image || (property.nearby_places || []).length > 0) && (
+    {(property.location_description || property.map_image) && (
       <Page size="A4" style={styles.page}>
         <PageHeader settings={settings} />
         <View style={styles.content}>
@@ -283,10 +229,10 @@ export const PropertyBrochureDocument = ({ property, settings }: PropertyBrochur
             <Image src={property.map_image} style={styles.image} />
           )}
 
-          {(property.nearby_places || []).length > 0 && (
+          {property.nearby_places && property.nearby_places.length > 0 && (
             <View style={styles.section}>
               <Text style={styles.subheading}>Nearby Places</Text>
-              {property.nearby_places?.map((place, index) => (
+              {property.nearby_places.map((place, index) => (
                 <View key={index} style={styles.keyInfoItem}>
                   <Text style={styles.text}>
                     {place.name} - {place.vicinity}
@@ -296,50 +242,59 @@ export const PropertyBrochureDocument = ({ property, settings }: PropertyBrochur
             </View>
           )}
         </View>
-        <PageFooter 
-          title={property.title} 
-          pageNumber={3 + (property.areas?.length || 0)} 
-          settings={settings} 
-        />
       </Page>
     )}
+
+    {/* Areas Pages */}
+    {property.areas && property.areas.map((area, index) => (
+      <Page key={area.id} size="A4" style={styles.page}>
+        <PageHeader settings={settings} />
+        <View style={styles.content}>
+          <Text style={styles.heading}>{area.title}</Text>
+          <View style={styles.areaDescription}>
+            <Text style={styles.text}>{area.description}</Text>
+          </View>
+          <View style={styles.grid}>
+            {(area.imageIds || [])
+              .map(id => (property.images || []).find(img => img.id === id))
+              .filter(Boolean)
+              .map((img, imgIndex) => (
+                <Image key={imgIndex} src={img!.url} style={styles.gridImage} />
+              ))}
+          </View>
+        </View>
+      </Page>
+    ))}
 
     {/* Contact Page */}
     <Page size="A4" style={styles.page}>
       <PageHeader settings={settings} />
       <View style={styles.content}>
-        <View style={styles.section}>
-          <Text style={styles.heading}>Contact Us</Text>
-          
-          {settings.logoUrl && (
-            <Image src={settings.logoUrl} style={{ width: 200, marginBottom: 20 }} />
-          )}
+        <Text style={styles.heading}>Contact Us</Text>
+        
+        {settings.logoUrl && (
+          <Image src={settings.logoUrl} style={{ width: 200, marginBottom: 20 }} />
+        )}
 
-          <View style={styles.keyInfo}>
-            <Text style={styles.text}>{settings.name}</Text>
-            <Text style={styles.text}>{settings.address}</Text>
-            <Text style={styles.text}>Phone: {settings.phone}</Text>
-            <Text style={styles.text}>Email: {settings.email}</Text>
-          </View>
-
-          {(settings.facebookUrl || settings.instagramUrl) && (
-            <View style={[styles.keyInfo, { marginTop: 20 }]}>
-              <Text style={styles.subheading}>Follow Us</Text>
-              {settings.facebookUrl && (
-                <Text style={styles.text}>Facebook: {settings.facebookUrl}</Text>
-              )}
-              {settings.instagramUrl && (
-                <Text style={styles.text}>Instagram: {settings.instagramUrl}</Text>
-              )}
-            </View>
-          )}
+        <View style={styles.keyInfo}>
+          <Text style={styles.text}>{settings.name}</Text>
+          <Text style={styles.text}>{settings.address}</Text>
+          <Text style={styles.text}>Phone: {settings.phone}</Text>
+          <Text style={styles.text}>Email: {settings.email}</Text>
         </View>
+
+        {(settings.facebookUrl || settings.instagramUrl) && (
+          <View style={[styles.keyInfo, { marginTop: 20 }]}>
+            <Text style={styles.subheading}>Follow Us</Text>
+            {settings.facebookUrl && (
+              <Text style={styles.text}>Facebook: {settings.facebookUrl}</Text>
+            )}
+            {settings.instagramUrl && (
+              <Text style={styles.text}>Instagram: {settings.instagramUrl}</Text>
+            )}
+          </View>
+        )}
       </View>
-      <PageFooter 
-        title={property.title} 
-        pageNumber={4 + (property.areas?.length || 0)} 
-        settings={settings} 
-      />
     </Page>
   </Document>
 );
