@@ -139,6 +139,28 @@ const createStyles = (settings: AgencySettings) => StyleSheet.create({
     fontSize: 14,
     color: 'white',
     fontWeight: 'bold',
+  },
+  floorplanGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 20,
+    marginVertical: 15,
+  },
+  floorplanItem: {
+    width: '100%',
+    marginBottom: 20,
+  },
+  floorplanImage: {
+    width: '100%',
+    height: 400,
+    objectFit: 'contain',
+    marginVertical: 10,
+  },
+  floorplanCaption: {
+    fontSize: 12,
+    color: '#4a4a4a',
+    textAlign: 'center',
+    marginTop: 5,
   }
 });
 
@@ -211,7 +233,8 @@ export const PropertyBrochureDocument = ({ property, settings }: PropertyBrochur
     features = [],
     nearby_places = [],
     areas = [],
-    images = []
+    images = [],
+    floorplans = []
   } = property;
 
   const styles = createStyles(settings);
@@ -320,6 +343,33 @@ export const PropertyBrochureDocument = ({ property, settings }: PropertyBrochur
           )}
         </View>
       </Page>
+
+      {floorplans && floorplans.length > 0 && (
+        <Page size="A4" style={styles.page}>
+          <PageHeader settings={settings} styles={styles} />
+          <View style={styles.content}>
+            <Text style={styles.heading}>Floorplans</Text>
+            <View style={styles.floorplanGrid}>
+              {floorplans.map((plan, index) => (
+                <View key={index} style={styles.floorplanItem}>
+                  <Image 
+                    src={plan} 
+                    style={styles.floorplanImage}
+                  />
+                  <Text style={styles.floorplanCaption}>
+                    Floorplan {index + 1}
+                  </Text>
+                </View>
+              ))}
+            </View>
+          </View>
+          <Text style={styles.footerText}>
+            {[settings.name, settings.phone, settings.email]
+              .filter(Boolean)
+              .join(' - ')}
+          </Text>
+        </Page>
+      )}
 
       {(property.location_description || property.map_image) && (
         <Page size="A4" style={styles.page}>
