@@ -86,19 +86,19 @@ export function ContactSection({ property, settings }: WebViewSectionProps) {
         {agent && (
           <div className="w-full rounded-xl shadow-lg p-8" style={{ backgroundColor: settings?.primaryColor }}>
             <h4 className="text-xl font-semibold mb-6 text-white">Contact Agent</h4>
-            <div className="flex items-center gap-4 mb-6">
-              <Avatar className="w-16 h-16 border-2 border-white">
-                {agent.agent_photo ? (
-                  <AvatarImage src={agent.agent_photo} alt={agent.full_name} />
-                ) : (
-                  <AvatarFallback className="bg-white/10 text-white">
-                    {agent.full_name?.charAt(0)}
-                  </AvatarFallback>
-                )}
-              </Avatar>
-              <p className="font-medium text-base text-white">{agent.full_name}</p>
-            </div>
-            <div className="space-y-4">
+            <div className="flex flex-col gap-4 mb-6">
+              <div className="flex items-start gap-4">
+                <Avatar className="w-24 h-24 border-2 border-white">
+                  {agent.agent_photo ? (
+                    <AvatarImage src={agent.agent_photo} alt={agent.full_name} />
+                  ) : (
+                    <AvatarFallback className="bg-white/10 text-white text-xl">
+                      {agent.full_name?.charAt(0)}
+                    </AvatarFallback>
+                  )}
+                </Avatar>
+                <p className="font-medium text-base text-white mt-2">{agent.full_name}</p>
+              </div>
               <div className="flex flex-col items-start gap-3">
                 {agent.phone && (
                   <a 
