@@ -106,10 +106,12 @@ const defaultSections: Section[] = [
   }
 ];
 
-export function TemplateBuilder() {
-  const [sections, setSections] = React.useState<Section[]>(defaultSections);
-  const [templateName, setTemplateName] = React.useState('');
-  const [description, setDescription] = React.useState('');
+export function TemplateBuilder({ template }: { template?: any }) {
+  const [sections, setSections] = React.useState<Section[]>(
+    template?.sections || defaultSections
+  );
+  const [templateName, setTemplateName] = React.useState(template?.name || '');
+  const [description, setDescription] = React.useState(template?.description || '');
   const [selectedSectionId, setSelectedSectionId] = React.useState<string | null>(null);
   const { toast } = useToast();
 
@@ -212,7 +214,10 @@ export function TemplateBuilder() {
 
       const { error } = await supabase
         .from('brochure_templates')
-        .insert([templateData]);
+        .upsert([{
+          ...(template?.id ? { id: template.id } : {}),
+          ...templateData
+        }]);
 
       if (error) throw error;
 
@@ -221,9 +226,7 @@ export function TemplateBuilder() {
         description: "Template saved successfully",
       });
 
-      // Reset form after successful save
-      setTemplateName('');
-      setDescription('');
+      window.location.reload(); // Refresh to show updated list
     } catch (error) {
       console.error('Error saving template:', error);
       toast({
@@ -285,7 +288,7 @@ export function TemplateBuilder() {
         </div>
 
         <Button onClick={saveTemplate} className="w-full">
-          Save Template
+          {template ? 'Update Template' : 'Save Template'}
         </Button>
       </div>
 
