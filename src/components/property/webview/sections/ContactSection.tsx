@@ -1,10 +1,11 @@
 
 import { ContactForm } from "../ContactForm";
 import { WebViewSectionProps } from "../types";
-import { MessageCircle, Mail, Phone, Building2 } from "lucide-react";
+import { MessageCircle, Mail, Phone, QrCode } from "lucide-react";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import QRCode from "qrcode.react";
 
 interface Agent {
   id: string;
@@ -17,6 +18,7 @@ interface Agent {
 
 export function ContactSection({ property, settings }: WebViewSectionProps) {
   const [agent, setAgent] = useState<Agent | null>(null);
+  const [showQR, setShowQR] = useState(false);
 
   useEffect(() => {
     const fetchAgent = async () => {
@@ -45,47 +47,32 @@ export function ContactSection({ property, settings }: WebViewSectionProps) {
 
   return (
     <div className="p-4 sm:p-6 space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Agency Contact Details */}
-        <div className="w-full rounded-xl shadow-lg p-8" style={{ backgroundColor: settings?.primaryColor }}>
-          <div className="flex items-center gap-3 mb-6">
-            <Building2 className="w-5 h-5 text-white" />
-            <h3 className="text-xl font-semibold text-white">Contact Agency</h3>
-          </div>
-          <div className="space-y-4">
-            {settings?.name && (
-              <p className="font-medium text-base text-white">{settings.name}</p>
-            )}
-            {settings?.address && (
-              <p className="text-sm text-white/90 leading-relaxed">{settings.address}</p>
-            )}
-            <div className="flex flex-col gap-3 mt-4">
-              {settings?.phone && (
-                <a 
-                  href={`tel:${settings.phone}`}
-                  className="flex items-center gap-3 text-sm text-white/90 hover:text-white transition-colors"
-                >
-                  <Phone className="w-4 h-4" />
-                  <span>{settings.phone}</span>
-                </a>
-              )}
-              {settings?.email && (
-                <a 
-                  href={`mailto:${settings.email}`}
-                  className="flex items-center gap-3 text-sm text-white/90 hover:text-white transition-colors"
-                >
-                  <Mail className="w-4 h-4" />
-                  <span>{settings.email}</span>
-                </a>
-              )}
-            </div>
-          </div>
-        </div>
-
+      <div className="grid grid-cols-1 gap-6">
         {/* Agent Details */}
         {agent && (
           <div className="w-full rounded-xl shadow-lg p-8" style={{ backgroundColor: settings?.primaryColor }}>
-            <h4 className="text-xl font-semibold mb-6 text-white">Contact Agent</h4>
+            <div className="flex justify-between items-start mb-6">
+              <h4 className="text-xl font-semibold text-white">Contact Agent</h4>
+              <button
+                onClick={() => setShowQR(!showQR)}
+                className="flex items-center gap-2 text-white/90 hover:text-white transition-colors"
+              >
+                <QrCode className="w-5 h-5" />
+                <span className="text-sm">Show QR</span>
+              </button>
+            </div>
+
+            {showQR && (
+              <div className="bg-white p-4 rounded-lg mb-6 flex justify-center">
+                <QRCode 
+                  value={window.location.href}
+                  size={150}
+                  level="H"
+                  includeMargin={true}
+                />
+              </div>
+            )}
+
             <div className="flex flex-col gap-4 mb-6">
               <div className="flex items-start gap-4">
                 <Avatar className="w-24 h-24 border-2 border-white">
