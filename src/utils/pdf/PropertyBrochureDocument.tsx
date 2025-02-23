@@ -1,4 +1,3 @@
-
 import { Document, Page, View, Text, Image, StyleSheet, Svg, Path } from '@react-pdf/renderer';
 import { PropertyData } from '@/types/property';
 import { AgencySettings } from '@/types/agency';
@@ -143,7 +142,25 @@ const createStyles = (settings: AgencySettings) => StyleSheet.create({
   }
 });
 
-// SVG icons with white stroke
+interface PropertyBrochureDocumentProps {
+  property: PropertyData;
+  settings: AgencySettings;
+}
+
+const PageHeader = ({ settings, styles }: { settings: AgencySettings; styles: ReturnType<typeof createStyles> }) => (
+  <View style={styles.header}>
+    {settings.logoUrl && (
+      <Image src={settings.logoUrl} style={styles.headerLogo} />
+    )}
+    <View style={styles.headerInfo}>
+      <Text style={styles.headerText}>{settings.name || ''}</Text>
+      <Text style={styles.headerText}>{settings.address || ''}</Text>
+      <Text style={styles.headerText}>Phone: {settings.phone || ''}</Text>
+      <Text style={styles.headerText}>Email: {settings.email || ''}</Text>
+    </View>
+  </View>
+);
+
 const RulerIcon = () => (
   <Svg viewBox="0 0 24 24" width={20} height={20}>
     <Path
@@ -188,25 +205,6 @@ const CalendarIcon = () => (
   </Svg>
 );
 
-interface PropertyBrochureDocumentProps {
-  property: PropertyData;
-  settings: AgencySettings;
-}
-
-const PageHeader = ({ settings }: { settings: AgencySettings }) => (
-  <View style={styles.header}>
-    {settings.logoUrl && (
-      <Image src={settings.logoUrl} style={styles.headerLogo} />
-    )}
-    <View style={styles.headerInfo}>
-      <Text style={styles.headerText}>{settings.name || ''}</Text>
-      <Text style={styles.headerText}>{settings.address || ''}</Text>
-      <Text style={styles.headerText}>Phone: {settings.phone || ''}</Text>
-      <Text style={styles.headerText}>Email: {settings.email || ''}</Text>
-    </View>
-  </View>
-);
-
 export const PropertyBrochureDocument = ({ property, settings }: PropertyBrochureDocumentProps) => {
   const {
     gridImages = [],
@@ -221,7 +219,7 @@ export const PropertyBrochureDocument = ({ property, settings }: PropertyBrochur
   return (
     <Document>
       <Page size="A4" style={styles.page}>
-        <PageHeader settings={settings} />
+        <PageHeader settings={settings} styles={styles} />
         
         {property.featuredImage && (
           <Image src={property.featuredImage} style={styles.image} />
@@ -246,7 +244,7 @@ export const PropertyBrochureDocument = ({ property, settings }: PropertyBrochur
       </Page>
 
       <Page size="A4" style={styles.page}>
-        <PageHeader settings={settings} />
+        <PageHeader settings={settings} styles={styles} />
         
         <View style={styles.content}>
           <View style={styles.section}>
@@ -325,7 +323,7 @@ export const PropertyBrochureDocument = ({ property, settings }: PropertyBrochur
 
       {(property.location_description || property.map_image) && (
         <Page size="A4" style={styles.page}>
-          <PageHeader settings={settings} />
+          <PageHeader settings={settings} styles={styles} />
           <View style={styles.content}>
             <Text style={styles.heading}>Location</Text>
             
@@ -357,7 +355,7 @@ export const PropertyBrochureDocument = ({ property, settings }: PropertyBrochur
 
       {areas.length > 0 && areas.slice(0, 4).map((area, index) => (
         <Page key={area.id || index} size="A4" style={styles.page}>
-          <PageHeader settings={settings} />
+          <PageHeader settings={settings} styles={styles} />
           <View style={styles.content}>
             <Text style={styles.heading}>{area.title || ''}</Text>
             <View style={styles.areaDescription}>
@@ -377,7 +375,7 @@ export const PropertyBrochureDocument = ({ property, settings }: PropertyBrochur
       ))}
 
       <Page size="A4" style={styles.page}>
-        <PageHeader settings={settings} />
+        <PageHeader settings={settings} styles={styles} />
         <View style={styles.content}>
           <Text style={styles.heading}>Contact Us</Text>
           
