@@ -5,7 +5,7 @@ import { MessageCircle, Mail, Phone, QrCode } from "lucide-react";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import QRCode from "qrcode.react";
+import { QRCodeSVG } from "qrcode.react";  // Changed to named import
 
 interface Agent {
   id: string;
@@ -64,7 +64,7 @@ export function ContactSection({ property, settings }: WebViewSectionProps) {
 
             {showQR && (
               <div className="bg-white p-4 rounded-lg mb-6 flex justify-center">
-                <QRCode 
+                <QRCodeSVG 
                   value={window.location.href}
                   size={150}
                   level="H"
