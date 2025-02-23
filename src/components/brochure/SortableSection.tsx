@@ -4,12 +4,14 @@ import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { GripVertical } from 'lucide-react';
 import type { Section } from './TemplateBuilder';
+import { cn } from '@/lib/utils';
 
 interface SortableSectionProps {
   section: Section;
+  isSelected?: boolean;
 }
 
-export function SortableSection({ section }: SortableSectionProps) {
+export function SortableSection({ section, isSelected }: SortableSectionProps) {
   const {
     attributes,
     listeners,
@@ -27,7 +29,10 @@ export function SortableSection({ section }: SortableSectionProps) {
     <div
       ref={setNodeRef}
       style={style}
-      className="flex items-center gap-2 p-3 bg-white rounded-md border shadow-sm"
+      className={cn(
+        "flex items-center gap-2 p-3 bg-white rounded-md border shadow-sm transition-colors",
+        isSelected && "ring-2 ring-primary"
+      )}
     >
       <button
         className="cursor-move p-1 hover:bg-gray-100 rounded"
