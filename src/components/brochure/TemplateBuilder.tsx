@@ -196,17 +196,23 @@ export function TemplateBuilder() {
           backgroundColor: section.design.backgroundColor,
           textColor: section.design.textColor,
           padding: section.design.padding,
-          contentElements: section.design.contentElements
+          contentElements: section.design.contentElements?.map(el => ({
+            id: el.id,
+            type: el.type,
+            title: el.title
+          }))
         }
       }));
 
+      const templateData = {
+        name: templateName,
+        description,
+        sections: sectionsToSave as unknown as Json
+      };
+
       const { error } = await supabase
         .from('brochure_templates')
-        .insert([{
-          name: templateName,
-          description,
-          sections: sectionsToSave
-        }]);
+        .insert([templateData]);
 
       if (error) throw error;
 
