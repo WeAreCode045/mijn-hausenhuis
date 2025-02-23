@@ -181,7 +181,7 @@ export const PropertyBrochureDocument = ({ property, settings }: PropertyBrochur
       </View>
       
       <View style={styles.grid}>
-        {property.gridImages.slice(0, 6).map((url, index) => (
+        {(property.gridImages || []).slice(0, 6).map((url, index) => (
           <Image key={index} src={url} style={styles.gridImage} />
         ))}
       </View>
@@ -229,7 +229,7 @@ export const PropertyBrochureDocument = ({ property, settings }: PropertyBrochur
         <View style={styles.section}>
           <Text style={styles.subheading}>Features</Text>
           <View style={styles.featuresGrid}>
-            {property.features?.map((feature, index) => (
+            {(property.features || []).map((feature, index) => (
               <View key={index} style={styles.featureItem}>
                 <Text style={styles.text}>{feature.description}</Text>
               </View>
@@ -241,7 +241,7 @@ export const PropertyBrochureDocument = ({ property, settings }: PropertyBrochur
     </Page>
 
     {/* Individual Area Pages */}
-    {property.areas?.map((area, index) => (
+    {(property.areas || []).map((area, index) => (
       <Page key={area.id} size="A4" style={styles.page}>
         <PageHeader settings={settings} />
         <View style={styles.content}>
@@ -250,8 +250,8 @@ export const PropertyBrochureDocument = ({ property, settings }: PropertyBrochur
             <Text style={styles.text}>{area.description}</Text>
           </View>
           <View style={styles.areaImageGrid}>
-            {area.imageIds
-              .map(id => property.images.find(img => img.id === id))
+            {(area.imageIds || [])
+              .map(id => (property.images || []).find(img => img.id === id))
               .filter(Boolean)
               .map((img, imgIndex) => (
                 <Image key={imgIndex} src={img!.url} style={styles.areaImage} />
@@ -267,7 +267,7 @@ export const PropertyBrochureDocument = ({ property, settings }: PropertyBrochur
     ))}
 
     {/* Location Page */}
-    {(property.location_description || property.map_image || property.nearby_places?.length > 0) && (
+    {(property.location_description || property.map_image || (property.nearby_places || []).length > 0) && (
       <Page size="A4" style={styles.page}>
         <PageHeader settings={settings} />
         <View style={styles.content}>
@@ -283,10 +283,10 @@ export const PropertyBrochureDocument = ({ property, settings }: PropertyBrochur
             <Image src={property.map_image} style={styles.image} />
           )}
 
-          {property.nearby_places && property.nearby_places.length > 0 && (
+          {(property.nearby_places || []).length > 0 && (
             <View style={styles.section}>
               <Text style={styles.subheading}>Nearby Places</Text>
-              {property.nearby_places.map((place, index) => (
+              {property.nearby_places?.map((place, index) => (
                 <View key={index} style={styles.keyInfoItem}>
                   <Text style={styles.text}>
                     {place.name} - {place.vicinity}
