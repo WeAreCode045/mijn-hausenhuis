@@ -4,6 +4,18 @@ import { supabase } from "@/integrations/supabase/client";
 import { User } from "@/types/user";
 import { useToast } from "@/components/ui/use-toast";
 
+interface ProfileResponse {
+  id: string;
+  created_at: string;
+  email: string | null;
+  full_name: string | null;
+  phone: string | null;
+  role: "admin" | "agent" | null;
+  updated_at: string;
+  whatsapp_number: string | null;
+  agent_photo: string | null;
+}
+
 export function useUsers() {
   const { toast } = useToast();
 
@@ -18,7 +30,7 @@ export function useUsers() {
       if (error) throw error;
       
       // Transform the data to match the User type
-      const transformedData: User[] = data.map(user => ({
+      const transformedData: User[] = (data as ProfileResponse[]).map(user => ({
         id: user.id,
         email: user.email || null,
         full_name: user.full_name || null,
