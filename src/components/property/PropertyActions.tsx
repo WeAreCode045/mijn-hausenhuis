@@ -2,7 +2,7 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
-import { Download, ExternalLink, Share2, Trash2 } from "lucide-react";
+import { Download, ExternalLink, Save, Share2, Trash2 } from "lucide-react";
 import { generatePropertyPDF } from "@/utils/pdfGenerator";
 import { PropertyFormData } from "@/types/property";
 import { AgencySettings } from "@/types/agency";
@@ -23,9 +23,10 @@ interface PropertyActionsProps {
   property: PropertyFormData;
   settings: AgencySettings;
   onDelete: () => void;
+  onSave: () => void;
 }
 
-export function PropertyActions({ property, settings, onDelete }: PropertyActionsProps) {
+export function PropertyActions({ property, settings, onDelete, onSave }: PropertyActionsProps) {
   const navigate = useNavigate();
   
   if (!property.id) return null;
@@ -61,6 +62,21 @@ export function PropertyActions({ property, settings, onDelete }: PropertyAction
       </CardHeader>
       <CardContent className="grid grid-cols-2 gap-2">
         <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button 
+                variant="default" 
+                className="w-full"
+                onClick={onSave}
+              >
+                <Save className="w-4 h-4" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Save Property</p>
+            </TooltipContent>
+          </Tooltip>
+
           <Tooltip>
             <TooltipTrigger asChild>
               <Button 
@@ -124,7 +140,7 @@ export function PropertyActions({ property, settings, onDelete }: PropertyAction
             <TooltipTrigger asChild>
               <Button 
                 variant="destructive" 
-                className="w-full"
+                className="w-full col-span-2"
                 onClick={onDelete}
               >
                 <Trash2 className="w-4 h-4" />

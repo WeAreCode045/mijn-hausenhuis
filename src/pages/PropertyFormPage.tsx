@@ -1,4 +1,3 @@
-
 import { useNavigate, useParams } from "react-router-dom";
 import { PropertyForm } from "@/components/PropertyForm";
 import { supabase } from "@/integrations/supabase/client";
@@ -9,8 +8,6 @@ import { PropertyMediaLibrary } from "@/components/property/PropertyMediaLibrary
 import { usePropertyForm } from "@/hooks/usePropertyForm";
 import { usePropertyImages } from "@/hooks/usePropertyImages";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Save } from "lucide-react";
 import { useAgencySettings } from "@/hooks/useAgencySettings";
 import { useAuth } from "@/providers/AuthProvider";
 import { useEffect, useState } from "react";
@@ -174,10 +171,6 @@ export default function PropertyFormPage() {
           <h1 className="text-4xl font-bold text-estate-800">
             {id ? "Edit Property" : "New Property"}
           </h1>
-          <Button onClick={() => handleFormSubmit(formData)} className="gap-2">
-            <Save className="h-4 w-4" />
-            Save Property
-          </Button>
         </div>
 
         {formData.id && (
@@ -214,6 +207,7 @@ export default function PropertyFormPage() {
                 property={formData}
                 settings={settings}
                 onDelete={handleDeleteProperty}
+                onSave={() => handleFormSubmit(formData)}
               />
             )}
             {isAdmin && (
@@ -256,4 +250,3 @@ export default function PropertyFormPage() {
     </div>
   );
 }
-
