@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { DndContext, DragOverlay, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { SortableContext, arrayMove, verticalListSortingStrategy } from '@dnd-kit/sortable';
@@ -113,7 +114,11 @@ export function TemplateBuilder() {
   const { toast } = useToast();
 
   const sensors = useSensors(
-    useSensor(PointerSensor),
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 5,
+      },
+    }),
     useSensor(KeyboardSensor)
   );
 
@@ -121,6 +126,8 @@ export function TemplateBuilder() {
 
   const handleDragEnd = (event: any) => {
     const { active, over } = event;
+
+    if (!over) return;
 
     if (active.id !== over.id) {
       setSections((items) => {
@@ -133,6 +140,8 @@ export function TemplateBuilder() {
 
   const handleContentDragEnd = (event: any) => {
     const { active, over } = event;
+    
+    if (!over) return;
     
     if (active.id !== over.id && selectedSection) {
       setSections(prevSections => prevSections.map(section => {
@@ -187,21 +196,17 @@ export function TemplateBuilder() {
           backgroundColor: section.design.backgroundColor,
           textColor: section.design.textColor,
           padding: section.design.padding,
-          contentElements: section.design.contentElements?.map(el => ({
-            id: el.id,
-            type: el.type,
-            title: el.title
-          }))
+          contentElements: section.design.contentElements
         }
       }));
 
       const { error } = await supabase
         .from('brochure_templates')
-        .insert({
+        .insert([{
           name: templateName,
           description,
-          sections: sectionsToSave as Json,
-        });
+          sections: sectionsToSave
+        }]);
 
       if (error) throw error;
 
@@ -209,7 +214,12 @@ export function TemplateBuilder() {
         title: "Success",
         description: "Template saved successfully",
       });
+
+      // Reset form after successful save
+      setTemplateName('');
+      setDescription('');
     } catch (error) {
+      console.error('Error saving template:', error);
       toast({
         title: "Error",
         description: "Failed to save template",
