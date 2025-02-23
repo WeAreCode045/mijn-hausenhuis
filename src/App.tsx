@@ -17,6 +17,7 @@ const PropertyFormPage = lazy(() => import("./pages/PropertyFormPage"));
 const Settings = lazy(() => import("./pages/Settings"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const Auth = lazy(() => import("./pages/Auth"));
+const Templates = lazy(() => import("./pages/Templates"));
 const PropertyWebView = lazy(() => import("./components/property/PropertyWebView").then(module => ({ default: module.PropertyWebView })));
 const Users = lazy(() => import("./pages/Users"));
 
@@ -86,6 +87,7 @@ const App = () => (
                             <Route path="/property/:id/edit" element={<PropertyFormPage />} />
                             <Route path="/settings" element={<Settings />} />
                             <Route path="/users" element={<Users />} />
+                            <Route path="/templates" element={<Templates />} />
                             <Route path="*" element={<NotFound />} />
                           </Routes>
                         </Suspense>
