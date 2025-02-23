@@ -167,6 +167,7 @@ const createStyles = (settings: AgencySettings) => StyleSheet.create({
 interface PropertyBrochureDocumentProps {
   property: PropertyData;
   settings: AgencySettings;
+  template?: Section[];
 }
 
 const PageHeader = ({ settings, styles }: { settings: AgencySettings; styles: ReturnType<typeof createStyles> }) => (
@@ -227,7 +228,7 @@ const CalendarIcon = () => (
   </Svg>
 );
 
-export const PropertyBrochureDocument = ({ property, settings }: PropertyBrochureDocumentProps) => {
+export const PropertyBrochureDocument = ({ property, settings, template }: PropertyBrochureDocumentProps) => {
   const {
     gridImages = [],
     features = [],
