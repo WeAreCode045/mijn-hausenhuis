@@ -1,7 +1,7 @@
 
 import { ContactForm } from "../ContactForm";
 import { WebViewSectionProps } from "../types";
-import { MessageCircle, Mail, Phone, Building2, WhatsApp } from "lucide-react";
+import { MessageCircle, Mail, Phone, Building2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -125,7 +125,7 @@ export function ContactSection({ property, settings }: WebViewSectionProps) {
                     rel="noopener noreferrer"
                     className="flex items-center gap-3 text-sm text-white/90 hover:text-white transition-colors"
                   >
-                    <WhatsApp className="w-4 h-4" />
+                    <MessageCircle className="w-4 h-4" />
                     <span>WhatsApp</span>
                   </a>
                 )}
