@@ -20,11 +20,11 @@ export function useUsers() {
       // Transform the data to match the User type
       const transformedData: User[] = data.map(user => ({
         id: user.id,
-        email: user.email,
-        full_name: user.full_name,
-        phone: user.phone,
-        whatsapp_number: user.whatsapp_number,
-        role: user.role,
+        email: user.email || null,
+        full_name: user.full_name || null,
+        phone: user.phone || null,
+        whatsapp_number: user.whatsapp_number || null,
+        role: user.role || null,
         agent_photo: user.agent_photo || null
       }));
 
