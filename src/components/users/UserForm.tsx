@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 
 interface UserFormProps {
   isEditMode: boolean;
@@ -30,12 +31,57 @@ export function UserForm({ isEditMode, initialData, onSuccess }: UserFormProps) 
     whatsappNumber: initialData?.whatsapp_number || "",
     role: (initialData?.role as "admin" | "agent") || "agent"
   });
+  const [photoFile, setPhotoFile] = useState<File | null>(null);
+  const [photoPreview, setPhotoPreview] = useState<string>(initialData?.agent_photo || "");
+
+  const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      setPhotoFile(file);
+      
+      // Create preview
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setPhotoPreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const uploadPhoto = async (userId: string): Promise<string | null> => {
+    if (!photoFile) return null;
+
+    const fileExt = photoFile.name.split('.').pop();
+    const fileName = `${userId}.${fileExt}`;
+    const filePath = `${fileName}`;
+
+    const { error: uploadError } = await supabase.storage
+      .from('agent-photos')
+      .upload(filePath, photoFile, {
+        upsert: true
+      });
+
+    if (uploadError) {
+      throw uploadError;
+    }
+
+    const { data: { publicUrl } } = supabase.storage
+      .from('agent-photos')
+      .getPublicUrl(filePath);
+
+    return publicUrl;
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     try {
       if (isEditMode && initialData?.id) {
+        let photoUrl = null;
+        if (photoFile) {
+          photoUrl = await uploadPhoto(initialData.id);
+        }
+
         const { error } = await supabase
           .from("profiles")
           .update({
@@ -43,7 +89,8 @@ export function UserForm({ isEditMode, initialData, onSuccess }: UserFormProps) 
             phone: formData.phone,
             whatsapp_number: formData.whatsappNumber,
             role: formData.role,
-            updated_at: new Date().toISOString()
+            updated_at: new Date().toISOString(),
+            ...(photoUrl && { agent_photo: photoUrl })
           })
           .eq("id", initialData.id);
 
@@ -67,6 +114,11 @@ export function UserForm({ isEditMode, initialData, onSuccess }: UserFormProps) 
         if (authError) throw authError;
 
         if (authData.user) {
+          let photoUrl = null;
+          if (photoFile) {
+            photoUrl = await uploadPhoto(authData.user.id);
+          }
+
           const { error: profileError } = await supabase
             .from("profiles")
             .update({
@@ -74,7 +126,8 @@ export function UserForm({ isEditMode, initialData, onSuccess }: UserFormProps) 
               role: formData.role,
               phone: formData.phone,
               whatsapp_number: formData.whatsappNumber,
-              updated_at: new Date().toISOString()
+              updated_at: new Date().toISOString(),
+              ...(photoUrl && { agent_photo: photoUrl })
             })
             .eq("id", authData.user.id);
 
@@ -100,6 +153,22 @@ export function UserForm({ isEditMode, initialData, onSuccess }: UserFormProps) 
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
+      <div className="space-y-2">
+        <Label>Profile Photo</Label>
+        <div className="flex items-center gap-4">
+          <Avatar className="w-20 h-20">
+            <AvatarImage src={photoPreview} alt="Profile photo" />
+            <AvatarFallback>{formData.fullName?.charAt(0) || "U"}</AvatarFallback>
+          </Avatar>
+          <Input
+            type="file"
+            accept="image/*"
+            onChange={handlePhotoChange}
+            className="max-w-[250px]"
+          />
+        </div>
+      </div>
+      
       <div className="space-y-2">
         <Label htmlFor="email">Email</Label>
         <Input
