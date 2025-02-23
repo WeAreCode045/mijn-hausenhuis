@@ -8,6 +8,7 @@ import { Input } from '../ui/input';
 import { Label } from '../ui/label';
 import { useToast } from '../ui/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import type { Json } from '@/integrations/supabase/types';
 
 export interface Section {
   id: string;
@@ -58,15 +59,19 @@ export function TemplateBuilder() {
     }
 
     try {
+      // Convert sections array to a format that matches the Json type
+      const sectionsJson = sections.map(section => ({
+        ...section,
+        type: section.type as string,
+      })) as Json[];
+
       const { error } = await supabase
         .from('brochure_templates')
-        .insert([
-          {
-            name: templateName,
-            description,
-            sections: sections,
-          },
-        ]);
+        .insert({
+          name: templateName,
+          description,
+          sections: sectionsJson,
+        });
 
       if (error) throw error;
 
