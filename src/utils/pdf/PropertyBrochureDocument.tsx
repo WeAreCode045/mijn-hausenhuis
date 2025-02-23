@@ -1,8 +1,9 @@
+
 import { Document, Page, View, Text, Image, StyleSheet, Svg, Path } from '@react-pdf/renderer';
 import { PropertyData } from '@/types/property';
 import { AgencySettings } from '@/types/agency';
 
-const styles = StyleSheet.create({
+const createStyles = (settings: AgencySettings) => StyleSheet.create({
   page: {
     padding: 30,
     backgroundColor: 'white',
@@ -89,8 +90,13 @@ const styles = StyleSheet.create({
   areaDescription: {
     marginVertical: 15,
     padding: 15,
-    backgroundColor: '#f8f9fa',
+    backgroundColor: settings.primaryColor || '#40497A',
     borderRadius: 8,
+  },
+  areaText: {
+    fontSize: 12,
+    lineHeight: 1.5,
+    color: 'white',
   },
   keyInfo: {
     marginTop: 15,
@@ -105,9 +111,9 @@ const styles = StyleSheet.create({
     marginTop: 15,
   },
   keyInfoBox: {
-    width: '48%',
+    width: '31%',
     padding: 15,
-    backgroundColor: '#f8f9fa',
+    backgroundColor: settings.primaryColor || '#40497A',
     borderRadius: 8,
     marginBottom: 10,
     flexDirection: 'row',
@@ -115,23 +121,72 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   iconContainer: {
-    width: 24,
-    height: 24,
+    width: 32,
+    height: 32,
+    backgroundColor: settings.secondaryColor || '#E2E8F0',
+    borderRadius: 16,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   keyInfoContent: {
     flex: 1,
   },
   keyInfoBoxLabel: {
     fontSize: 10,
-    color: '#666',
+    color: 'white',
     marginBottom: 4,
   },
   keyInfoBoxValue: {
     fontSize: 14,
-    color: '#333',
+    color: 'white',
     fontWeight: 'bold',
   }
 });
+
+// SVG icons with white stroke
+const RulerIcon = () => (
+  <Svg viewBox="0 0 24 24" width={20} height={20}>
+    <Path
+      d="M3 21V3h18v18H3z M3 16.5h18 M3 12h18 M3 7.5h18"
+      stroke="white"
+      strokeWidth={1.5}
+      fill="none"
+    />
+  </Svg>
+);
+
+const BedIcon = () => (
+  <Svg viewBox="0 0 24 24" width={20} height={20}>
+    <Path
+      d="M2 20v-8a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v8 M4 10V6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v4"
+      stroke="white"
+      strokeWidth={1.5}
+      fill="none"
+    />
+  </Svg>
+);
+
+const BathIcon = () => (
+  <Svg viewBox="0 0 24 24" width={20} height={20}>
+    <Path
+      d="M4 12h16a1 1 0 0 1 1 1v2a4 4 0 0 1-4 4h-10a4 4 0 0 1-4-4v-2a1 1 0 0 1 1-1z M6 12V5a2 2 0 0 1 2-2h3v2.25"
+      stroke="white"
+      strokeWidth={1.5}
+      fill="none"
+    />
+  </Svg>
+);
+
+const CalendarIcon = () => (
+  <Svg viewBox="0 0 24 24" width={20} height={20}>
+    <Path
+      d="M8 2v4M16 2v4M3 10h18M5 4h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"
+      stroke="white"
+      strokeWidth={1.5}
+      fill="none"
+    />
+  </Svg>
+);
 
 interface PropertyBrochureDocumentProps {
   property: PropertyData;
@@ -152,50 +207,6 @@ const PageHeader = ({ settings }: { settings: AgencySettings }) => (
   </View>
 );
 
-const RulerIcon = () => (
-  <Svg viewBox="0 0 24 24" width={24} height={24}>
-    <Path
-      d="M3 21V3h18v18H3z M3 16.5h18 M3 12h18 M3 7.5h18"
-      stroke="#666"
-      strokeWidth={1.5}
-      fill="none"
-    />
-  </Svg>
-);
-
-const BedIcon = () => (
-  <Svg viewBox="0 0 24 24" width={24} height={24}>
-    <Path
-      d="M2 20v-8a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v8 M4 10V6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v4"
-      stroke="#666"
-      strokeWidth={1.5}
-      fill="none"
-    />
-  </Svg>
-);
-
-const BathIcon = () => (
-  <Svg viewBox="0 0 24 24" width={24} height={24}>
-    <Path
-      d="M4 12h16a1 1 0 0 1 1 1v2a4 4 0 0 1-4 4h-10a4 4 0 0 1-4-4v-2a1 1 0 0 1 1-1z M6 12V5a2 2 0 0 1 2-2h3v2.25"
-      stroke="#666"
-      strokeWidth={1.5}
-      fill="none"
-    />
-  </Svg>
-);
-
-const CalendarIcon = () => (
-  <Svg viewBox="0 0 24 24" width={24} height={24}>
-    <Path
-      d="M8 2v4M16 2v4M3 10h18M5 4h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"
-      stroke="#666"
-      strokeWidth={1.5}
-      fill="none"
-    />
-  </Svg>
-);
-
 export const PropertyBrochureDocument = ({ property, settings }: PropertyBrochureDocumentProps) => {
   const {
     gridImages = [],
@@ -204,6 +215,8 @@ export const PropertyBrochureDocument = ({ property, settings }: PropertyBrochur
     areas = [],
     images = []
   } = property;
+
+  const styles = createStyles(settings);
 
   return (
     <Document>
@@ -318,7 +331,7 @@ export const PropertyBrochureDocument = ({ property, settings }: PropertyBrochur
             
             {property.location_description && (
               <View style={styles.areaDescription}>
-                <Text style={styles.text}>{property.location_description}</Text>
+                <Text style={styles.areaText}>{property.location_description}</Text>
               </View>
             )}
 
@@ -330,7 +343,7 @@ export const PropertyBrochureDocument = ({ property, settings }: PropertyBrochur
               <View style={styles.section}>
                 <Text style={styles.subheading}>Nearby Places</Text>
                 {nearby_places.slice(0, 5).map((place, index) => (
-                  <View key={index} style={styles.keyInfoItem}>
+                  <View key={index} style={styles.keyInfo}>
                     <Text style={styles.text}>
                       {place.name || ''} - {place.vicinity || ''}
                     </Text>
@@ -348,7 +361,7 @@ export const PropertyBrochureDocument = ({ property, settings }: PropertyBrochur
           <View style={styles.content}>
             <Text style={styles.heading}>{area.title || ''}</Text>
             <View style={styles.areaDescription}>
-              <Text style={styles.text}>{area.description || ''}</Text>
+              <Text style={styles.areaText}>{area.description || ''}</Text>
             </View>
             <View style={styles.grid}>
               {(area.imageIds || [])
