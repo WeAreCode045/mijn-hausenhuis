@@ -12,19 +12,47 @@ const createStyles = (settings: AgencySettings) => StyleSheet.create({
   section: {
     marginBottom: 20,
   },
+  coverHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 20,
+    marginBottom: 20,
+  },
+  coverLogo: {
+    width: 150,
+    height: 50,
+    objectFit: 'contain',
+  },
+  handwrittenText: {
+    fontFamily: 'Helvetica',
+    fontSize: 24,
+    color: settings.secondaryColor || '#2a2a2a',
+    fontStyle: 'italic',
+  },
+  coverFooter: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: settings.primaryColor || '#1a1a1a',
+    padding: 20,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
   coverTitle: {
     fontSize: 32,
-    marginBottom: 10,
-    color: settings.primaryColor || '#1a1a1a',
-    fontWeight: 'bold',
-    textAlign: 'center',
+    color: 'white',
+    fontWeight: 900,
+    fontFamily: 'Helvetica-Bold',
+    flex: 1,
   },
   coverPrice: {
-    fontSize: 24,
-    marginBottom: 20,
-    color: settings.secondaryColor || '#2a2a2a',
-    textAlign: 'center',
-    fontWeight: 'medium',
+    fontSize: 28,
+    color: 'white',
+    fontWeight: 900,
+    fontFamily: 'Helvetica-Bold',
   },
   sectionTitle: {
     fontSize: 24,
@@ -250,17 +278,34 @@ export const PropertyBrochureDocument = ({ property, settings, template }: Prope
       case 'cover':
         return (
           <Page size="A4" style={styles.page}>
+            <View style={styles.coverHeader}>
+              {settings.logoUrl && (
+                <Image src={settings.logoUrl} style={styles.coverLogo} />
+              )}
+              <Text style={styles.handwrittenText}>Wordt dit uw droomhuis?</Text>
+            </View>
+
             {property.featuredImage && (
-              <Image src={property.featuredImage} style={styles.fullWidthImage} />
+              <Image 
+                src={property.featuredImage} 
+                style={[styles.fullWidthImage, { height: 500 }]} 
+              />
             )}
-            <Text style={styles.coverTitle}>{property.title || 'Untitled Property'}</Text>
-            <Text style={styles.coverPrice}>{property.price || ''}</Text>
+
             <View style={styles.imageGrid}>
-              {(property.gridImages || []).slice(0, 6).map((url, index) => (
+              {(property.gridImages || []).slice(0, 4).map((url, index) => (
                 <Image key={index} src={url} style={styles.gridImage} />
               ))}
             </View>
-            <Footer settings={settings} styles={styles} />
+
+            <View style={styles.coverFooter}>
+              <Text style={styles.coverTitle}>
+                {property.title || 'Untitled Property'}
+              </Text>
+              <Text style={styles.coverPrice}>
+                {property.price || ''}
+              </Text>
+            </View>
           </Page>
         );
 
