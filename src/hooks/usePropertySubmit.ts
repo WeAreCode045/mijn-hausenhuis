@@ -1,33 +1,51 @@
 
+import { useNavigate } from "react-router-dom";
+import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { PropertyData, PropertySubmitData } from "@/types/property";
-import { Json } from "@/integrations/supabase/types";
+import type { PropertySubmitData } from "@/types/property";
 
-export const usePropertySubmit = () => {
-  const submitProperty = async (property: PropertyData): Promise<void> => {
-    const imageUrls = property.images.map(img => img.url);
-    
-    const submitData: PropertySubmitData = {
-      ...property,
-      features: property.features as unknown as Json,
-      areas: property.areas.map(area => ({
-        id: area.id,
-        title: area.title,
-        description: area.description,
-        imageIds: area.imageIds
-      })) as unknown as Json[],
-      images: imageUrls,
-      nearby_places: property.nearby_places as unknown as Json
-    };
+export function usePropertySubmit() {
+  const navigate = useNavigate();
+  const { toast } = useToast();
 
-    const { error } = await supabase
-      .from('properties')
-      .insert(submitData);
+  const handleDatabaseSubmit = async (data: PropertySubmitData, id?: string) => {
+    try {
+      if (id) {
+        const { error: updateError } = await supabase
+          .from('properties')
+          .update(data)
+          .eq('id', id);
+        
+        if (updateError) throw updateError;
 
-    if (error) {
-      throw error;
+        toast({
+          title: "Property Updated",
+          description: "The property has been saved successfully",
+          variant: "default",
+        });
+      } else {
+        const { error: insertError } = await supabase
+          .from('properties')
+          .insert(data);
+        
+        if (insertError) throw insertError;
+
+        toast({
+          title: "Property Created",
+          description: "The property has been saved successfully",
+          variant: "default",
+        });
+        navigate('/');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      toast({
+        title: "Error",
+        description: "An error occurred while saving the property",
+        variant: "destructive",
+      });
     }
   };
 
-  return { submitProperty };
-};
+  return { handleDatabaseSubmit };
+}

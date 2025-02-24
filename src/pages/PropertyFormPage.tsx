@@ -1,21 +1,20 @@
 
 import { useNavigate, useParams } from "react-router-dom";
 import { PropertyForm } from "@/components/PropertyForm";
-import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
-import type { PropertySubmitData, PropertyFormData, PropertyImage, PropertyData } from "@/types/property";
+import type { PropertySubmitData, PropertyFormData, PropertyData } from "@/types/property";
 import { Json } from "@/integrations/supabase/types";
 import { PropertyMediaLibrary } from "@/components/property/PropertyMediaLibrary";
 import { usePropertyForm } from "@/hooks/usePropertyForm";
 import { usePropertyImages } from "@/hooks/usePropertyImages";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useAgencySettings } from "@/hooks/useAgencySettings";
 import { useAuth } from "@/providers/AuthProvider";
-import { useEffect, useState } from "react";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { PropertyActions } from "@/components/property/PropertyActions";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Code } from "@/components/ui/code";
+import { PropertyInformationCard } from "@/components/property/PropertyInformationCard";
+import { AgentSelector } from "@/components/property/AgentSelector";
+import { useAgentSelect } from "@/hooks/useAgentSelect";
+import { usePropertySubmit } from "@/hooks/usePropertySubmit";
+import { supabase } from "@/integrations/supabase/client";
 
 export default function PropertyFormPage() {
   const navigate = useNavigate();
@@ -23,70 +22,7 @@ export default function PropertyFormPage() {
   const { toast } = useToast();
   const { settings } = useAgencySettings();
   const { isAdmin } = useAuth();
-  const [agents, setAgents] = useState<Array<{ id: string; full_name: string }>>([]);
-  const [selectedAgent, setSelectedAgent] = useState<string>("");
-
-  useEffect(() => {
-    const fetchAgents = async () => {
-      if (isAdmin) {
-        const { data, error } = await supabase
-          .from('profiles')
-          .select('id, full_name')
-          .eq('role', 'agent');
-        
-        if (!error && data) {
-          setAgents(data);
-        }
-      }
-    };
-    
-    fetchAgents();
-  }, [isAdmin]);
-
-  const handleDatabaseSubmit = async (data: PropertySubmitData) => {
-    try {
-      if (id) {
-        const { error: updateError } = await supabase
-          .from('properties')
-          .update({
-            ...data,
-            agent_id: selectedAgent || null
-          })
-          .eq('id', id);
-        
-        if (updateError) throw updateError;
-
-        toast({
-          title: "Property Updated",
-          description: "The property has been saved successfully",
-          variant: "default",
-        });
-      } else {
-        const { error: insertError } = await supabase
-          .from('properties')
-          .insert({
-            ...data,
-            agent_id: selectedAgent || null
-          });
-        
-        if (insertError) throw insertError;
-
-        toast({
-          title: "Property Created",
-          description: "The property has been saved successfully",
-          variant: "default",
-        });
-        navigate('/');
-      }
-    } catch (error) {
-      console.error('Error:', error);
-      toast({
-        title: "Error",
-        description: "An error occurred while saving the property",
-        variant: "destructive",
-      });
-    }
-  };
+  const { handleDatabaseSubmit } = usePropertySubmit();
 
   const handleFormSubmit = (formData: PropertyFormData) => {
     if (!formData.id) {
@@ -97,7 +33,7 @@ export default function PropertyFormPage() {
     // Create a propertyData object with the required id
     const propertyData: PropertyData = {
       ...formData,
-      id: formData.id, // This ensures id is treated as required
+      id: formData.id,
       features: formData.features || [],
       images: formData.images || [],
       floorplans: formData.floorplans || [],
@@ -148,7 +84,7 @@ export default function PropertyFormPage() {
       agent_id: selectedAgent || null
     };
     
-    handleDatabaseSubmit(submitData);
+    handleDatabaseSubmit(submitData, id);
   };
 
   const { formData, setFormData, isLoading } = usePropertyForm(id, handleFormSubmit);
@@ -157,11 +93,7 @@ export default function PropertyFormPage() {
     handleRemoveImage,
   } = usePropertyImages(formData, setFormData);
 
-  useEffect(() => {
-    if (formData?.agent_id) {
-      setSelectedAgent(formData.agent_id);
-    }
-  }, [formData?.agent_id]);
+  const { agents, selectedAgent, setSelectedAgent } = useAgentSelect(formData?.agent_id);
 
   const handleDeleteProperty = async () => {
     if (!id || !window.confirm('Are you sure you want to delete this property?')) return;
@@ -196,7 +128,7 @@ export default function PropertyFormPage() {
   // Cast formData to PropertyData when we know id exists
   const propertyDataWithId: PropertyData = {
     ...formData,
-    id: formData.id || crypto.randomUUID(), // Provide a new ID if none exists
+    id: formData.id || crypto.randomUUID(),
     features: formData.features || [],
     images: formData.images || [],
     floorplans: formData.floorplans || [],
@@ -217,8 +149,6 @@ export default function PropertyFormPage() {
     gridImages: formData.gridImages || []
   };
 
-  const apiEndpoint = `${window.location.origin}/api/properties/${propertyDataWithId.id}`;
-
   return (
     <div className="min-h-screen bg-estate-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
@@ -229,29 +159,10 @@ export default function PropertyFormPage() {
         </div>
 
         {propertyDataWithId.id && (
-          <Card className="mb-6">
-            <CardHeader>
-              <CardTitle>Property Information</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <Alert>
-                <AlertDescription className="font-mono">
-                  <div className="space-y-2">
-                    <div>
-                      <span className="font-semibold">ID:</span> {propertyDataWithId.id}
-                    </div>
-                    <div>
-                      <span className="font-semibold">Object ID:</span> {propertyDataWithId.object_id || 'Not set'}
-                    </div>
-                    <div>
-                      <span className="font-semibold">API Endpoint:</span>
-                      <Code className="ml-2">{apiEndpoint}</Code>
-                    </div>
-                  </div>
-                </AlertDescription>
-              </Alert>
-            </CardContent>
-          </Card>
+          <PropertyInformationCard
+            id={propertyDataWithId.id}
+            objectId={propertyDataWithId.object_id}
+          />
         )}
 
         <div className="flex gap-6">
@@ -266,28 +177,11 @@ export default function PropertyFormPage() {
               />
             )}
             {isAdmin && (
-              <Card>
-                <CardHeader>
-                  <CardTitle>Assign Agent</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <Select
-                    value={selectedAgent}
-                    onValueChange={setSelectedAgent}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select an agent" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {agents.map((agent) => (
-                        <SelectItem key={agent.id} value={agent.id}>
-                          {agent.full_name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </CardContent>
-              </Card>
+              <AgentSelector
+                agents={agents}
+                selectedAgent={selectedAgent}
+                onAgentSelect={setSelectedAgent}
+              />
             )}
             <PropertyMediaLibrary
               images={propertyDataWithId.images.map(img => img.url)}
