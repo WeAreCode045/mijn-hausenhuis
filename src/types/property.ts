@@ -9,7 +9,7 @@ export interface PropertyFeature {
 export interface PropertyImage {
   id: string;
   url: string;
-  [key: string]: string; // Add index signature to make it compatible with Json type
+  [key: string]: string;
 }
 
 export interface PropertyArea {
@@ -33,8 +33,8 @@ export interface PropertyGridImage {
   url: string;
 }
 
-export interface PropertyData {
-  id: string;
+// Base interface with common properties
+interface BasePropertyData {
   title: string;
   price: string;
   address: string;
@@ -57,16 +57,21 @@ export interface PropertyData {
   areaPhotos?: string[];
   currentPath?: string;
   object_id?: string;
-  map_image?: string;
+  map_image?: string | null;
   nearby_places?: PropertyPlaceType[];
-  latitude?: number;
-  longitude?: number;
-  agent_id?: string; // Add this line
+  latitude?: number | null;
+  longitude?: number | null;
+  agent_id?: string;
 }
 
-export interface PropertyFormData extends Omit<PropertyData, 'id'> {
+// PropertyData requires id
+export interface PropertyData extends BasePropertyData {
+  id: string;
+}
+
+// PropertyFormData makes id optional
+export interface PropertyFormData extends BasePropertyData {
   id?: string;
-  agent_id?: string;
 }
 
 export interface PropertySubmitData {
