@@ -193,7 +193,31 @@ export default function PropertyFormPage() {
     return null;
   }
 
-  const apiEndpoint = `${window.location.origin}/api/properties/${formData.id}`;
+  // Cast formData to PropertyData when we know id exists
+  const propertyDataWithId: PropertyData = {
+    ...formData,
+    id: formData.id || crypto.randomUUID(), // Provide a new ID if none exists
+    features: formData.features || [],
+    images: formData.images || [],
+    floorplans: formData.floorplans || [],
+    areas: formData.areas || [],
+    title: formData.title || '',
+    price: formData.price || '',
+    address: formData.address || '',
+    bedrooms: formData.bedrooms || '',
+    bathrooms: formData.bathrooms || '',
+    sqft: formData.sqft || '',
+    livingArea: formData.livingArea || '',
+    buildYear: formData.buildYear || '',
+    garages: formData.garages || '',
+    energyLabel: formData.energyLabel || '',
+    hasGarden: formData.hasGarden || false,
+    description: formData.description || '',
+    featuredImage: formData.featuredImage || null,
+    gridImages: formData.gridImages || []
+  };
+
+  const apiEndpoint = `${window.location.origin}/api/properties/${propertyDataWithId.id}`;
 
   return (
     <div className="min-h-screen bg-estate-50 py-12 px-4 sm:px-6 lg:px-8">
@@ -204,7 +228,7 @@ export default function PropertyFormPage() {
           </h1>
         </div>
 
-        {formData.id && (
+        {propertyDataWithId.id && (
           <Card className="mb-6">
             <CardHeader>
               <CardTitle>Property Information</CardTitle>
@@ -214,10 +238,10 @@ export default function PropertyFormPage() {
                 <AlertDescription className="font-mono">
                   <div className="space-y-2">
                     <div>
-                      <span className="font-semibold">ID:</span> {formData.id}
+                      <span className="font-semibold">ID:</span> {propertyDataWithId.id}
                     </div>
                     <div>
-                      <span className="font-semibold">Object ID:</span> {formData.object_id || 'Not set'}
+                      <span className="font-semibold">Object ID:</span> {propertyDataWithId.object_id || 'Not set'}
                     </div>
                     <div>
                       <span className="font-semibold">API Endpoint:</span>
@@ -235,7 +259,7 @@ export default function PropertyFormPage() {
           <div className="w-80 shrink-0 space-y-6">
             {id && (
               <PropertyActions
-                property={formData}
+                property={propertyDataWithId}
                 settings={settings}
                 onDelete={handleDeleteProperty}
                 onSave={() => handleFormSubmit(formData)}
@@ -266,10 +290,10 @@ export default function PropertyFormPage() {
               </Card>
             )}
             <PropertyMediaLibrary
-              images={formData.images.map(img => img.url)}
+              images={propertyDataWithId.images.map(img => img.url)}
               onImageUpload={handleImageUpload}
               onRemoveImage={(index) => {
-                const imageToRemove = formData.images[index];
+                const imageToRemove = propertyDataWithId.images[index];
                 if (imageToRemove) {
                   handleRemoveImage(imageToRemove.id);
                 }
