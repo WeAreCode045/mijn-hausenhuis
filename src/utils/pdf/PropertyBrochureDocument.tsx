@@ -1,3 +1,4 @@
+
 import { Document, Page, View, Text, Image, StyleSheet, Svg, Path } from '@react-pdf/renderer';
 import { PropertyData } from '@/types/property';
 import { AgencySettings } from '@/types/agency';
@@ -241,16 +242,74 @@ export const PropertyBrochureDocument = ({ property, settings, template }: Prope
 
   const styles = createStyles(settings);
 
-  const defaultSections = [
-    { type: 'cover', id: 'cover' },
-    { type: 'details', id: 'details' },
-    { type: 'features', id: 'features' },
-    { type: 'location', id: 'location' },
-    { type: 'floorplans', id: 'floorplans' },
-    { type: 'areas', id: 'areas' },
-    { type: 'contact', id: 'contact' }
+  // Define default sections with proper Section type
+  const defaultSections: Section[] = [
+    { 
+      id: 'cover', 
+      type: 'cover',
+      title: 'Cover Page',
+      design: {
+        padding: '2rem',
+        contentElements: []
+      }
+    },
+    { 
+      id: 'details',
+      type: 'details',
+      title: 'Property Details',
+      design: {
+        padding: '2rem',
+        contentElements: []
+      }
+    },
+    { 
+      id: 'features',
+      type: 'features',
+      title: 'Features',
+      design: {
+        padding: '2rem',
+        contentElements: []
+      }
+    },
+    { 
+      id: 'location',
+      type: 'location',
+      title: 'Location',
+      design: {
+        padding: '2rem',
+        contentElements: []
+      }
+    },
+    { 
+      id: 'floorplans',
+      type: 'floorplans',
+      title: 'Floorplans',
+      design: {
+        padding: '2rem',
+        contentElements: []
+      }
+    },
+    { 
+      id: 'areas',
+      type: 'areas',
+      title: 'Areas',
+      design: {
+        padding: '2rem',
+        contentElements: []
+      }
+    },
+    { 
+      id: 'contact',
+      type: 'contact',
+      title: 'Contact',
+      design: {
+        padding: '2rem',
+        contentElements: []
+      }
+    }
   ];
 
+  // Use template sections if available, otherwise use default sections
   const sections = template || defaultSections;
 
   const renderSection = (section: Section) => {

@@ -1,3 +1,4 @@
+
 import { useNavigate, useParams } from "react-router-dom";
 import { PropertyForm } from "@/components/PropertyForm";
 import { supabase } from "@/integrations/supabase/client";
@@ -88,6 +89,11 @@ export default function PropertyFormPage() {
   };
 
   const handleFormSubmit = (formData: PropertyFormData) => {
+    if (!formData.id) {
+      console.error('Property ID is required');
+      return;
+    }
+
     const submitData: PropertySubmitData = {
       id: formData.id,
       title: formData.title,
@@ -117,6 +123,7 @@ export default function PropertyFormPage() {
       map_image: formData.map_image,
       agent_id: selectedAgent || null
     };
+    
     handleDatabaseSubmit(submitData);
   };
 
