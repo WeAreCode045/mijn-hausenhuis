@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { GripVertical, Grid, Plus } from 'lucide-react';
+import { GripVertical, Grid, Plus, Trash2 } from 'lucide-react';
 import type { Section, ContentElement } from './TemplateBuilder';
 import { cn } from '@/lib/utils';
 import { Button } from '../ui/button';
@@ -11,9 +11,17 @@ interface SortableSectionProps {
   section: Section;
   isSelected?: boolean;
   onAddColumn?: () => void;
+  onDeleteColumn?: (index: number) => void;
+  onAddContainer?: () => void;
 }
 
-export function SortableSection({ section, isSelected, onAddColumn }: SortableSectionProps) {
+export function SortableSection({ 
+  section, 
+  isSelected, 
+  onAddColumn, 
+  onDeleteColumn,
+  onAddContainer 
+}: SortableSectionProps) {
   const {
     attributes,
     listeners,
@@ -23,9 +31,6 @@ export function SortableSection({ section, isSelected, onAddColumn }: SortableSe
   } = useSortable({ id: section.id });
 
   const [resizingColumn, setResizingColumn] = useState<number | null>(null);
-  const [columnWidths, setColumnWidths] = useState<number[]>(
-    Array(section.design.columns || 1).fill(1)
-  );
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -55,36 +60,6 @@ export function SortableSection({ section, isSelected, onAddColumn }: SortableSe
     }
   };
 
-  const handleColumnResizeStart = (columnIndex: number, e: React.MouseEvent) => {
-    e.preventDefault();
-    setResizingColumn(columnIndex);
-
-    const handleMouseMove = (e: MouseEvent) => {
-      if (resizingColumn === null) return;
-
-      const container = e.currentTarget as HTMLElement;
-      const containerRect = container.getBoundingClientRect();
-      const relativeX = e.clientX - containerRect.left;
-      const containerWidth = containerRect.width;
-      
-      const newWidths = [...columnWidths];
-      const totalColumns = section.design.columns || 1;
-      const widthPerColumn = containerWidth / totalColumns;
-      
-      newWidths[resizingColumn] = Math.max(0.5, Math.min(2, relativeX / widthPerColumn));
-      setColumnWidths(newWidths);
-    };
-
-    const handleMouseUp = () => {
-      setResizingColumn(null);
-      document.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('mouseup', handleMouseUp);
-    };
-
-    document.addEventListener('mousemove', handleMouseMove);
-    document.addEventListener('mouseup', handleMouseUp);
-  };
-
   return (
     <div
       ref={setNodeRef}
@@ -105,56 +80,65 @@ export function SortableSection({ section, isSelected, onAddColumn }: SortableSe
           </button>
           <span className="text-sm font-medium">{section.title}</span>
         </div>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={onAddColumn}
-          className="text-gray-500 hover:text-gray-700"
-        >
-          <Plus className="h-4 w-4 mr-1" />
-          Add Column
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={onAddContainer}
+            className="text-gray-500 hover:text-gray-700"
+          >
+            <Plus className="h-4 w-4 mr-1" />
+            Add Container
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={onAddColumn}
+            className="text-gray-500 hover:text-gray-700"
+          >
+            <Plus className="h-4 w-4 mr-1" />
+            Add Column
+          </Button>
+        </div>
       </div>
 
-      <div 
-        className="grid gap-4 min-h-[100px] border-2 border-dashed border-gray-200 rounded-md p-4"
-        style={{
-          gridTemplateColumns: columnWidths.map(width => `${width}fr`).join(' ')
-        }}
-      >
+      <div className="grid gap-4">
         {Array.from({ length: section.design.columns || 1 }).map((_, index) => (
           <div
             key={index}
-            className={cn(
-              "bg-gray-50 rounded-md p-2 min-h-[100px] relative",
-              "transition-all duration-200"
-            )}
-            onDragOver={(e) => handleDragOver(e, index)}
-            onDragLeave={handleDragLeave}
-            onDrop={(e) => handleDrop(e, index)}
+            className="relative"
           >
-            {section.design.contentElements?.filter(
-              element => element.columnIndex === index
-            ).map((element) => (
-              <div
-                key={element.id}
-                className="bg-white p-2 mb-2 rounded border shadow-sm"
-              >
-                {element.title}
+            <div
+              className={cn(
+                "bg-gray-50 rounded-md p-2 min-h-[100px] relative",
+                "transition-all duration-200"
+              )}
+              onDragOver={(e) => handleDragOver(e, index)}
+              onDragLeave={handleDragLeave}
+              onDrop={(e) => handleDrop(e, index)}
+            >
+              {section.design.contentElements?.filter(
+                element => element.columnIndex === index
+              ).map((element) => (
+                <div
+                  key={element.id}
+                  className="bg-white p-2 mb-2 rounded border shadow-sm"
+                >
+                  {element.title}
+                </div>
+              ))}
+              <div className="absolute inset-0 flex items-center justify-center text-gray-400 pointer-events-none">
+                <Grid className="h-6 w-6" />
               </div>
-            ))}
-            <div className="absolute inset-0 flex items-center justify-center text-gray-400 pointer-events-none">
-              <Grid className="h-6 w-6" />
             </div>
-            {index < (section.design.columns || 1) - 1 && (
-              <div
-                className={cn(
-                  "absolute top-0 right-0 w-1 h-full cursor-col-resize hover:bg-primary",
-                  resizingColumn === index && "bg-primary"
-                )}
-                onMouseDown={(e) => handleColumnResizeStart(index, e)}
-              />
-            )}
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => onDeleteColumn?.(index)}
+              className="absolute -right-2 -top-2 p-1 h-6 w-6 rounded-full bg-red-100 hover:bg-red-200"
+            >
+              <Trash2 className="h-4 w-4 text-red-500" />
+            </Button>
           </div>
         ))}
       </div>

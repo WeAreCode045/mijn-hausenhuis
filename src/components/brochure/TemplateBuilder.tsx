@@ -221,7 +221,38 @@ export function TemplateBuilder({ template }: { template: Template | null }) {
     );
   };
 
-  const handleContentDrop = (sectionId: string, elementId: string, columnIndex: number) => {
+  const handleDeleteColumn = (sectionId: string, columnIndex: number) => {
+    setSections(prevSections =>
+      prevSections.map(section => {
+        if (section.id === sectionId) {
+          const newColumns = (section.design.columns || 1) - 1;
+          if (newColumns < 1) return section;
+
+          const newContentElements = section.design.contentElements?.map(element => {
+            if (element.columnIndex === columnIndex) {
+              return { ...element, columnIndex: Math.max(0, columnIndex - 1) };
+            }
+            if (element.columnIndex && element.columnIndex > columnIndex) {
+              return { ...element, columnIndex: element.columnIndex - 1 };
+            }
+            return element;
+          });
+
+          return {
+            ...section,
+            design: {
+              ...section.design,
+              columns: newColumns,
+              contentElements: newContentElements
+            }
+          };
+        }
+        return section;
+      })
+    );
+  };
+
+  const handleAddContainer = (sectionId: string) => {
     setSections(prevSections =>
       prevSections.map(section =>
         section.id === sectionId
@@ -229,11 +260,15 @@ export function TemplateBuilder({ template }: { template: Template | null }) {
               ...section,
               design: {
                 ...section.design,
-                contentElements: section.design.contentElements?.map(element =>
-                  element.id === elementId
-                    ? { ...element, columnIndex }
-                    : element
-                )
+                contentElements: [
+                  ...(section.design.contentElements || []),
+                  {
+                    id: crypto.randomUUID(),
+                    type: 'text',
+                    title: 'New Container',
+                    columnIndex: 0
+                  }
+                ]
               }
             }
           : section
@@ -355,6 +390,8 @@ export function TemplateBuilder({ template }: { template: Template | null }) {
                       section={section} 
                       isSelected={selectedSectionId === section.id}
                       onAddColumn={() => handleAddColumn(section.id)}
+                      onDeleteColumn={(columnIndex) => handleDeleteColumn(section.id, columnIndex)}
+                      onAddContainer={() => handleAddContainer(section.id)}
                     />
                   </div>
                 ))}
