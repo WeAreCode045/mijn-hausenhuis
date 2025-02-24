@@ -1,3 +1,4 @@
+
 import { Card } from "@/components/ui/card";
 import { useToast } from "@/components/ui/use-toast";
 import { useNavigate } from "react-router-dom";
@@ -15,7 +16,8 @@ import { useFormSteps } from "@/hooks/useFormSteps";
 export function AddPropertyForm() {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { handleSubmit } = usePropertyFormSubmit(async (data) => {
+  
+  const handlePropertySubmit = (data: PropertyFormData) => {
     try {
       navigate('/');
       toast({
@@ -31,9 +33,9 @@ export function AddPropertyForm() {
         variant: "destructive",
       });
     }
-  });
+  };
 
-  const { formData, setFormData } = usePropertyForm(undefined, handleSubmit);
+  const { formData, setFormData } = usePropertyForm(undefined, handlePropertySubmit);
   const { addFeature, removeFeature, updateFeature } = useFeatures(formData, setFormData);
   const { currentStep, handleNext, handlePrevious, handleStepClick } = useFormSteps(formData, () => {}, steps.length);
   
@@ -64,10 +66,31 @@ export function AddPropertyForm() {
     setFormData({ ...formData, map_image: null });
   };
 
+  // Create adapter functions to match expected types
+  const handleRemoveImageAdapter = (index: number) => {
+    const imageToRemove = formData.images[index];
+    if (imageToRemove) {
+      handleRemoveImage(imageToRemove.id);
+    }
+  };
+
+  const handleToggleGridImageAdapter = (url: string) => {
+    const newGridImages = [...(formData.gridImages || [])];
+    if (newGridImages.includes(url)) {
+      newGridImages.splice(newGridImages.indexOf(url), 1);
+    } else {
+      newGridImages.push(url);
+    }
+    handleToggleGridImage(newGridImages);
+  };
+
   return (
     <div className="container py-10">
       <Card className="w-full p-6">
-        <form onSubmit={(e) => handleSubmit(e, formData)} className="space-y-6">
+        <form onSubmit={(e) => {
+          e.preventDefault();
+          handlePropertySubmit(formData);
+        }} className="space-y-6">
           <FormStepNavigation
             steps={steps}
             currentStep={currentStep}
@@ -90,11 +113,11 @@ export function AddPropertyForm() {
             handleImageUpload={handleImageUpload}
             handleAreaPhotosUpload={handleAreaPhotosUpload}
             handleFloorplanUpload={handleFloorplanUpload}
-            handleRemoveImage={handleRemoveImage}
+            handleRemoveImage={handleRemoveImageAdapter}
             handleRemoveAreaPhoto={handleRemoveAreaPhoto}
             handleRemoveFloorplan={handleRemoveFloorplan}
             handleSetFeaturedImage={handleSetFeaturedImage}
-            handleToggleGridImage={handleToggleGridImage}
+            handleToggleGridImage={handleToggleGridImageAdapter}
             handleMapImageDelete={handleMapImageDelete}
           />
         </form>

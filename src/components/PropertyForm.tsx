@@ -57,13 +57,34 @@ export function PropertyForm({ onSubmit }: PropertyFormProps) {
     setFormData({ ...formData, map_image: null });
   };
 
+  // Create adapter functions to match expected types
+  const handleRemoveImageAdapter = (index: number) => {
+    const imageToRemove = formData.images[index];
+    if (imageToRemove) {
+      handleRemoveImage(imageToRemove.id);
+    }
+  };
+
+  const handleToggleGridImageAdapter = (url: string) => {
+    const newGridImages = [...(formData.gridImages || [])];
+    if (newGridImages.includes(url)) {
+      newGridImages.splice(newGridImages.indexOf(url), 1);
+    } else {
+      newGridImages.push(url);
+    }
+    handleToggleGridImage(newGridImages);
+  };
+
   if (!formData || isLoading) {
     return null;
   }
 
   return (
     <Card className="w-full p-6 animate-fadeIn">
-      <form onSubmit={(e) => handleSubmit(e, formData)} className="space-y-6">
+      <form onSubmit={(e) => {
+        e.preventDefault();
+        handleSubmit(e, formData);
+      }} className="space-y-6">
         <FormStepNavigation
           steps={steps}
           currentStep={currentStep}
@@ -86,11 +107,11 @@ export function PropertyForm({ onSubmit }: PropertyFormProps) {
           handleImageUpload={handleImageUpload}
           handleAreaPhotosUpload={handleAreaPhotosUpload}
           handleFloorplanUpload={handleFloorplanUpload}
-          handleRemoveImage={handleRemoveImage}
+          handleRemoveImage={handleRemoveImageAdapter}
           handleRemoveAreaPhoto={handleRemoveAreaPhoto}
           handleRemoveFloorplan={handleRemoveFloorplan}
           handleSetFeaturedImage={handleSetFeaturedImage}
-          handleToggleGridImage={handleToggleGridImage}
+          handleToggleGridImage={handleToggleGridImageAdapter}
           handleMapImageDelete={handleMapImageDelete}
         />
       </form>
