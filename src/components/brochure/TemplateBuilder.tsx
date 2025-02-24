@@ -145,14 +145,6 @@ export function TemplateBuilder({ template }: { template: Template | null }) {
   const [selectedSectionId, setSelectedSectionId] = React.useState<string | null>(null);
   const { toast } = useToast();
 
-  React.useEffect(() => {
-    if (template) {
-      setSections(template.sections);
-      setTemplateName(template.name);
-      setDescription(template.description || '');
-    }
-  }, [template]);
-
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
@@ -161,8 +153,6 @@ export function TemplateBuilder({ template }: { template: Template | null }) {
     }),
     useSensor(KeyboardSensor)
   );
-
-  const selectedSection = sections.find(section => section.id === selectedSectionId);
 
   const handleDragEnd = (event: any) => {
     const { active, over } = event;
@@ -176,91 +166,6 @@ export function TemplateBuilder({ template }: { template: Template | null }) {
         return arrayMove(items, oldIndex, newIndex);
       });
     }
-  };
-
-  const handleContentDragEnd = (event: any) => {
-    const { active, over } = event;
-    
-    if (!over) return;
-    
-    if (active.id !== over.id && selectedSection) {
-      setSections(prevSections => prevSections.map(section => {
-        if (section.id === selectedSection.id && section.design.contentElements) {
-          const oldIndex = section.design.contentElements.findIndex(
-            item => item.id === active.id
-          );
-          const newIndex = section.design.contentElements.findIndex(
-            item => item.id === over.id
-          );
-          
-          return {
-            ...section,
-            design: {
-              ...section.design,
-              contentElements: arrayMove(section.design.contentElements, oldIndex, newIndex)
-            }
-          };
-        }
-        return section;
-      }));
-    }
-  };
-
-  const updateSectionDesign = (sectionId: string, design: Partial<SectionDesign>) => {
-    setSections(prevSections => 
-      prevSections.map(section => 
-        section.id === sectionId 
-          ? { ...section, design: { ...section.design, ...design } }
-          : section
-      )
-    );
-  };
-
-  const handleAddColumn = (sectionId: string) => {
-    setSections(prevSections =>
-      prevSections.map(section =>
-        section.id === sectionId
-          ? {
-              ...section,
-              design: {
-                ...section.design,
-                columns: (section.design.columns || 1) + 1
-              }
-            }
-          : section
-      )
-    );
-  };
-
-  const handleDeleteColumn = (sectionId: string, columnIndex: number) => {
-    setSections(prevSections =>
-      prevSections.map(section => {
-        if (section.id === sectionId) {
-          const newColumns = (section.design.columns || 1) - 1;
-          if (newColumns < 1) return section;
-
-          const newContentElements = section.design.contentElements?.map(element => {
-            if (element.columnIndex === columnIndex) {
-              return { ...element, columnIndex: Math.max(0, columnIndex - 1) };
-            }
-            if (element.columnIndex && element.columnIndex > columnIndex) {
-              return { ...element, columnIndex: element.columnIndex - 1 };
-            }
-            return element;
-          });
-
-          return {
-            ...section,
-            design: {
-              ...section.design,
-              columns: newColumns,
-              contentElements: newContentElements
-            }
-          };
-        }
-        return section;
-      })
-    );
   };
 
   const handleAddContainer = (sectionId: string) => {
@@ -307,6 +212,24 @@ export function TemplateBuilder({ template }: { template: Template | null }) {
     );
   };
 
+  const handleDeleteContainer = (sectionId: string, containerId: string) => {
+    setSections(prevSections =>
+      prevSections.map(section =>
+        section.id === sectionId
+          ? {
+              ...section,
+              design: {
+                ...section.design,
+                containers: section.design.containers.filter(container => 
+                  container.id !== containerId
+                )
+              }
+            }
+          : section
+      )
+    );
+  };
+
   const saveTemplate = async () => {
     if (!templateName) {
       toast({
@@ -329,32 +252,10 @@ export function TemplateBuilder({ template }: { template: Template | null }) {
         return;
       }
 
-      const sectionsToSave = sections.map(section => ({
-        id: section.id,
-        type: section.type,
-        title: section.title,
-        design: {
-          columns: section.design.columns,
-          backgroundColor: section.design.backgroundColor,
-          textColor: section.design.textColor,
-          padding: section.design.padding,
-          containers: section.design.containers.map(container => ({
-            id: container.id,
-            columns: container.columns,
-            columnWidths: container.columnWidths,
-            elements: container.elements.map(el => ({
-              id: el.id,
-              type: el.type,
-              title: el.title
-            }))
-          }))
-        }
-      }));
-
       const templateData = {
         name: templateName,
         description,
-        sections: sectionsToSave as unknown as Json,
+        sections,
         created_by: user.id
       };
 
@@ -425,9 +326,13 @@ export function TemplateBuilder({ template }: { template: Template | null }) {
                     <SortableSection 
                       section={section} 
                       isSelected={selectedSectionId === section.id}
-                      onAddColumn={() => handleAddColumn(section.id)}
-                      onDeleteColumn={(columnIndex) => handleDeleteColumn(section.id, columnIndex)}
                       onAddContainer={() => handleAddContainer(section.id)}
+                      onUpdateContainer={(containerId, updates) => 
+                        handleUpdateContainer(section.id, containerId, updates)
+                      }
+                      onDeleteContainer={(containerId) => 
+                        handleDeleteContainer(section.id, containerId)
+                      }
                     />
                   </div>
                 ))}
@@ -442,8 +347,34 @@ export function TemplateBuilder({ template }: { template: Template | null }) {
       </div>
 
       <div className="space-y-4">
-        {selectedSection && (
+        {selectedSectionId && (
           <>
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Layout className="w-5 h-5" />
+                  Global Elements
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-2">
+                  {globalElements.map((element) => (
+                    <div
+                      key={element.id}
+                      draggable
+                      onDragStart={(e) => {
+                        e.dataTransfer.setData('text/plain', element.id);
+                      }}
+                      className="flex items-center gap-2 p-3 bg-white rounded-md border shadow-sm cursor-move hover:border-primary"
+                    >
+                      <Layout className="h-4 w-4" />
+                      <span className="text-sm font-medium">{element.title}</span>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -453,7 +384,7 @@ export function TemplateBuilder({ template }: { template: Template | null }) {
               </CardHeader>
               <CardContent>
                 <div className="space-y-2">
-                  {defaultContentElements[selectedSection.type].map((element) => (
+                  {defaultContentElements[sections.find(s => s.id === selectedSectionId)?.type || 'cover'].map((element) => (
                     <div
                       key={element.id}
                       draggable
@@ -470,102 +401,6 @@ export function TemplateBuilder({ template }: { template: Template | null }) {
                       <span className="text-sm font-medium">{element.title}</span>
                     </div>
                   ))}
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Layout className="w-5 h-5" />
-                  Section Design
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-2">
-                  <Label>Layout</Label>
-                  <Select
-                    value={selectedSection.design?.columns?.toString() || "1"}
-                    onValueChange={(value) => 
-                      updateSectionDesign(selectedSection.id, { columns: parseInt(value) })
-                    }
-                  >
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Select columns" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="1">1 Column</SelectItem>
-                      <SelectItem value="2">2 Columns</SelectItem>
-                      <SelectItem value="3">3 Columns</SelectItem>
-                      <SelectItem value="4">4 Columns</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="space-y-2">
-                  <Label>Background Color</Label>
-                  <div className="flex gap-2">
-                    <Input
-                      type="color"
-                      value={selectedSection.design?.backgroundColor || "#ffffff"}
-                      onChange={(e) => 
-                        updateSectionDesign(selectedSection.id, { backgroundColor: e.target.value })
-                      }
-                      className="w-12 h-12 p-1"
-                    />
-                    <Input
-                      type="text"
-                      value={selectedSection.design?.backgroundColor || "#ffffff"}
-                      onChange={(e) => 
-                        updateSectionDesign(selectedSection.id, { backgroundColor: e.target.value })
-                      }
-                      placeholder="#ffffff"
-                      className="flex-1"
-                    />
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <Label>Text Color</Label>
-                  <div className="flex gap-2">
-                    <Input
-                      type="color"
-                      value={selectedSection.design?.textColor || "#000000"}
-                      onChange={(e) => 
-                        updateSectionDesign(selectedSection.id, { textColor: e.target.value })
-                      }
-                      className="w-12 h-12 p-1"
-                    />
-                    <Input
-                      type="text"
-                      value={selectedSection.design?.textColor || "#000000"}
-                      onChange={(e) => 
-                        updateSectionDesign(selectedSection.id, { textColor: e.target.value })
-                      }
-                      placeholder="#000000"
-                      className="flex-1"
-                    />
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <Label>Padding</Label>
-                  <Select
-                    value={selectedSection.design?.padding || "2rem"}
-                    onValueChange={(value) => 
-                      updateSectionDesign(selectedSection.id, { padding: value })
-                    }
-                  >
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Select padding" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="1rem">Small</SelectItem>
-                      <SelectItem value="2rem">Medium</SelectItem>
-                      <SelectItem value="3rem">Large</SelectItem>
-                      <SelectItem value="4rem">Extra Large</SelectItem>
-                    </SelectContent>
-                  </Select>
                 </div>
               </CardContent>
             </Card>

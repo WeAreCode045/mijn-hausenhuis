@@ -248,7 +248,7 @@ export const PropertyBrochureDocument = ({ property, settings, template }: Prope
       title: 'Cover Page',
       design: {
         padding: '2rem',
-        contentElements: []
+        containers: []
       }
     },
     { 
@@ -257,7 +257,7 @@ export const PropertyBrochureDocument = ({ property, settings, template }: Prope
       title: 'Property Details',
       design: {
         padding: '2rem',
-        contentElements: []
+        containers: []
       }
     },
     { 
@@ -266,7 +266,7 @@ export const PropertyBrochureDocument = ({ property, settings, template }: Prope
       title: 'Location',
       design: {
         padding: '2rem',
-        contentElements: []
+        containers: []
       }
     },
     { 
@@ -275,7 +275,7 @@ export const PropertyBrochureDocument = ({ property, settings, template }: Prope
       title: 'Floorplans',
       design: {
         padding: '2rem',
-        contentElements: []
+        containers: []
       }
     },
     { 
@@ -284,7 +284,7 @@ export const PropertyBrochureDocument = ({ property, settings, template }: Prope
       title: 'Areas',
       design: {
         padding: '2rem',
-        contentElements: []
+        containers: []
       }
     },
     { 
@@ -293,7 +293,7 @@ export const PropertyBrochureDocument = ({ property, settings, template }: Prope
       title: 'Contact',
       design: {
         padding: '2rem',
-        contentElements: []
+        containers: []
       }
     }
   ];
