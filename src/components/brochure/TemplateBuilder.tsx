@@ -18,6 +18,7 @@ export interface ContentElement {
   id: string;
   type: 'keyInfo' | 'features' | 'description' | 'images' | 'text' | 'header';
   title: string;
+  columnIndex?: number;
 }
 
 export interface SectionDesign {
@@ -187,6 +188,42 @@ export function TemplateBuilder({ template }: { template: Template | null }) {
     );
   };
 
+  const handleAddColumn = (sectionId: string) => {
+    setSections(prevSections =>
+      prevSections.map(section =>
+        section.id === sectionId
+          ? {
+              ...section,
+              design: {
+                ...section.design,
+                columns: (section.design.columns || 1) + 1
+              }
+            }
+          : section
+      )
+    );
+  };
+
+  const handleContentDrop = (sectionId: string, elementId: string, columnIndex: number) => {
+    setSections(prevSections =>
+      prevSections.map(section =>
+        section.id === sectionId
+          ? {
+              ...section,
+              design: {
+                ...section.design,
+                contentElements: section.design.contentElements?.map(element =>
+                  element.id === elementId
+                    ? { ...element, columnIndex }
+                    : element
+                )
+              }
+            }
+          : section
+      )
+    );
+  };
+
   const saveTemplate = async () => {
     if (!templateName) {
       toast({
@@ -291,7 +328,7 @@ export function TemplateBuilder({ template }: { template: Template | null }) {
             onDragEnd={handleDragEnd}
           >
             <SortableContext items={sections} strategy={verticalListSortingStrategy}>
-              <div className="space-y-2">
+              <div className="space-y-4">
                 {sections.map((section) => (
                   <div 
                     key={section.id}
@@ -301,6 +338,7 @@ export function TemplateBuilder({ template }: { template: Template | null }) {
                     <SortableSection 
                       section={section} 
                       isSelected={selectedSectionId === section.id}
+                      onAddColumn={() => handleAddColumn(section.id)}
                     />
                   </div>
                 ))}
