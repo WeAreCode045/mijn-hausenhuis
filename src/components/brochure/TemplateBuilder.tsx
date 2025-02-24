@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { DndContext, DragOverlay, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { SortableContext, arrayMove, verticalListSortingStrategy } from '@dnd-kit/sortable';
@@ -252,19 +253,33 @@ export function TemplateBuilder({ template }: { template: Template | null }) {
         return;
       }
 
+      // Convert sections to a JSON-compatible format
+      const sectionsJson = sections.map(section => ({
+        ...section,
+        design: {
+          ...section.design,
+          containers: section.design.containers.map(container => ({
+            ...container,
+            elements: container.elements.map(element => ({
+              ...element
+            }))
+          }))
+        }
+      })) as Json;
+
       const templateData = {
         name: templateName,
-        description,
-        sections,
+        description: description || null,
+        sections: sectionsJson,
         created_by: user.id
       };
 
       const { error } = await supabase
         .from('brochure_templates')
-        .upsert([{
+        .upsert({
           ...(template?.id ? { id: template.id } : {}),
           ...templateData
-        }]);
+        });
 
       if (error) throw error;
 
