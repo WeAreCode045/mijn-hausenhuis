@@ -1,4 +1,3 @@
-
 import { Card } from "@/components/ui/card";
 import { useParams } from "react-router-dom";
 import { usePropertyForm } from "@/hooks/usePropertyForm";
@@ -56,9 +55,8 @@ export function PropertyForm({ onSubmit }: PropertyFormProps) {
     steps.length
   );
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+  const handleFieldChange = (field: keyof PropertyFormData, value: any) => {
+    setFormData({ ...formData, [field]: value });
   };
 
   const handleMapImageDelete = async () => {
@@ -82,12 +80,15 @@ export function PropertyForm({ onSubmit }: PropertyFormProps) {
         />
         <PropertyFormContent 
           formData={formData}
-          onSubmit={(e) => handleSubmit(e, formData)}
-          currentStep={currentStep}
-          addFeature={addFeature}
-          removeFeature={removeFeature}
-          updateFeature={updateFeature}
-          handleInputChange={handleInputChange}
+          onFieldChange={handleFieldChange}
+          onAddFeature={addFeature}
+          onRemoveFeature={removeFeature}
+          onUpdateFeature={updateFeature}
+          onAddArea={addArea}
+          onRemoveArea={removeArea}
+          onUpdateArea={updateArea}
+          onAreaImageUpload={handleAreaImageUpload}
+          onAreaImageRemove={removeAreaImage}
           handleImageUpload={handleImageUpload}
           handleAreaPhotosUpload={handleAreaPhotosUpload}
           handleFloorplanUpload={handleFloorplanUpload}
@@ -96,11 +97,6 @@ export function PropertyForm({ onSubmit }: PropertyFormProps) {
           handleRemoveFloorplan={handleRemoveFloorplan}
           handleSetFeaturedImage={handleSetFeaturedImage}
           handleToggleGridImage={handleToggleGridImage}
-          addArea={addArea}
-          removeArea={removeArea}
-          updateArea={updateArea}
-          handleAreaImageUpload={handleAreaImageUpload}
-          removeAreaImage={removeAreaImage}
           handleMapImageDelete={handleMapImageDelete}
         />
       </form>

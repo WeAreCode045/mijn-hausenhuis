@@ -1,4 +1,3 @@
-
 import { Json } from "@/integrations/supabase/types";
 
 export interface PropertyFeature {
@@ -62,6 +61,7 @@ interface BasePropertyData {
   latitude?: number | null;
   longitude?: number | null;
   agent_id?: string;
+  virtualTourUrl?: string;
 }
 
 // PropertyData requires id

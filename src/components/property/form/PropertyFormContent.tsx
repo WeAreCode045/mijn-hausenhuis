@@ -2,9 +2,9 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
-import { PropertyFeature } from "@/components/property/PropertyFeatures";
+import { PropertyFeatures } from "@/components/property/PropertyFeatures";
 import { PropertyAreas } from "@/components/property/PropertyAreas";
-import { EnergyLabelSelector } from "@/components/property/EnergyLabelSelector";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import type { PropertyFormData } from "@/types/property";
 
 interface PropertyFormContentProps {
@@ -137,10 +137,21 @@ export function PropertyFormContent({
         </div>
         <div>
           <Label htmlFor="energyLabel">Energy Label</Label>
-          <EnergyLabelSelector
+          <Select
             value={formData.energyLabel}
-            onChange={(value) => onFieldChange('energyLabel', value)}
-          />
+            onValueChange={(value) => onFieldChange('energyLabel', value)}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Select energy label" />
+            </SelectTrigger>
+            <SelectContent>
+              {['A+++', 'A++', 'A+', 'A', 'B', 'C', 'D', 'E', 'F', 'G'].map((label) => (
+                <SelectItem key={label} value={label}>
+                  {label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
         <div className="flex items-center space-x-2">
           <Checkbox
@@ -169,7 +180,7 @@ export function PropertyFormContent({
           />
         </div>
         <div className="col-span-2">
-          <PropertyFeature
+          <PropertyFeatures
             features={formData.features}
             onAdd={onAddFeature}
             onRemove={onRemoveFeature}
