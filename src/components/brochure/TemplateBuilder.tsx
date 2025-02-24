@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { DndContext, DragOverlay, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { SortableContext, arrayMove, verticalListSortingStrategy } from '@dnd-kit/sortable';
@@ -11,7 +10,7 @@ import { supabase } from '@/integrations/supabase/client';
 import type { Json } from '@/integrations/supabase/types';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
-import { Grid, Layout, Columns, Type, GripVertical } from 'lucide-react';
+import { Grid, Layout, Columns, Type, GripVertical, Map, Phone, Image } from 'lucide-react';
 import type { Template } from '@/pages/Templates';
 
 export interface ContentElement {
@@ -45,6 +44,24 @@ const defaultContentElements: Record<string, ContentElement[]> = {
   cover: [
     { id: 'hi1', type: 'header', title: 'Header' },
     { id: 'im1', type: 'images', title: 'Images' }
+  ],
+  floorplans: [
+    { id: 'fp1', type: 'images', title: 'Floorplan Images' },
+    { id: 'fd1', type: 'text', title: 'Floorplan Description' }
+  ],
+  location: [
+    { id: 'mp1', type: 'images', title: 'Map' },
+    { id: 'ld1', type: 'text', title: 'Location Description' },
+    { id: 'np1', type: 'text', title: 'Nearby Places' }
+  ],
+  areas: [
+    { id: 'ai1', type: 'images', title: 'Area Images' },
+    { id: 'ad1', type: 'text', title: 'Area Description' }
+  ],
+  contact: [
+    { id: 'cf1', type: 'text', title: 'Contact Form' },
+    { id: 'ci1', type: 'images', title: 'Agent Image' },
+    { id: 'cd1', type: 'text', title: 'Contact Details' }
   ]
 };
 
@@ -235,7 +252,6 @@ export function TemplateBuilder({ template }: { template: Template | null }) {
     }
 
     try {
-      // Get the current user's ID
       const { data: { user } } = await supabase.auth.getUser();
       
       if (!user) {
@@ -268,7 +284,7 @@ export function TemplateBuilder({ template }: { template: Template | null }) {
         name: templateName,
         description,
         sections: sectionsToSave as unknown as Json,
-        created_by: user.id // Add the user's ID
+        created_by: user.id
       };
 
       const { error } = await supabase
@@ -285,7 +301,7 @@ export function TemplateBuilder({ template }: { template: Template | null }) {
         description: "Template saved successfully",
       });
 
-      window.location.reload(); // Refresh to show updated list
+      window.location.reload();
     } catch (error) {
       console.error('Error saving template:', error);
       toast({
@@ -355,6 +371,36 @@ export function TemplateBuilder({ template }: { template: Template | null }) {
       <div className="space-y-4">
         {selectedSection && (
           <>
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Layout className="w-5 h-5" />
+                  Content Elements
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-2">
+                  {defaultContentElements[selectedSection.type].map((element) => (
+                    <div
+                      key={element.id}
+                      draggable
+                      onDragStart={(e) => {
+                        e.dataTransfer.setData('text/plain', element.id);
+                      }}
+                      className="flex items-center gap-2 p-3 bg-white rounded-md border shadow-sm cursor-move hover:border-primary"
+                    >
+                      {element.type === 'keyInfo' && <Grid className="h-4 w-4" />}
+                      {element.type === 'features' && <Layout className="h-4 w-4" />}
+                      {element.type === 'description' && <Type className="h-4 w-4" />}
+                      {element.type === 'images' && <Image className="h-4 w-4" />}
+                      {element.type === 'text' && <Type className="h-4 w-4" />}
+                      <span className="text-sm font-medium">{element.title}</span>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -450,41 +496,6 @@ export function TemplateBuilder({ template }: { template: Template | null }) {
                 </div>
               </CardContent>
             </Card>
-
-            {selectedSection.design.contentElements && selectedSection.design.contentElements.length > 0 && (
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Layout className="w-5 h-5" />
-                    Content Elements
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <DndContext
-                    sensors={sensors}
-                    collisionDetection={closestCenter}
-                    onDragEnd={handleContentDragEnd}
-                  >
-                    <SortableContext 
-                      items={selectedSection.design.contentElements} 
-                      strategy={verticalListSortingStrategy}
-                    >
-                      <div className="space-y-2">
-                        {selectedSection.design.contentElements.map((element) => (
-                          <div
-                            key={element.id}
-                            className="flex items-center gap-2 p-3 bg-white rounded-md border shadow-sm"
-                          >
-                            <GripVertical className="h-5 w-5 text-gray-500 cursor-move" />
-                            <span className="text-sm font-medium">{element.title}</span>
-                          </div>
-                        ))}
-                      </div>
-                    </SortableContext>
-                  </DndContext>
-                </CardContent>
-              </Card>
-            )}
           </>
         )}
       </div>
