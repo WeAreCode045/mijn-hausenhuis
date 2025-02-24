@@ -4,8 +4,16 @@ import { TemplateList } from "@/components/brochure/TemplateList";
 import { DndContext } from '@dnd-kit/core';
 import { useState } from "react";
 
+interface Template {
+  id: string;
+  name: string;
+  description: string | null;
+  sections: any;
+  created_at: string;
+}
+
 export default function Templates() {
-  const [selectedTemplate, setSelectedTemplate] = useState(null);
+  const [selectedTemplate, setSelectedTemplate] = useState<Template | null>(null);
 
   return (
     <div className="min-h-screen bg-estate-50 py-12 px-4 sm:px-6 lg:px-8">
@@ -15,7 +23,7 @@ export default function Templates() {
         <TemplateList onEdit={setSelectedTemplate} />
         
         <DndContext>
-          <TemplateBuilder />
+          <TemplateBuilder template={selectedTemplate} />
         </DndContext>
       </div>
     </div>
