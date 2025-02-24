@@ -100,6 +100,12 @@ const createStyles = (settings: AgencySettings) => StyleSheet.create({
     gap: 15,
   },
   gridImage: {
+    width: '23%',
+    height: 150,
+    objectFit: 'cover',
+    borderRadius: 8,
+  },
+  areaGridImage: {
     width: '48%',
     height: 200,
     objectFit: 'cover',
@@ -362,7 +368,7 @@ export const PropertyBrochureDocument = ({ property, settings, template }: Prope
                   <Image
                     key={imgIndex}
                     src={imageUrl}
-                    style={isLastAndOdd ? styles.fullWidthImage : styles.gridImage}
+                    style={isLastAndOdd ? styles.fullWidthImage : styles.areaGridImage}
                   />
                 );
               })}
