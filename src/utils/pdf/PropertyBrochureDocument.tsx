@@ -1,6 +1,8 @@
+
 import { Document, Page, View, Text, Image, StyleSheet, Svg, Path } from '@react-pdf/renderer';
 import { PropertyData } from '@/types/property';
 import { AgencySettings } from '@/types/agency';
+import { Section } from '@/components/brochure/TemplateBuilder';
 
 const createStyles = (settings: AgencySettings) => StyleSheet.create({
   page: {
