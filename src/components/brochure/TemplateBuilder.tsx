@@ -15,17 +15,23 @@ import type { Template } from '@/pages/Templates';
 
 export interface ContentElement {
   id: string;
-  type: 'keyInfo' | 'features' | 'description' | 'images' | 'text' | 'header';
+  type: 'keyInfo' | 'features' | 'description' | 'images' | 'text' | 'header' | 'global';
   title: string;
   columnIndex?: number;
 }
 
+export interface Container {
+  id: string;
+  columns: number;
+  columnWidths: number[];
+  elements: ContentElement[];
+}
+
 export interface SectionDesign {
-  columns?: number;
   backgroundColor?: string;
   textColor?: string;
   padding?: string;
-  contentElements?: ContentElement[];
+  containers: Container[];
 }
 
 export interface Section {
@@ -34,6 +40,14 @@ export interface Section {
   title: string;
   design: SectionDesign;
 }
+
+const globalElements: ContentElement[] = [
+  { id: 'gh1', type: 'global', title: 'Header' },
+  { id: 'gf1', type: 'global', title: 'Footer' },
+  { id: 'gp1', type: 'global', title: 'Price' },
+  { id: 'gt1', type: 'global', title: 'Property Title' },
+  { id: 'gi1', type: 'global', title: 'Featured Image' }
+];
 
 const defaultContentElements: Record<string, ContentElement[]> = {
   details: [
@@ -72,7 +86,7 @@ const defaultSections: Section[] = [
     title: 'Cover Page', 
     design: { 
       padding: '2rem',
-      contentElements: defaultContentElements.cover 
+      containers: [] 
     } 
   },
   { 
@@ -80,9 +94,8 @@ const defaultSections: Section[] = [
     type: 'details', 
     title: 'Property Details', 
     design: { 
-      columns: 2, 
       padding: '2rem',
-      contentElements: defaultContentElements.details 
+      containers: [] 
     } 
   },
   { 
@@ -90,9 +103,8 @@ const defaultSections: Section[] = [
     type: 'floorplans', 
     title: 'Floorplans', 
     design: { 
-      columns: 2, 
       padding: '2rem',
-      contentElements: [] 
+      containers: [] 
     } 
   },
   { 
@@ -101,7 +113,7 @@ const defaultSections: Section[] = [
     title: 'Location', 
     design: { 
       padding: '2rem',
-      contentElements: [] 
+      containers: [] 
     } 
   },
   { 
@@ -109,9 +121,8 @@ const defaultSections: Section[] = [
     type: 'areas', 
     title: 'Areas', 
     design: { 
-      columns: 3, 
       padding: '2rem',
-      contentElements: [] 
+      containers: [] 
     } 
   },
   { 
@@ -120,7 +131,7 @@ const defaultSections: Section[] = [
     title: 'Contact', 
     design: { 
       padding: '2rem',
-      contentElements: [] 
+      containers: [] 
     } 
   }
 ];
@@ -260,15 +271,35 @@ export function TemplateBuilder({ template }: { template: Template | null }) {
               ...section,
               design: {
                 ...section.design,
-                contentElements: [
-                  ...(section.design.contentElements || []),
+                containers: [
+                  ...(section.design.containers || []),
                   {
                     id: crypto.randomUUID(),
-                    type: 'text',
-                    title: 'New Container',
-                    columnIndex: 0
+                    columns: 1,
+                    columnWidths: [1],
+                    elements: []
                   }
                 ]
+              }
+            }
+          : section
+      )
+    );
+  };
+
+  const handleUpdateContainer = (sectionId: string, containerId: string, updates: Partial<Container>) => {
+    setSections(prevSections =>
+      prevSections.map(section =>
+        section.id === sectionId
+          ? {
+              ...section,
+              design: {
+                ...section.design,
+                containers: section.design.containers.map(container =>
+                  container.id === containerId
+                    ? { ...container, ...updates }
+                    : container
+                )
               }
             }
           : section
@@ -307,10 +338,15 @@ export function TemplateBuilder({ template }: { template: Template | null }) {
           backgroundColor: section.design.backgroundColor,
           textColor: section.design.textColor,
           padding: section.design.padding,
-          contentElements: section.design.contentElements?.map(el => ({
-            id: el.id,
-            type: el.type,
-            title: el.title
+          containers: section.design.containers.map(container => ({
+            id: container.id,
+            columns: container.columns,
+            columnWidths: container.columnWidths,
+            elements: container.elements.map(el => ({
+              id: el.id,
+              type: el.type,
+              title: el.title
+            }))
           }))
         }
       }));
