@@ -3,7 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { PropertyForm } from "@/components/PropertyForm";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
-import type { PropertySubmitData, PropertyFormData, PropertyImage } from "@/types/property";
+import type { PropertySubmitData, PropertyFormData, PropertyImage, PropertyData } from "@/types/property";
 import { Json } from "@/integrations/supabase/types";
 import { PropertyMediaLibrary } from "@/components/property/PropertyMediaLibrary";
 import { usePropertyForm } from "@/hooks/usePropertyForm";
@@ -93,6 +93,12 @@ export default function PropertyFormPage() {
       console.error('Property ID is required');
       return;
     }
+
+    // Create a PropertyData object with required id
+    const propertyData: PropertyData = {
+      ...formData,
+      id: formData.id // Ensure id is included
+    };
 
     const submitData: PropertySubmitData = {
       id: formData.id,

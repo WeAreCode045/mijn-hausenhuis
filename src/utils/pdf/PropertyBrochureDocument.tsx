@@ -1,4 +1,3 @@
-
 import { Document, Page, View, Text, Image, StyleSheet, Svg, Path } from '@react-pdf/renderer';
 import { PropertyData } from '@/types/property';
 import { AgencySettings } from '@/types/agency';
@@ -242,7 +241,6 @@ export const PropertyBrochureDocument = ({ property, settings, template }: Prope
 
   const styles = createStyles(settings);
 
-  // Define default sections with proper Section type
   const defaultSections: Section[] = [
     { 
       id: 'cover', 
@@ -257,15 +255,6 @@ export const PropertyBrochureDocument = ({ property, settings, template }: Prope
       id: 'details',
       type: 'details',
       title: 'Property Details',
-      design: {
-        padding: '2rem',
-        contentElements: []
-      }
-    },
-    { 
-      id: 'features',
-      type: 'features',
-      title: 'Features',
       design: {
         padding: '2rem',
         contentElements: []
@@ -309,7 +298,6 @@ export const PropertyBrochureDocument = ({ property, settings, template }: Prope
     }
   ];
 
-  // Use template sections if available, otherwise use default sections
   const sections = template || defaultSections;
 
   const renderSection = (section: Section) => {
