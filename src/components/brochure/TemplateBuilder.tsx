@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { DndContext, DragOverlay, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { SortableContext, arrayMove, verticalListSortingStrategy } from '@dnd-kit/sortable';
@@ -197,6 +198,18 @@ export function TemplateBuilder({ template }: { template: Template | null }) {
     }
 
     try {
+      // Get the current user's ID
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        toast({
+          title: "Error",
+          description: "You must be logged in to save templates",
+          variant: "destructive",
+        });
+        return;
+      }
+
       const sectionsToSave = sections.map(section => ({
         id: section.id,
         type: section.type,
@@ -217,7 +230,8 @@ export function TemplateBuilder({ template }: { template: Template | null }) {
       const templateData = {
         name: templateName,
         description,
-        sections: sectionsToSave as unknown as Json
+        sections: sectionsToSave as unknown as Json,
+        created_by: user.id // Add the user's ID
       };
 
       const { error } = await supabase
