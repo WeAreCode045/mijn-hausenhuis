@@ -18,6 +18,15 @@ interface PropertyFormContentProps {
   onUpdateArea: (id: string, field: keyof PropertyFormData["areas"][0], value: string | string[]) => void;
   onAreaImageUpload: (id: string, files: FileList) => void;
   onAreaImageRemove: (id: string, imageId: string) => void;
+  handleImageUpload: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  handleAreaPhotosUpload: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  handleFloorplanUpload: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  handleRemoveImage: (index: number) => void;
+  handleRemoveAreaPhoto: (index: number) => void;
+  handleRemoveFloorplan: (index: number) => void;
+  handleSetFeaturedImage: (url: string | null) => void;
+  handleToggleGridImage: (url: string) => void;
+  handleMapImageDelete: () => Promise<void>;
 }
 
 export function PropertyFormContent({
@@ -31,6 +40,15 @@ export function PropertyFormContent({
   onUpdateArea,
   onAreaImageUpload,
   onAreaImageRemove,
+  handleImageUpload,
+  handleAreaPhotosUpload,
+  handleFloorplanUpload,
+  handleRemoveImage,
+  handleRemoveAreaPhoto,
+  handleRemoveFloorplan,
+  handleSetFeaturedImage,
+  handleToggleGridImage,
+  handleMapImageDelete,
 }: PropertyFormContentProps) {
   return (
     <div className="space-y-6">

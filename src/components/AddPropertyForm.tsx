@@ -1,115 +1,27 @@
-
 import { Card } from "@/components/ui/card";
-import { useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
-import type { PropertyFormData, PropertySubmitData } from "@/types/property";
 import { useToast } from "@/components/ui/use-toast";
-import { PropertyFormContent } from "./property/form/PropertyFormContent";
-import { Json } from "@/integrations/supabase/types";
+import { useNavigate } from "react-router-dom";
+import { PropertyFormContent } from "@/components/property/form/PropertyFormContent";
+import { usePropertyForm } from "@/hooks/usePropertyForm";
+import { usePropertyFormSubmit } from "@/hooks/usePropertyFormSubmit";
 import { useFeatures } from "@/hooks/useFeatures";
-import { usePropertyImages } from "@/hooks/usePropertyImages";
 import { usePropertyAreas } from "@/hooks/usePropertyAreas";
-
-const initialFormData: PropertyFormData = {
-  title: "",
-  price: "",
-  address: "",
-  bedrooms: "",
-  bathrooms: "",
-  sqft: "",
-  livingArea: "",
-  buildYear: "",
-  garages: "",
-  energyLabel: "",
-  hasGarden: false,
-  description: "",
-  location_description: "",
-  features: [],
-  images: [],
-  floorplans: [],
-  featuredImage: null,
-  gridImages: [],
-  areas: [],
-  map_image: null,
-  nearby_places: [],
-  latitude: null,
-  longitude: null
-};
+import { usePropertyImages } from "@/hooks/usePropertyImages";
+import type { PropertyFormData } from "@/types/property";
+import { steps } from "@/components/property/form/formSteps";
+import { FormStepNavigation } from "@/components/property/form/FormStepNavigation";
+import { useFormSteps } from "@/hooks/useFormSteps";
 
 export function AddPropertyForm() {
-  const [formData, setFormData] = useState<PropertyFormData>(initialFormData);
-  const [currentStep, setCurrentStep] = useState(1);
+  const navigate = useNavigate();
   const { toast } = useToast();
-
-  const { addFeature, removeFeature, updateFeature } = useFeatures(formData, setFormData);
-  const {
-    handleImageUpload,
-    handleAreaPhotosUpload,
-    handleFloorplanUpload,
-    handleRemoveImage: handleRemoveImageById,
-    handleRemoveAreaPhoto,
-    handleRemoveFloorplan,
-    handleSetFeaturedImage,
-    handleToggleGridImage
-  } = usePropertyImages(formData, setFormData);
-
-  // Create an index-based wrapper for handleRemoveImage
-  const handleRemoveImage = (index: number) => {
-    const imageToRemove = formData.images[index];
-    if (imageToRemove) {
-      handleRemoveImageById(imageToRemove.id);
-    }
-  };
-
-  const {
-    handleAreaImageUpload,
-    addArea,
-    removeArea,
-    updateArea,
-    removeAreaImage
-  } = usePropertyAreas(formData, setFormData);
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
-  };
-
-  const handleMapImageDelete = async () => {
-    setFormData({ ...formData, map_image: null });
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const { handleSubmit } = usePropertyFormSubmit(async (data) => {
     try {
-      const submitData: PropertySubmitData = {
-        ...formData,
-        features: formData.features as unknown as Json,
-        areas: formData.areas.map(area => ({
-          id: area.id,
-          title: area.title,
-          description: area.description,
-          imageIds: area.imageIds
-        })) as unknown as Json[],
-        images: formData.images.map(img => img.url),
-        nearby_places: (formData.nearby_places || []).map(place => ({
-          id: place.id,
-          name: place.name,
-          type: place.type,
-          vicinity: place.vicinity,
-          rating: place.rating,
-          user_ratings_total: place.user_ratings_total
-        })) as unknown as Json
-      };
-
-      const { error } = await supabase
-        .from('properties')
-        .insert(submitData);
-
-      if (error) throw error;
-
+      navigate('/');
       toast({
         title: "Success",
         description: "Property created successfully",
+        variant: "default",
       });
     } catch (error) {
       console.error('Error:', error);
@@ -119,33 +31,74 @@ export function AddPropertyForm() {
         variant: "destructive",
       });
     }
+  });
+
+  const { formData, setFormData } = usePropertyForm(undefined, handleSubmit);
+  const { addFeature, removeFeature, updateFeature } = useFeatures(formData, setFormData);
+  const { currentStep, handleNext, handlePrevious, handleStepClick } = useFormSteps(formData, () => {}, steps.length);
+  
+  const {
+    handleImageUpload,
+    handleRemoveImage,
+    handleAreaPhotosUpload,
+    handleFloorplanUpload,
+    handleRemoveAreaPhoto,
+    handleRemoveFloorplan,
+    handleSetFeaturedImage,
+    handleToggleGridImage
+  } = usePropertyImages(formData, setFormData);
+
+  const {
+    handleAreaImageUpload,
+    addArea,
+    removeArea,
+    updateArea,
+    removeAreaImage
+  } = usePropertyAreas(formData, setFormData);
+
+  const handleFieldChange = (field: keyof PropertyFormData, value: any) => {
+    setFormData({ ...formData, [field]: value });
+  };
+
+  const handleMapImageDelete = async () => {
+    setFormData({ ...formData, map_image: null });
   };
 
   return (
-    <Card className="w-full max-w-2xl p-6 space-y-6 animate-fadeIn">
-      <PropertyFormContent 
-        formData={formData}
-        onSubmit={handleSubmit}
-        currentStep={currentStep}
-        addFeature={addFeature}
-        removeFeature={removeFeature}
-        updateFeature={updateFeature}
-        handleInputChange={handleInputChange}
-        handleImageUpload={handleImageUpload}
-        handleAreaPhotosUpload={handleAreaPhotosUpload}
-        handleFloorplanUpload={handleFloorplanUpload}
-        handleRemoveImage={handleRemoveImage}
-        handleRemoveAreaPhoto={handleRemoveAreaPhoto}
-        handleRemoveFloorplan={handleRemoveFloorplan}
-        handleSetFeaturedImage={handleSetFeaturedImage}
-        handleToggleGridImage={handleToggleGridImage}
-        addArea={addArea}
-        removeArea={removeArea}
-        updateArea={updateArea}
-        handleAreaImageUpload={handleAreaImageUpload}
-        removeAreaImage={removeAreaImage}
-        handleMapImageDelete={handleMapImageDelete}
-      />
-    </Card>
+    <div className="container py-10">
+      <Card className="w-full p-6">
+        <form onSubmit={(e) => handleSubmit(e, formData)} className="space-y-6">
+          <FormStepNavigation
+            steps={steps}
+            currentStep={currentStep}
+            onStepClick={handleStepClick}
+            onPrevious={handlePrevious}
+            onNext={handleNext}
+            isUpdateMode={false}
+          />
+          <PropertyFormContent 
+            formData={formData}
+            onFieldChange={handleFieldChange}
+            onAddFeature={addFeature}
+            onRemoveFeature={removeFeature}
+            onUpdateFeature={updateFeature}
+            onAddArea={addArea}
+            onRemoveArea={removeArea}
+            onUpdateArea={updateArea}
+            onAreaImageUpload={handleAreaImageUpload}
+            onAreaImageRemove={removeAreaImage}
+            handleImageUpload={handleImageUpload}
+            handleAreaPhotosUpload={handleAreaPhotosUpload}
+            handleFloorplanUpload={handleFloorplanUpload}
+            handleRemoveImage={handleRemoveImage}
+            handleRemoveAreaPhoto={handleRemoveAreaPhoto}
+            handleRemoveFloorplan={handleRemoveFloorplan}
+            handleSetFeaturedImage={handleSetFeaturedImage}
+            handleToggleGridImage={handleToggleGridImage}
+            handleMapImageDelete={handleMapImageDelete}
+          />
+        </form>
+      </Card>
+    </div>
   );
 }

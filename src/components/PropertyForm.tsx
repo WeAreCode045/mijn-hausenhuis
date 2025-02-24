@@ -1,3 +1,4 @@
+
 import { Card } from "@/components/ui/card";
 import { useParams } from "react-router-dom";
 import { usePropertyForm } from "@/hooks/usePropertyForm";
@@ -25,21 +26,14 @@ export function PropertyForm({ onSubmit }: PropertyFormProps) {
   
   const {
     handleImageUpload,
+    handleRemoveImage,
     handleAreaPhotosUpload,
     handleFloorplanUpload,
-    handleRemoveImage: handleRemoveImageById,
     handleRemoveAreaPhoto,
     handleRemoveFloorplan,
     handleSetFeaturedImage,
     handleToggleGridImage
   } = usePropertyImages(formData, setFormData);
-
-  const handleRemoveImage = (index: number) => {
-    const imageToRemove = formData.images[index];
-    if (imageToRemove) {
-      handleRemoveImageById(imageToRemove.id);
-    }
-  };
 
   const {
     handleAreaImageUpload,
