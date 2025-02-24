@@ -1,7 +1,8 @@
-import { Document, Page, View, Text, Image, StyleSheet, Svg, Path } from '@react-pdf/renderer';
+import { Document, Page, View, Text, Image, StyleSheet, Link } from '@react-pdf/renderer';
 import { PropertyData } from '@/types/property';
 import { AgencySettings } from '@/types/agency';
 import { Section } from '@/components/brochure/TemplateBuilder';
+import QRCode from 'qrcode';
 
 const createStyles = (settings: AgencySettings) => StyleSheet.create({
   page: {
@@ -11,104 +12,42 @@ const createStyles = (settings: AgencySettings) => StyleSheet.create({
   section: {
     marginBottom: 20,
   },
-  heading: {
-    fontSize: 24,
+  coverTitle: {
+    fontSize: 32,
     marginBottom: 10,
-    color: '#1a1a1a',
+    color: settings.primaryColor || '#1a1a1a',
+    fontWeight: 'bold',
+    textAlign: 'center',
   },
-  subheading: {
-    fontSize: 18,
-    marginBottom: 8,
-    color: '#2a2a2a',
+  coverPrice: {
+    fontSize: 24,
+    marginBottom: 20,
+    color: settings.secondaryColor || '#2a2a2a',
+    textAlign: 'center',
+    fontWeight: 'medium',
+  },
+  sectionTitle: {
+    fontSize: 24,
+    marginBottom: 16,
+    color: settings.primaryColor || '#1a1a1a',
+    fontWeight: 'bold',
   },
   text: {
     fontSize: 12,
     lineHeight: 1.5,
     color: '#4a4a4a',
   },
-  image: {
-    width: '100%',
-    height: 300,
-    objectFit: 'cover',
-    marginVertical: 10,
-    borderRadius: 4,
-  },
-  featuresGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 10,
-    marginVertical: 10,
-  },
-  featureItem: {
-    width: '48%',
-    padding: 8,
-    backgroundColor: '#f3f4f6',
-    borderRadius: 4,
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 20,
-    marginBottom: 30,
-  },
-  headerLogo: {
-    width: 100,
-    height: 40,
-    objectFit: 'contain',
-  },
-  headerInfo: {
-    flex: 1,
-  },
-  headerText: {
-    fontSize: 8,
-    color: '#666',
-  },
-  footerText: {
-    fontSize: 10,
-    color: '#666',
-    position: 'absolute',
-    bottom: 30,
-    left: 30,
-    right: 30,
-    textAlign: 'center',
-  },
-  grid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 10,
-  },
-  gridImage: {
-    width: '31%',
-    height: 100,
-    objectFit: 'cover',
-    borderRadius: 4,
-  },
-  content: {
-    marginTop: 20,
-    marginBottom: 50,
-  },
-  areaDescription: {
-    marginVertical: 15,
-    padding: 15,
-    backgroundColor: settings.primaryColor || '#40497A',
-    borderRadius: 8,
-  },
-  areaText: {
-    fontSize: 12,
-    lineHeight: 1.5,
-    color: 'white',
-  },
-  keyInfo: {
-    marginTop: 15,
-    padding: 15,
+  descriptionBlock: {
     backgroundColor: '#f8f9fa',
+    padding: 20,
     borderRadius: 8,
+    marginVertical: 15,
   },
   keyInfoGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: 10,
-    marginTop: 15,
+    marginVertical: 20,
   },
   keyInfoBox: {
     width: '31%',
@@ -116,54 +55,129 @@ const createStyles = (settings: AgencySettings) => StyleSheet.create({
     backgroundColor: settings.primaryColor || '#40497A',
     borderRadius: 8,
     marginBottom: 10,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
   },
-  iconContainer: {
-    width: 32,
-    height: 32,
-    backgroundColor: settings.secondaryColor || '#E2E8F0',
-    borderRadius: 16,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  keyInfoContent: {
-    flex: 1,
-  },
-  keyInfoBoxLabel: {
+  keyInfoLabel: {
     fontSize: 10,
     color: 'white',
     marginBottom: 4,
   },
-  keyInfoBoxValue: {
+  keyInfoValue: {
     fontSize: 14,
     color: 'white',
     fontWeight: 'bold',
   },
-  floorplanGrid: {
+  imageGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 20,
-    marginVertical: 15,
+    gap: 15,
   },
-  floorplanItem: {
+  gridImage: {
+    width: '48%',
+    height: 200,
+    objectFit: 'cover',
+    borderRadius: 8,
+  },
+  fullWidthImage: {
     width: '100%',
+    height: 300,
+    objectFit: 'cover',
+    borderRadius: 8,
+  },
+  categoryBlock: {
+    backgroundColor: settings.primaryColor || '#40497A',
+    padding: 15,
+    borderRadius: 8,
+    width: '48%',
+    marginBottom: 15,
+  },
+  categoryTitle: {
+    color: 'white',
+    fontSize: 14,
+    fontWeight: 'bold',
+    marginBottom: 10,
+  },
+  placeItem: {
+    color: 'white',
+    fontSize: 12,
+    marginBottom: 5,
+  },
+  contactBlock: {
+    width: '48%',
+    padding: 20,
+    backgroundColor: settings.primaryColor || '#40497A',
+    borderRadius: 8,
     marginBottom: 20,
   },
-  floorplanImage: {
-    width: '100%',
-    height: 400,
-    objectFit: 'contain',
-    marginVertical: 10,
+  contactTitle: {
+    color: 'white',
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 10,
   },
-  floorplanCaption: {
+  contactInfo: {
+    color: 'white',
     fontSize: 12,
-    color: '#4a4a4a',
+    marginBottom: 5,
+  },
+  qrCodeContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    marginTop: 30,
+  },
+  qrCode: {
+    width: 100,
+    height: 100,
+  },
+  qrLabel: {
     textAlign: 'center',
+    fontSize: 10,
     marginTop: 5,
-  }
+    color: '#666',
+  },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 30,
+    borderBottom: 1,
+    borderBottomColor: '#eee',
+    paddingBottom: 10,
+  },
+  headerLogo: {
+    width: 120,
+    height: 40,
+    objectFit: 'contain',
+  },
+  footer: {
+    position: 'absolute',
+    bottom: 30,
+    left: 30,
+    right: 30,
+    textAlign: 'center',
+    fontSize: 10,
+    color: '#666',
+    borderTop: 1,
+    borderTopColor: '#eee',
+    paddingTop: 10,
+  },
 });
+
+const Header = ({ settings, styles }: { settings: AgencySettings; styles: any }) => (
+  <View style={styles.header}>
+    {settings.logoUrl && (
+      <Image src={settings.logoUrl} style={styles.headerLogo} />
+    )}
+    <View style={{ flex: 1 }}>
+      <Text style={styles.text}>{settings.name || ''}</Text>
+      <Text style={styles.text}>{settings.phone || ''}</Text>
+    </View>
+  </View>
+);
+
+const Footer = ({ settings, styles }: { settings: AgencySettings; styles: any }) => (
+  <View style={styles.footer}>
+    <Text>{`${settings.name} - ${settings.address} - ${settings.phone} - ${settings.email}`}</Text>
+  </View>
+);
 
 interface PropertyBrochureDocumentProps {
   property: PropertyData;
@@ -171,74 +185,7 @@ interface PropertyBrochureDocumentProps {
   template?: Section[];
 }
 
-const PageHeader = ({ settings, styles }: { settings: AgencySettings; styles: ReturnType<typeof createStyles> }) => (
-  <View style={styles.header}>
-    {settings.logoUrl && (
-      <Image src={settings.logoUrl} style={styles.headerLogo} />
-    )}
-    <View style={styles.headerInfo}>
-      <Text style={styles.headerText}>{settings.name || ''}</Text>
-      <Text style={styles.headerText}>{settings.address || ''}</Text>
-      <Text style={styles.headerText}>Phone: {settings.phone || ''}</Text>
-      <Text style={styles.headerText}>Email: {settings.email || ''}</Text>
-    </View>
-  </View>
-);
-
-const RulerIcon = () => (
-  <Svg viewBox="0 0 24 24" width={20} height={20}>
-    <Path
-      d="M3 21V3h18v18H3z M3 16.5h18 M3 12h18 M3 7.5h18"
-      stroke="white"
-      strokeWidth={1.5}
-      fill="none"
-    />
-  </Svg>
-);
-
-const BedIcon = () => (
-  <Svg viewBox="0 0 24 24" width={20} height={20}>
-    <Path
-      d="M2 20v-8a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v8 M4 10V6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v4"
-      stroke="white"
-      strokeWidth={1.5}
-      fill="none"
-    />
-  </Svg>
-);
-
-const BathIcon = () => (
-  <Svg viewBox="0 0 24 24" width={20} height={20}>
-    <Path
-      d="M4 12h16a1 1 0 0 1 1 1v2a4 4 0 0 1-4 4h-10a4 4 0 0 1-4-4v-2a1 1 0 0 1 1-1z M6 12V5a2 2 0 0 1 2-2h3v2.25"
-      stroke="white"
-      strokeWidth={1.5}
-      fill="none"
-    />
-  </Svg>
-);
-
-const CalendarIcon = () => (
-  <Svg viewBox="0 0 24 24" width={20} height={20}>
-    <Path
-      d="M8 2v4M16 2v4M3 10h18M5 4h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"
-      stroke="white"
-      strokeWidth={1.5}
-      fill="none"
-    />
-  </Svg>
-);
-
 export const PropertyBrochureDocument = ({ property, settings, template }: PropertyBrochureDocumentProps) => {
-  const {
-    gridImages = [],
-    features = [],
-    nearby_places = [],
-    areas = [],
-    images = [],
-    floorplans = []
-  } = property;
-
   const styles = createStyles(settings);
 
   const defaultSections: Section[] = [
@@ -298,220 +245,153 @@ export const PropertyBrochureDocument = ({ property, settings, template }: Prope
     }
   ];
 
-  const sections = template || defaultSections;
-
   const renderSection = (section: Section) => {
     switch (section.type) {
       case 'cover':
         return (
           <Page size="A4" style={styles.page}>
-            <PageHeader settings={settings} styles={styles} />
             {property.featuredImage && (
-              <Image src={property.featuredImage} style={styles.image} />
+              <Image src={property.featuredImage} style={styles.fullWidthImage} />
             )}
-            <View style={styles.section}>
-              <Text style={styles.heading}>{property.title || 'Untitled Property'}</Text>
-              <Text style={styles.subheading}>{property.price || ''}</Text>
-            </View>
-            <View style={styles.grid}>
-              {gridImages.slice(0, 6).map((url, index) => (
+            <Text style={styles.coverTitle}>{property.title || 'Untitled Property'}</Text>
+            <Text style={styles.coverPrice}>{property.price || ''}</Text>
+            <View style={styles.imageGrid}>
+              {(property.gridImages || []).slice(0, 6).map((url, index) => (
                 <Image key={index} src={url} style={styles.gridImage} />
               ))}
             </View>
-            <Text style={styles.footerText}>
-              {[settings.name, settings.phone, settings.email]
-                .filter(Boolean)
-                .join(' - ')}
-            </Text>
+            <Footer settings={settings} styles={styles} />
           </Page>
         );
 
       case 'details':
         return (
           <Page size="A4" style={styles.page}>
-            <PageHeader settings={settings} styles={styles} />
-            <View style={styles.content}>
-              <View style={styles.section}>
-                <Text style={styles.heading}>Property Details</Text>
-                <Text style={styles.text}>{property.description || ''}</Text>
+            <Header settings={settings} styles={styles} />
+            <View style={styles.keyInfoGrid}>
+              <View style={styles.keyInfoBox}>
+                <Text style={styles.keyInfoLabel}>Living Area</Text>
+                <Text style={styles.keyInfoValue}>{property.livingArea} m²</Text>
               </View>
-              <View style={styles.keyInfoGrid}>
-                <View style={styles.keyInfoBox}>
-                  <View style={styles.iconContainer}>
-                    <RulerIcon />
-                  </View>
-                  <View style={styles.keyInfoContent}>
-                    <Text style={styles.keyInfoBoxLabel}>Living Area</Text>
-                    <Text style={styles.keyInfoBoxValue}>{property.livingArea || '0'} m²</Text>
-                  </View>
-                </View>
-
-                <View style={styles.keyInfoBox}>
-                  <View style={styles.iconContainer}>
-                    <RulerIcon />
-                  </View>
-                  <View style={styles.keyInfoContent}>
-                    <Text style={styles.keyInfoBoxLabel}>Plot Size</Text>
-                    <Text style={styles.keyInfoBoxValue}>{property.sqft || '0'} m²</Text>
-                  </View>
-                </View>
-
-                <View style={styles.keyInfoBox}>
-                  <View style={styles.iconContainer}>
-                    <BedIcon />
-                  </View>
-                  <View style={styles.keyInfoContent}>
-                    <Text style={styles.keyInfoBoxLabel}>Bedrooms</Text>
-                    <Text style={styles.keyInfoBoxValue}>{property.bedrooms || '0'}</Text>
-                  </View>
-                </View>
-
-                <View style={styles.keyInfoBox}>
-                  <View style={styles.iconContainer}>
-                    <BathIcon />
-                  </View>
-                  <View style={styles.keyInfoContent}>
-                    <Text style={styles.keyInfoBoxLabel}>Bathrooms</Text>
-                    <Text style={styles.keyInfoBoxValue}>{property.bathrooms || '0'}</Text>
-                  </View>
-                </View>
-
-                {property.buildYear && (
-                  <View style={styles.keyInfoBox}>
-                    <View style={styles.iconContainer}>
-                      <CalendarIcon />
-                    </View>
-                    <View style={styles.keyInfoContent}>
-                      <Text style={styles.keyInfoBoxLabel}>Build Year</Text>
-                      <Text style={styles.keyInfoBoxValue}>{property.buildYear}</Text>
-                    </View>
-                  </View>
-                )}
+              <View style={styles.keyInfoBox}>
+                <Text style={styles.keyInfoLabel}>Plot Size</Text>
+                <Text style={styles.keyInfoValue}>{property.sqft} m²</Text>
               </View>
-
-              {features.length > 0 && (
-                <View style={styles.section}>
-                  <Text style={styles.subheading}>Features</Text>
-                  <View style={styles.featuresGrid}>
-                    {features.slice(0, 10).map((feature, index) => (
-                      <View key={index} style={styles.featureItem}>
-                        <Text style={styles.text}>{feature.description || ''}</Text>
-                      </View>
-                    ))}
-                  </View>
-                </View>
-              )}
+              <View style={styles.keyInfoBox}>
+                <Text style={styles.keyInfoLabel}>Bedrooms</Text>
+                <Text style={styles.keyInfoValue}>{property.bedrooms}</Text>
+              </View>
+              <View style={styles.keyInfoBox}>
+                <Text style={styles.keyInfoLabel}>Bathrooms</Text>
+                <Text style={styles.keyInfoValue}>{property.bathrooms}</Text>
+              </View>
+              <View style={styles.keyInfoBox}>
+                <Text style={styles.keyInfoLabel}>Build Year</Text>
+                <Text style={styles.keyInfoValue}>{property.buildYear}</Text>
+              </View>
+              <View style={styles.keyInfoBox}>
+                <Text style={styles.keyInfoLabel}>Energy Label</Text>
+                <Text style={styles.keyInfoValue}>{property.energyLabel || 'N/A'}</Text>
+              </View>
             </View>
+            <View style={styles.descriptionBlock}>
+              <Text style={styles.text}>{property.description}</Text>
+            </View>
+            <Footer settings={settings} styles={styles} />
           </Page>
         );
 
-      case 'floorplans':
-        return floorplans && floorplans.length > 0 ? (
-          <Page size="A4" style={styles.page}>
-            <PageHeader settings={settings} styles={styles} />
-            <View style={styles.content}>
-              <Text style={styles.heading}>Floorplans</Text>
-              <View style={styles.floorplanGrid}>
-                {floorplans.map((plan, index) => (
-                  <View key={index} style={styles.floorplanItem}>
-                    <Image src={plan} style={styles.floorplanImage} />
-                    <Text style={styles.floorplanCaption}>
-                      Floorplan {index + 1}
-                    </Text>
-                  </View>
-                ))}
-              </View>
+      case 'areas':
+        return property.areas.map((area, index) => (
+          <Page key={index} size="A4" style={styles.page}>
+            <Header settings={settings} styles={styles} />
+            <Text style={styles.sectionTitle}>{area.title}</Text>
+            <Text style={[styles.text, { marginBottom: 20 }]}>{area.description}</Text>
+            <View style={styles.imageGrid}>
+              {area.imageIds.map((imageId, imgIndex) => {
+                const imageUrl = property.images.find(img => img.id === imageId)?.url;
+                if (!imageUrl) return null;
+
+                const isLastAndOdd = imgIndex === area.imageIds.length - 1 && area.imageIds.length % 2 !== 0;
+                return (
+                  <Image
+                    key={imgIndex}
+                    src={imageUrl}
+                    style={isLastAndOdd ? styles.fullWidthImage : styles.gridImage}
+                  />
+                );
+              })}
             </View>
-            <Text style={styles.footerText}>
-              {[settings.name, settings.phone, settings.email]
-                .filter(Boolean)
-                .join(' - ')}
-            </Text>
+            <Footer settings={settings} styles={styles} />
           </Page>
-        ) : null;
+        ));
+
+      case 'floorplans':
+        return (
+          <Page size="A4" style={styles.page}>
+            <Header settings={settings} styles={styles} />
+            <Text style={styles.sectionTitle}>Floorplans</Text>
+            <View style={styles.imageGrid}>
+              {(property.floorplans || []).map((plan, index) => (
+                <Image key={index} src={plan} style={styles.gridImage} />
+              ))}
+            </View>
+            <Footer settings={settings} styles={styles} />
+          </Page>
+        );
 
       case 'location':
-        return (property.location_description || property.map_image) ? (
+        const placesByType = (property.nearby_places || []).reduce((acc: Record<string, any[]>, place) => {
+          if (!acc[place.type]) acc[place.type] = [];
+          if (acc[place.type].length < 2) acc[place.type].push(place);
+          return acc;
+        }, {});
+
+        return (
           <Page size="A4" style={styles.page}>
-            <PageHeader settings={settings} styles={styles} />
-            <View style={styles.content}>
-              <Text style={styles.heading}>Location</Text>
-              {property.location_description && (
-                <View style={styles.areaDescription}>
-                  <Text style={styles.areaText}>{property.location_description}</Text>
-                </View>
-              )}
-              {property.map_image && (
-                <Image src={property.map_image} style={styles.image} />
-              )}
-              {nearby_places.length > 0 && (
-                <View style={styles.section}>
-                  <Text style={styles.subheading}>Nearby Places</Text>
-                  {nearby_places.slice(0, 5).map((place, index) => (
-                    <View key={index} style={styles.keyInfo}>
-                      <Text style={styles.text}>
-                        {place.name || ''} - {place.vicinity || ''}
-                      </Text>
-                    </View>
+            <Header settings={settings} styles={styles} />
+            <Text style={styles.sectionTitle}>Location</Text>
+            <Text style={[styles.text, styles.descriptionBlock]}>
+              {property.location_description}
+            </Text>
+            <View style={styles.imageGrid}>
+              {Object.entries(placesByType).map(([type, places], index) => (
+                <View key={type} style={styles.categoryBlock}>
+                  <Text style={styles.categoryTitle}>{type.replace('_', ' ').toUpperCase()}</Text>
+                  {places.map((place, placeIndex) => (
+                    <Text key={placeIndex} style={styles.placeItem}>
+                      {place.name} ({place.vicinity})
+                    </Text>
                   ))}
                 </View>
-              )}
+              ))}
             </View>
+            {property.map_image && (
+              <Image src={property.map_image} style={[styles.fullWidthImage, { marginTop: 20 }]} />
+            )}
+            <Footer settings={settings} styles={styles} />
           </Page>
-        ) : null;
-
-      case 'areas':
-        return areas.length > 0 ? (
-          <>
-            {areas.slice(0, 4).map((area, index) => (
-              <Page key={area.id || index} size="A4" style={styles.page}>
-                <PageHeader settings={settings} styles={styles} />
-                <View style={styles.content}>
-                  <Text style={styles.heading}>{area.title || ''}</Text>
-                  <View style={styles.areaDescription}>
-                    <Text style={styles.areaText}>{area.description || ''}</Text>
-                  </View>
-                  <View style={styles.grid}>
-                    {(area.imageIds || [])
-                      .slice(0, 6)
-                      .map(id => images.find(img => img.id === id))
-                      .filter(Boolean)
-                      .map((img, imgIndex) => (
-                        <Image key={imgIndex} src={img!.url} style={styles.gridImage} />
-                      ))}
-                  </View>
-                </View>
-              </Page>
-            ))}
-          </>
-        ) : null;
+        );
 
       case 'contact':
         return (
           <Page size="A4" style={styles.page}>
-            <PageHeader settings={settings} styles={styles} />
-            <View style={styles.content}>
-              <Text style={styles.heading}>Contact Us</Text>
-              {settings.logoUrl && (
-                <Image src={settings.logoUrl} style={{ width: 200, marginBottom: 20 }} />
-              )}
-              <View style={styles.keyInfo}>
-                <Text style={styles.text}>{settings.name || ''}</Text>
-                <Text style={styles.text}>{settings.address || ''}</Text>
-                <Text style={styles.text}>Phone: {settings.phone || ''}</Text>
-                <Text style={styles.text}>Email: {settings.email || ''}</Text>
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+              <View style={styles.contactBlock}>
+                <Text style={styles.contactTitle}>Agency Information</Text>
+                <Text style={styles.contactInfo}>{settings.name}</Text>
+                <Text style={styles.contactInfo}>{settings.address}</Text>
+                <Text style={styles.contactInfo}>{settings.phone}</Text>
+                <Text style={styles.contactInfo}>{settings.email}</Text>
               </View>
-              {(settings.facebookUrl || settings.instagramUrl) && (
-                <View style={[styles.keyInfo, { marginTop: 20 }]}>
-                  <Text style={styles.subheading}>Follow Us</Text>
-                  {settings.facebookUrl && (
-                    <Text style={styles.text}>Facebook: {settings.facebookUrl}</Text>
-                  )}
-                  {settings.instagramUrl && (
-                    <Text style={styles.text}>Instagram: {settings.instagramUrl}</Text>
-                  )}
-                </View>
-              )}
+              <View style={styles.contactBlock}>
+                <Text style={styles.contactTitle}>Agent Information</Text>
+                <Text style={styles.contactInfo}>Your dedicated agent</Text>
+                {/* Add agent information here when available */}
+              </View>
+            </View>
+            <View style={styles.qrCodeContainer}>
+              {/* QR codes will be added here */}
             </View>
           </Page>
         );
@@ -521,6 +401,8 @@ export const PropertyBrochureDocument = ({ property, settings, template }: Prope
     }
   };
 
+  const sections = template || defaultSections;
+  
   return (
     <Document>
       {sections.map((section) => renderSection(section))}
