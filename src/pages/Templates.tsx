@@ -4,7 +4,7 @@ import { TemplateList } from "@/components/brochure/TemplateList";
 import { DndContext } from '@dnd-kit/core';
 import { useState } from "react";
 
-interface Template {
+export interface Template {
   id: string;
   name: string;
   description: string | null;
@@ -23,10 +23,10 @@ export default function Templates() {
         <TemplateList onEdit={setSelectedTemplate} />
         
         <DndContext>
+          {/* Pass the full template object */}
           <TemplateBuilder template={selectedTemplate} />
         </DndContext>
       </div>
     </div>
   );
 }
-

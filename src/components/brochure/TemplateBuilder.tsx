@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { DndContext, DragOverlay, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { SortableContext, arrayMove, verticalListSortingStrategy } from '@dnd-kit/sortable';
@@ -12,6 +11,7 @@ import type { Json } from '@/integrations/supabase/types';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 import { Grid, Layout, Columns, Type, GripVertical } from 'lucide-react';
+import type { Template } from '@/pages/Templates';
 
 export interface ContentElement {
   id: string;
@@ -106,7 +106,7 @@ const defaultSections: Section[] = [
   }
 ];
 
-export function TemplateBuilder({ template }: { template?: any }) {
+export function TemplateBuilder({ template }: { template: Template | null }) {
   const [sections, setSections] = React.useState<Section[]>(
     template?.sections || defaultSections
   );
@@ -114,6 +114,14 @@ export function TemplateBuilder({ template }: { template?: any }) {
   const [description, setDescription] = React.useState(template?.description || '');
   const [selectedSectionId, setSelectedSectionId] = React.useState<string | null>(null);
   const { toast } = useToast();
+
+  React.useEffect(() => {
+    if (template) {
+      setSections(template.sections);
+      setTemplateName(template.name);
+      setDescription(template.description || '');
+    }
+  }, [template]);
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
