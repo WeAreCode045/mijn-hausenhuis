@@ -12,10 +12,15 @@ interface Template {
   id: string;
   name: string;
   description: string | null;
+  sections: any;
   created_at: string;
 }
 
-export function TemplateList({ onEdit }: { onEdit: (template: Template) => void }) {
+type TemplateListProps = {
+  onEdit: React.Dispatch<React.SetStateAction<Template | null>>;
+}
+
+export function TemplateList({ onEdit }: TemplateListProps) {
   const { toast } = useToast();
 
   const { data: templates, refetch } = useQuery({
@@ -115,4 +120,3 @@ export function TemplateList({ onEdit }: { onEdit: (template: Template) => void 
     </Card>
   );
 }
-
