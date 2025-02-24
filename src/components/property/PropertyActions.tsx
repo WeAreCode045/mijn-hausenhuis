@@ -22,12 +22,14 @@ export function PropertyActions({
   onSave 
 }: PropertyActionsProps) {
   const [isWebViewOpen, setIsWebViewOpen] = useState(false);
-  const [selectedTemplateId, setSelectedTemplateId] = useState<string>("");
+  const [selectedTemplateId, setSelectedTemplateId] = useState<string>("default");
   const { toast } = useToast();
 
   const handleGeneratePDF = async () => {
     try {
-      await generatePropertyPDF(property, settings, selectedTemplateId);
+      // Only pass the template ID if it's not the default
+      const templateId = selectedTemplateId === "default" ? "" : selectedTemplateId;
+      await generatePropertyPDF(property, settings, templateId);
       toast({
         title: "Success",
         description: "PDF generated successfully",

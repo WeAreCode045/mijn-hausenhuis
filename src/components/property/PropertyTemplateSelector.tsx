@@ -49,7 +49,7 @@ export function PropertyTemplateSelector({
             <SelectValue placeholder="Select a template" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">Default Template</SelectItem>
+            <SelectItem value="default">Default Template</SelectItem>
             {templates.map((template) => (
               <SelectItem key={template.id} value={template.id}>
                 {template.name}
