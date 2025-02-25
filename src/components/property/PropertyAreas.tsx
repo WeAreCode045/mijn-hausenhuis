@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { PropertyArea, PropertyImage } from "@/types/property";
-import { PlusCircle, MinusCircle, ImagePlus } from "lucide-react";
+import { PlusCircle, MinusCircle, ImagePlus, Trash2 } from "lucide-react";
 import { ImageSelectDialog } from "./ImageSelectDialog";
 
 interface PropertyAreasProps {
@@ -67,6 +67,37 @@ export function PropertyAreas({
               }}
               buttonText="Select Images"
             />
+            {area.imageIds && area.imageIds.length > 0 && (
+              <div className="grid grid-cols-3 sm:grid-cols-4 gap-4 mt-4">
+                {area.imageIds.map((imageId) => {
+                  const image = images.find(img => img.id === imageId);
+                  if (!image) return null;
+                  
+                  return (
+                    <div key={imageId} className="relative group">
+                      <img
+                        src={image.url}
+                        alt="Area"
+                        className="w-full aspect-square object-cover rounded-lg"
+                      />
+                      <Button
+                        type="button"
+                        variant="destructive"
+                        size="icon"
+                        className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
+                        onClick={() => {
+                          const newImageIds = area.imageIds.filter(id => id !== imageId);
+                          onUpdate(area.id, 'imageIds', newImageIds);
+                          onImageRemove(area.id, imageId);
+                        }}
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
           </div>
         </div>
       ))}
