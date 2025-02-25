@@ -62,7 +62,7 @@ export function PropertyWebViewContent({
       </div>
 
       {/* Content Section - Make it scrollable */}
-      <div className="flex-1 overflow-y-auto pb-20">
+      <div className="flex-1 overflow-y-scroll scrollbar-thin scrollbar-track-transparent scrollbar-thumb-gray-400 pb-20">
         <div className="p-4">
           {sections[currentPage]?.content}
         </div>
