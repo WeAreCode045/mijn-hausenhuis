@@ -94,6 +94,7 @@ export function PropertyForm({ onSubmit }: PropertyFormProps) {
           isUpdateMode={!!id}
         />
         <PropertyFormContent 
+          step={currentStep}
           formData={formData}
           onFieldChange={handleFieldChange}
           onAddFeature={addFeature}
