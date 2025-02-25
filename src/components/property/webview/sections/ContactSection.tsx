@@ -5,7 +5,7 @@ import { MessageCircle, Mail, Phone, QrCode } from "lucide-react";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { QRCodeSVG } from "qrcode.react";  // Changed to named import
+import { QRCodeSVG } from "qrcode.react";
 
 interface Agent {
   id: string;
@@ -48,6 +48,16 @@ export function ContactSection({ property, settings }: WebViewSectionProps) {
   return (
     <div className="p-4 sm:p-6 space-y-6">
       <div className="grid grid-cols-1 gap-6">
+        {/* Contact Form */}
+        <div className="w-full rounded-xl shadow-lg p-8 text-white" style={{ backgroundColor: settings?.secondaryColor }}>
+          <h3 className="text-xl font-semibold mb-6">Interesse in deze woning?</h3>
+          <ContactForm 
+            propertyId={property.id}
+            propertyTitle={property.title}
+            agentId={property.agent_id}
+          />
+        </div>
+
         {/* Agent Details */}
         {agent && (
           <div className="w-full rounded-xl shadow-lg p-8" style={{ backgroundColor: settings?.primaryColor }}>
@@ -120,16 +130,6 @@ export function ContactSection({ property, settings }: WebViewSectionProps) {
             </div>
           </div>
         )}
-      </div>
-
-      {/* Contact Form */}
-      <div className="w-full rounded-xl shadow-lg p-8 text-white" style={{ backgroundColor: settings?.secondaryColor }}>
-        <h3 className="text-xl font-semibold mb-6">Interesse in deze woning?</h3>
-        <ContactForm 
-          propertyId={property.id}
-          propertyTitle={property.title}
-          agentId={property.agent_id}
-        />
       </div>
     </div>
   );
