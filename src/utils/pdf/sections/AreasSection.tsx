@@ -12,7 +12,7 @@ export const AreasSection = ({ property, settings, styles }: {
 }) => {
   return property.areas.map((area, index) => {
     console.log(`Processing area ${area.title} with ${area.imageIds?.length} images`);
-    const imagesPerPage = 6; // 3 rows of 2 images
+    const imagesPerPage = 6; // 2 rows of 3 images
     const totalPages = Math.ceil((area.imageIds?.length || 0) / imagesPerPage);
     
     return Array.from({ length: totalPages }).map((_, pageIndex) => {
@@ -38,7 +38,7 @@ export const AreasSection = ({ property, settings, styles }: {
                   <Image
                     key={imgIndex}
                     src={imageUrl}
-                    style={styles.areaGridImage}
+                    style={[styles.areaGridImage, { width: '31%' }]} // Update to roughly 1/3 width with gap consideration
                   />
                 );
               })}
