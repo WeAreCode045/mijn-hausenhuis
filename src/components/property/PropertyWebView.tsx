@@ -25,17 +25,15 @@ export function PropertyWebView({ property, open, onOpenChange }: PropertyWebVie
   const printContentRef = useRef<HTMLDivElement>(null);
   
   const { propertyData } = usePropertyData(id, property);
+  const { calculateTotalPages } = usePageCalculation();
   const {
     selectedImage,
     setSelectedImage,
     currentPage,
     setCurrentPage,
     handleShare,
-    handlePrint,
-    handleNext,
-    handlePrevious,
-    totalPages
-  } = usePropertyWebView(propertyData);
+    handlePrint
+  } = usePropertyWebView();
 
   if (!propertyData) {
     return <div>Loading...</div>;
@@ -60,6 +58,8 @@ export function PropertyWebView({ property, open, onOpenChange }: PropertyWebVie
       />
     );
   }
+
+  const totalPages = calculateTotalPages(propertyData);
 
   return (
     <div className="min-h-screen bg-white relative">
@@ -111,8 +111,8 @@ export function PropertyWebView({ property, open, onOpenChange }: PropertyWebVie
               <WebViewFooter 
                 currentPage={currentPage}
                 totalPages={totalPages}
-                onPrevious={handlePrevious}
-                onNext={handleNext}
+                onPrevious={() => setCurrentPage(currentPage - 1)}
+                onNext={() => setCurrentPage(currentPage + 1)}
                 onShare={handleShare}
                 onPrint={handlePrint}
               />
