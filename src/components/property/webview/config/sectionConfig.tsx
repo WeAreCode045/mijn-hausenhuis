@@ -53,31 +53,26 @@ export const getSections = ({ property, settings, currentPage, isPrintView, wait
 
   // Add area sections if there are areas
   if (property.areas && property.areas.length > 0) {
-    for (let i = 0; i < Math.ceil(property.areas.length / 2); i++) {
-      sections.push({
-        id: `areas-${i}`,
-        title: `Areas ${i + 1}`,
-        content: (
-          <div className="h-full flex flex-col">
-            <div className="flex-1 overflow-y-auto">
-              <div className="space-y-4">
-                <AreasSection 
-                  key={`${key}-areas-${i}`} 
-                  property={{
-                    ...property,
-                    currentPath: `areas-${i}`
-                  }} 
-                  settings={settings} 
-                />
-              </div>
+    sections.push({
+      id: 'areas',
+      title: 'Areas',
+      content: (
+        <div className="h-full flex flex-col">
+          <div className="flex-1 overflow-y-auto">
+            <div className="space-y-4">
+              <AreasSection 
+                key={key} 
+                property={{ ...property }} 
+                settings={settings} 
+              />
             </div>
-            {isPrintView && (
-              <PrintFooter property={property} currentPage={currentPage} settings={settings} />
-            )}
           </div>
-        )
-      });
-    }
+          {isPrintView && (
+            <PrintFooter property={property} currentPage={currentPage} settings={settings} />
+          )}
+        </div>
+      )
+    });
   }
 
   // Add floorplans section if there are floorplans

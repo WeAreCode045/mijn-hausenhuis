@@ -23,7 +23,6 @@ export function PropertyWebViewContent({
   property,
   settings,
   currentPage,
-  setCurrentPage,
   selectedImage,
   setSelectedImage,
   handleShare,
