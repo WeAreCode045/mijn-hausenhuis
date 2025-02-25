@@ -11,9 +11,14 @@ export const AreasSection = ({ property, settings, styles }: {
   styles: any;
 }) => {
   return property.areas.map((area, index) => {
-    console.log(`Processing area ${area.title} with ${area.imageIds?.length} images`);
+    // Filter out any null or undefined imageIds
+    const validImageIds = (area.imageIds || []).filter(id => 
+      property.images.some(img => img.id === id)
+    );
+    
+    console.log(`Processing area ${area.title} with ${validImageIds.length} valid images`);
     const imagesPerPage = 6; // 2 rows of 3 images
-    const totalPages = Math.ceil((area.imageIds?.length || 0) / imagesPerPage);
+    const totalPages = Math.ceil(validImageIds.length / imagesPerPage);
     
     return Array.from({ length: totalPages }).map((_, pageIndex) => {
       console.log(`Creating page ${pageIndex + 1} of ${totalPages} for area ${area.title}`);
@@ -27,7 +32,7 @@ export const AreasSection = ({ property, settings, styles }: {
             </>
           )}
           <View style={styles.imageGrid}>
-            {(area.imageIds || [])
+            {validImageIds
               .slice(pageIndex * imagesPerPage, (pageIndex + 1) * imagesPerPage)
               .map((imageId, imgIndex) => {
                 const imageUrl = property.images.find(img => img.id === imageId)?.url;
@@ -39,10 +44,11 @@ export const AreasSection = ({ property, settings, styles }: {
                     key={imgIndex}
                     src={imageUrl}
                     style={{
-                      ...styles.areaGridImage,
-                      aspectRatio: '4/3',
                       width: '31%',
-                      height: 'auto'
+                      height: 140,
+                      objectFit: 'cover',
+                      borderRadius: 8,
+                      marginBottom: 15
                     }}
                   />
                 );

@@ -41,6 +41,16 @@ export const DetailsSection = ({ property, settings, styles }: {
     <View style={styles.descriptionBlock}>
       <Text style={styles.text}>{property.description}</Text>
     </View>
+    {property.features && property.features.length > 0 && (
+      <View style={[styles.descriptionBlock, { marginTop: 20 }]}>
+        <Text style={[styles.sectionTitle, { fontSize: 18 }]}>Features</Text>
+        {property.features.map((feature, index) => (
+          <Text key={index} style={[styles.text, { marginBottom: 5 }]}>
+            • {feature.description}
+          </Text>
+        ))}
+      </View>
+    )}
     <Footer settings={settings} styles={styles} />
   </Page>
 );
