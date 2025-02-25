@@ -14,14 +14,14 @@ interface PropertyStepContentProps {
   onUpdateArea: (id: string, field: keyof any, value: string | string[]) => void;
   onAreaImageUpload: (id: string, files: FileList) => void;
   onAreaImageRemove: (id: string, imageId: string) => void;
-  handleImageUpload: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  handleAreaPhotosUpload: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  handleFloorplanUpload: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  handleRemoveImage: (index: number) => void;
-  handleRemoveAreaPhoto: (index: number) => void;
-  handleRemoveFloorplan: (index: number) => void;
+  handleImageUpload: (e: React.ChangeEvent<HTMLInputElement>) => Promise<void>;
+  handleAreaPhotosUpload: (e: React.ChangeEvent<HTMLInputElement>) => Promise<void>;
+  handleFloorplanUpload: (e: React.ChangeEvent<HTMLInputElement>) => Promise<void>;
+  handleRemoveImage: (index: number) => Promise<void>;
+  handleRemoveAreaPhoto: (index: number) => Promise<void>;
+  handleRemoveFloorplan: (index: number) => Promise<void>;
   handleSetFeaturedImage: (url: string | null) => void;
-  handleToggleGridImage: (url: string) => void;
+  handleToggleGridImage: (urls: string[]) => void;
   handleMapImageDelete: () => Promise<void>;
 }
 
@@ -62,12 +62,12 @@ export function PropertyStepContent({
           onUpdateArea={onUpdateArea}
           onAreaImageUpload={onAreaImageUpload}
           onAreaImageRemove={onAreaImageRemove}
-          handleImageUpload={handleImageUpload}
-          handleAreaPhotosUpload={handleAreaPhotosUpload}
-          handleFloorplanUpload={handleFloorplanUpload}
-          handleRemoveImage={handleRemoveImage}
-          handleRemoveAreaPhoto={handleRemoveAreaPhoto}
-          handleRemoveFloorplan={handleRemoveFloorplan}
+          handleImageUpload={async (e) => await handleImageUpload(e)}
+          handleAreaPhotosUpload={async (e) => await handleAreaPhotosUpload(e)}
+          handleFloorplanUpload={async (e) => await handleFloorplanUpload(e)}
+          handleRemoveImage={async (index) => await handleRemoveImage(index)}
+          handleRemoveAreaPhoto={async (index) => await handleRemoveAreaPhoto(index)}
+          handleRemoveFloorplan={async (index) => await handleRemoveFloorplan(index)}
           handleSetFeaturedImage={handleSetFeaturedImage}
           handleToggleGridImage={handleToggleGridImage}
           handleMapImageDelete={handleMapImageDelete}
