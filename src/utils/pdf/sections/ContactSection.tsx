@@ -4,14 +4,14 @@ import { PropertyData } from '@/types/property';
 import { AgencySettings } from '@/types/agency';
 import { Header } from '../components/Header';
 import { Footer } from '../components/Footer';
+import { supabase } from '@/integrations/supabase/client';
+import { useEffect, useState } from 'react';
 
 export const ContactSection = ({ property, settings, styles }: {
   property: PropertyData;
   settings: AgencySettings;
   styles: any;
 }) => {
-  const agent = settings.agents?.find(a => a.id === property.agent_id);
-
   return (
     <Page size="A4" style={styles.page}>
       <Header settings={settings} styles={styles} />
@@ -23,15 +23,10 @@ export const ContactSection = ({ property, settings, styles }: {
           <Text style={styles.contactInfo}>{settings.phone}</Text>
           <Text style={styles.contactInfo}>{settings.email}</Text>
         </View>
-        {agent && (
+        {property.agent_id && (
           <View style={styles.contactBlock}>
             <Text style={styles.contactTitle}>Your Agent</Text>
-            <Text style={styles.contactInfo}>{agent.full_name}</Text>
-            <Text style={styles.contactInfo}>{agent.email}</Text>
-            <Text style={styles.contactInfo}>{agent.phone}</Text>
-            {agent.whatsapp_number && (
-              <Text style={styles.contactInfo}>WhatsApp: {agent.whatsapp_number}</Text>
-            )}
+            <Text style={styles.contactInfo}>{property.agent_id}</Text>
           </View>
         )}
       </View>

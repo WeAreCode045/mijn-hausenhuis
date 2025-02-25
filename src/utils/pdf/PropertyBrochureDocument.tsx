@@ -31,6 +31,25 @@ export const PropertyBrochureDocument = ({ property, settings, template }: Prope
 
   const sections = template || defaultSections;
   
+  const renderSection = (section: Section) => {
+    switch (section.type) {
+      case 'cover':
+        return <CoverSection key={section.id} property={property} settings={settings} styles={styles} />;
+      case 'details':
+        return <DetailsSection key={section.id} property={property} settings={settings} styles={styles} />;
+      case 'areas':
+        return <AreasSection key={section.id} property={property} settings={settings} styles={styles} />;
+      case 'floorplans':
+        return <FloorplansSection key={section.id} property={property} settings={settings} styles={styles} />;
+      case 'location':
+        return <LocationSection key={section.id} property={property} settings={settings} styles={styles} />;
+      case 'contact':
+        return <ContactSection key={section.id} property={property} settings={settings} styles={styles} />;
+      default:
+        return null;
+    }
+  };
+
   return (
     <Document>
       {sections.map((section) => renderSection(section))}
