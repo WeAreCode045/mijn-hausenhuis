@@ -3,12 +3,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { PropertyArea } from "@/types/property";
+import { PropertyArea, PropertyImage } from "@/types/property";
 import { PlusCircle, MinusCircle, ImagePlus } from "lucide-react";
 import { ImageSelectDialog } from "./ImageSelectDialog";
 
 interface PropertyAreasProps {
   areas: PropertyArea[];
+  images: PropertyImage[];
   onAdd: () => void;
   onRemove: (id: string) => void;
   onUpdate: (id: string, field: keyof PropertyArea, value: string | string[]) => void;
@@ -18,6 +19,7 @@ interface PropertyAreasProps {
 
 export function PropertyAreas({
   areas,
+  images,
   onAdd,
   onRemove,
   onUpdate,
@@ -59,7 +61,7 @@ export function PropertyAreas({
           <div className="space-y-2">
             <Label>Area Images</Label>
             <ImageSelectDialog 
-              images={[]} 
+              images={images}
               onSelect={(selectedImages) => {
                 onUpdate(area.id, 'imageIds', selectedImages);
               }}
