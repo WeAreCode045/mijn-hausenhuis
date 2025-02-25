@@ -68,7 +68,7 @@ export function PropertyAreas({
               buttonText="Select Images"
             />
             {area.imageIds && area.imageIds.length > 0 && (
-              <div className="grid grid-cols-3 sm:grid-cols-4 gap-4 mt-4">
+              <div className="grid grid-cols-2 gap-4 mt-4">
                 {area.imageIds.map((imageId) => {
                   const image = images.find(img => img.id === imageId);
                   if (!image) return null;
@@ -78,7 +78,7 @@ export function PropertyAreas({
                       <img
                         src={image.url}
                         alt="Area"
-                        className="w-full aspect-square object-cover rounded-lg"
+                        className="w-full aspect-video object-cover rounded-lg"
                       />
                       <Button
                         type="button"

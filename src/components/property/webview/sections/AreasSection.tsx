@@ -32,7 +32,7 @@ export function AreasSection({ property, settings }: WebViewSectionProps) {
             </div>
 
             {area.imageIds && area.imageIds.length > 0 && (
-              <div className="grid grid-cols-3 gap-4">
+              <div className="grid grid-cols-2 gap-4">
                 {area.imageIds.map((imageId, imgIndex) => {
                   const imageUrl = getImageUrl(imageId);
                   if (!imageUrl) return null;
