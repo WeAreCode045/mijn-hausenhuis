@@ -5,12 +5,11 @@ export const usePageCalculation = () => {
   const calculateTotalPages = (propertyData: PropertyData | null, isPrintView: boolean = false) => {
     if (!propertyData) return 0;
     
-    // Start with overview and details pages
-    let total = 2;
+    let total = 2; // Overview and Details pages
     
-    // Add areas pages
+    // Add area pages
     if (propertyData.areas && propertyData.areas.length > 0) {
-      total += 1;
+      total += Math.ceil(propertyData.areas.length / 2);
     }
     
     // Add floorplans page if there are floorplans
