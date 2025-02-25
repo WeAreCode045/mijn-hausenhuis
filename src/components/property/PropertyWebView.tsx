@@ -32,12 +32,16 @@ export function PropertyWebView({ property, open, onOpenChange }: PropertyWebVie
     currentPage,
     setCurrentPage,
     handleShare,
-    handlePrint
+    handlePrint,
+    handleNext,
+    handlePrevious
   } = usePropertyWebView();
 
   if (!propertyData) {
     return <div>Loading...</div>;
   }
+
+  const totalPages = calculateTotalPages(propertyData);
 
   if (typeof open !== 'undefined' && onOpenChange) {
     return (
@@ -54,12 +58,10 @@ export function PropertyWebView({ property, open, onOpenChange }: PropertyWebVie
         setSelectedImage={setSelectedImage}
         handleShare={handleShare}
         handlePrint={handlePrint}
-        handleDownload={async () => {}} // Add empty function to satisfy type
+        handleDownload={async () => {}}
       />
     );
   }
-
-  const totalPages = calculateTotalPages(propertyData);
 
   return (
     <div className="min-h-screen bg-white relative">
@@ -93,7 +95,7 @@ export function PropertyWebView({ property, open, onOpenChange }: PropertyWebVie
                       setSelectedImage={setSelectedImage}
                       handleShare={handleShare}
                       handlePrint={handlePrint}
-                      handleDownload={async () => {}} // Add empty function to satisfy type
+                      handleDownload={async () => {}}
                     />
                   </div>
                 </div>
@@ -111,8 +113,8 @@ export function PropertyWebView({ property, open, onOpenChange }: PropertyWebVie
               <WebViewFooter 
                 currentPage={currentPage}
                 totalPages={totalPages}
-                onPrevious={() => setCurrentPage(currentPage - 1)}
-                onNext={() => setCurrentPage(currentPage + 1)}
+                onPrevious={handlePrevious}
+                onNext={handleNext}
                 onShare={handleShare}
                 onPrint={handlePrint}
               />

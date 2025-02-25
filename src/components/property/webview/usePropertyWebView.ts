@@ -22,11 +22,22 @@ export function usePropertyWebView() {
       case 'email':
         window.location.href = `mailto:?subject=${encodeURIComponent('Property')}&body=${encodeURIComponent(text + '\n\n' + shareUrl)}`;
         break;
+      case 'copy':
+        await navigator.clipboard.writeText(shareUrl);
+        break;
     }
   };
 
   const handlePrint = () => {
     window.print();
+  };
+
+  const handleNext = () => {
+    setCurrentPage(prev => prev + 1);
+  };
+
+  const handlePrevious = () => {
+    setCurrentPage(prev => prev - 1);
   };
 
   return {
@@ -35,6 +46,8 @@ export function usePropertyWebView() {
     currentPage,
     setCurrentPage,
     handleShare,
-    handlePrint
+    handlePrint,
+    handleNext,
+    handlePrevious
   };
 }
