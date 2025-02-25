@@ -1,9 +1,12 @@
 
 import { useState } from "react";
+import { usePageCalculation } from "./hooks/usePageCalculation";
+import type { PropertyData } from "@/types/property";
 
-export function usePropertyWebView() {
+export function usePropertyWebView(propertyData?: PropertyData) {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(0);
+  const { calculateTotalPages } = usePageCalculation();
 
   const handleShare = async (platform: string) => {
     const shareUrl = window.location.href;
@@ -22,11 +25,28 @@ export function usePropertyWebView() {
       case 'email':
         window.location.href = `mailto:?subject=${encodeURIComponent('Property')}&body=${encodeURIComponent(text + '\n\n' + shareUrl)}`;
         break;
+      case 'copy':
+        await navigator.clipboard.writeText(shareUrl);
+        break;
     }
   };
 
   const handlePrint = () => {
     window.print();
+  };
+
+  const totalPages = propertyData ? calculateTotalPages(propertyData) : 0;
+
+  const handleNext = () => {
+    if (currentPage < totalPages - 1) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
+
+  const handlePrevious = () => {
+    if (currentPage > 0) {
+      setCurrentPage(currentPage - 1);
+    }
   };
 
   return {
@@ -35,6 +55,9 @@ export function usePropertyWebView() {
     currentPage,
     setCurrentPage,
     handleShare,
-    handlePrint
+    handlePrint,
+    handleNext,
+    handlePrevious,
+    totalPages
   };
 }
