@@ -38,7 +38,7 @@ export const AreasSection = ({ property, settings, styles }: {
                   <Image
                     key={imgIndex}
                     src={imageUrl}
-                    style={[styles.areaGridImage, { width: '31%' }]} // Update to roughly 1/3 width with gap consideration
+                    style={styles.areaGridImage}
                   />
                 );
               })}
