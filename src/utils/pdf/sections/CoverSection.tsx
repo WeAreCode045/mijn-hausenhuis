@@ -24,18 +24,8 @@ export const CoverSection = ({ property, settings, styles }: {
     )}
 
     <View style={styles.imageGrid}>
-      {(property.gridImages || []).slice(0, 3).map((url, index) => (
-        <Image 
-          key={index} 
-          src={url} 
-          style={{
-            width: '31%',
-            height: 140,
-            objectFit: 'cover',
-            borderRadius: 8,
-            marginBottom: 15
-          }} 
-        />
+      {(property.gridImages || []).slice(0, 4).map((url, index) => (
+        <Image key={index} src={url} style={styles.gridImage} />
       ))}
     </View>
 

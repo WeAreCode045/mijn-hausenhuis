@@ -23,33 +23,33 @@ export const PropertyBrochureDocument = ({ property, settings, template }: Prope
   const defaultSections: Section[] = [
     { id: 'cover', type: 'cover', title: 'Cover Page', design: { padding: '2rem', containers: [] } },
     { id: 'details', type: 'details', title: 'Property Details', design: { padding: '2rem', containers: [] } },
-    { id: 'areas', type: 'areas', title: 'Areas', design: { padding: '2rem', containers: [] } },
-    { id: 'floorplans', type: 'floorplans', title: 'Floorplans', design: { padding: '2rem', containers: [] } },
     { id: 'location', type: 'location', title: 'Location', design: { padding: '2rem', containers: [] } },
+    { id: 'floorplans', type: 'floorplans', title: 'Floorplans', design: { padding: '2rem', containers: [] } },
+    { id: 'areas', type: 'areas', title: 'Areas', design: { padding: '2rem', containers: [] } },
     { id: 'contact', type: 'contact', title: 'Contact', design: { padding: '2rem', containers: [] } }
   ];
 
-  const sections = template || defaultSections;
-  
   const renderSection = (section: Section) => {
     switch (section.type) {
       case 'cover':
-        return <CoverSection key={section.id} property={property} settings={settings} styles={styles} />;
+        return <CoverSection property={property} settings={settings} styles={styles} />;
       case 'details':
-        return <DetailsSection key={section.id} property={property} settings={settings} styles={styles} />;
+        return <DetailsSection property={property} settings={settings} styles={styles} />;
       case 'areas':
-        return <AreasSection key={section.id} property={property} settings={settings} styles={styles} />;
+        return <AreasSection property={property} settings={settings} styles={styles} />;
       case 'floorplans':
-        return <FloorplansSection key={section.id} property={property} settings={settings} styles={styles} />;
+        return <FloorplansSection property={property} settings={settings} styles={styles} />;
       case 'location':
-        return <LocationSection key={section.id} property={property} settings={settings} styles={styles} />;
+        return <LocationSection property={property} settings={settings} styles={styles} />;
       case 'contact':
-        return <ContactSection key={section.id} property={property} settings={settings} styles={styles} />;
+        return <ContactSection property={property} settings={settings} styles={styles} />;
       default:
         return null;
     }
   };
 
+  const sections = template || defaultSections;
+  
   return (
     <Document>
       {sections.map((section) => renderSection(section))}

@@ -1,3 +1,4 @@
+
 import { StyleSheet } from '@react-pdf/renderer';
 import { AgencySettings } from '@/types/agency';
 
@@ -105,8 +106,8 @@ export const createStyles = (settings: AgencySettings) => StyleSheet.create({
     aspectRatio: '4:3',
   },
   areaGridImage: {
-    width: '31%',
-    height: 140,
+    width: '31%', // Updated from 48% to 31% for 3-column layout
+    height: 180, // Adjusted height to maintain aspect ratio
     objectFit: 'cover',
     borderRadius: 8,
     marginBottom: 15,
