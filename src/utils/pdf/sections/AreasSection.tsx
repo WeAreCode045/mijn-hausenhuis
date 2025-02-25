@@ -38,7 +38,12 @@ export const AreasSection = ({ property, settings, styles }: {
                   <Image
                     key={imgIndex}
                     src={imageUrl}
-                    style={styles.areaGridImage}
+                    style={{
+                      ...styles.areaGridImage,
+                      aspectRatio: '4/3',
+                      width: '31%',
+                      height: 'auto'
+                    }}
                   />
                 );
               })}
