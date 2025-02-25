@@ -18,93 +18,18 @@ interface SectionConfigProps {
 
 export const getSections = ({ property, settings, currentPage, isPrintView, waitForPlaces }: SectionConfigProps) => {
   const key = `page-${currentPage}`;
-  const sections = [
-    {
-      id: 'overview',
-      title: 'Overview',
-      content: (
-        <div className="h-full flex flex-col">
-          <div className="flex-1 overflow-y-auto">
-            <OverviewSection key={key} property={property} settings={settings} />
-          </div>
-          {isPrintView && (
-            <PrintFooter property={property} currentPage={currentPage} settings={settings} />
-          )}
-        </div>
-      )
-    },
-    {
-      id: 'details',
-      title: 'Details',
-      content: (
-        <div className="h-full flex flex-col">
-          <div className="flex-1 overflow-y-auto">
-            <div className="space-y-4">
-              <DetailsSection key={key} property={property} settings={settings} />
-            </div>
-          </div>
-          {isPrintView && (
-            <PrintFooter property={property} currentPage={currentPage} settings={settings} />
-          )}
-        </div>
-      )
-    }
-  ];
+  
+  // Array to store all sections
+  const sections = [];
 
-  // Add area sections if there are areas
-  if (property.areas && property.areas.length > 0) {
-    sections.push({
-      id: 'areas',
-      title: 'Areas',
-      content: (
-        <div className="h-full flex flex-col">
-          <div className="flex-1 overflow-y-auto">
-            <div className="space-y-4">
-              <AreasSection 
-                key={key} 
-                property={{ ...property }} 
-                settings={settings} 
-              />
-            </div>
-          </div>
-          {isPrintView && (
-            <PrintFooter property={property} currentPage={currentPage} settings={settings} />
-          )}
-        </div>
-      )
-    });
-  }
-
-  // Add floorplans section if there are floorplans
-  if (property.floorplans && property.floorplans.length > 0) {
-    sections.push({
-      id: 'floorplans',
-      title: 'Floorplans',
-      content: (
-        <div className="h-full flex flex-col">
-          <div className="flex-1 overflow-y-auto">
-            <div className="space-y-4">
-              <FloorplansSection key={key} property={property} settings={settings} />
-            </div>
-          </div>
-          {isPrintView && (
-            <PrintFooter property={property} currentPage={currentPage} settings={settings} />
-          )}
-        </div>
-      )
-    });
-  }
-
-  // Add neighborhood section
+  // Add Overview section
   sections.push({
-    id: 'neighborhood',
-    title: 'Neighborhood',
+    id: 'overview',
+    title: 'Overview',
     content: (
       <div className="h-full flex flex-col">
         <div className="flex-1 overflow-y-auto">
-          <div className="space-y-4">
-            <NeighborhoodSection key={key} property={property} settings={settings} waitForPlaces={waitForPlaces} />
-          </div>
+          <OverviewSection key={key} property={property} settings={settings} />
         </div>
         {isPrintView && (
           <PrintFooter property={property} currentPage={currentPage} settings={settings} />
@@ -113,7 +38,84 @@ export const getSections = ({ property, settings, currentPage, isPrintView, wait
     )
   });
 
-  // Add contact section if not in print view
+  // Add Details section
+  sections.push({
+    id: 'details',
+    title: 'Details',
+    content: (
+      <div className="h-full flex flex-col">
+        <div className="flex-1 overflow-y-auto">
+          <DetailsSection key={key} property={property} settings={settings} />
+        </div>
+        {isPrintView && (
+          <PrintFooter property={property} currentPage={currentPage} settings={settings} />
+        )}
+      </div>
+    )
+  });
+
+  // Add Areas sections if there are areas
+  if (property.areas && property.areas.length > 0) {
+    for (let i = 0; i < Math.ceil(property.areas.length / 2); i++) {
+      sections.push({
+        id: `areas-${i}`,
+        title: `Areas ${i + 1}`,
+        content: (
+          <div className="h-full flex flex-col">
+            <div className="flex-1 overflow-y-auto">
+              <AreasSection 
+                key={`${key}-areas-${i}`} 
+                property={{
+                  ...property,
+                  currentPath: `areas-${i}`
+                }} 
+                settings={settings} 
+              />
+            </div>
+            {isPrintView && (
+              <PrintFooter property={property} currentPage={currentPage} settings={settings} />
+            )}
+          </div>
+        )
+      });
+    }
+  }
+
+  // Add Floorplans section if there are floorplans
+  if (property.floorplans && property.floorplans.length > 0) {
+    sections.push({
+      id: 'floorplans',
+      title: 'Floorplans',
+      content: (
+        <div className="h-full flex flex-col">
+          <div className="flex-1 overflow-y-auto">
+            <FloorplansSection key={key} property={property} settings={settings} />
+          </div>
+          {isPrintView && (
+            <PrintFooter property={property} currentPage={currentPage} settings={settings} />
+          )}
+        </div>
+      )
+    });
+  }
+
+  // Add Neighborhood section
+  sections.push({
+    id: 'neighborhood',
+    title: 'Neighborhood',
+    content: (
+      <div className="h-full flex flex-col">
+        <div className="flex-1 overflow-y-auto">
+          <NeighborhoodSection key={key} property={property} settings={settings} waitForPlaces={waitForPlaces} />
+        </div>
+        {isPrintView && (
+          <PrintFooter property={property} currentPage={currentPage} settings={settings} />
+        )}
+      </div>
+    )
+  });
+
+  // Add Contact section if not in print view
   if (!isPrintView) {
     sections.push({
       id: 'contact',
@@ -121,9 +123,7 @@ export const getSections = ({ property, settings, currentPage, isPrintView, wait
       content: (
         <div className="h-full flex flex-col">
           <div className="flex-1 overflow-y-auto">
-            <div className="space-y-4">
-              <ContactSection key={key} property={property} settings={settings} />
-            </div>
+            <ContactSection key={key} property={property} settings={settings} />
           </div>
         </div>
       )

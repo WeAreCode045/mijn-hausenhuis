@@ -23,6 +23,7 @@ export function PropertyWebViewContent({
   property,
   settings,
   currentPage,
+  setCurrentPage,
   selectedImage,
   setSelectedImage,
   handleShare,
@@ -60,10 +61,10 @@ export function PropertyWebViewContent({
           style={{ backgroundColor: settings?.primaryColor || '#9b87f5' }}
         >
           <span className="font-semibold text-white">
-            {property.title}
+            {sections[currentPage]?.title}
           </span>
           <span className="text-white text-sm">
-            {currentPage + 1}
+            {currentPage + 1} / {sections.length}
           </span>
         </div>
       )}
