@@ -27,8 +27,8 @@ export const getSections = ({ property, settings, currentPage, isPrintView, wait
     id: 'overview',
     title: 'Overview',
     content: (
-      <div className="h-full flex flex-col">
-        <div className="flex-1 overflow-y-auto">
+      <div className="h-full flex flex-col overflow-auto">
+        <div className="flex-1">
           <OverviewSection key={key} property={property} settings={settings} />
         </div>
         {isPrintView && (
@@ -43,8 +43,8 @@ export const getSections = ({ property, settings, currentPage, isPrintView, wait
     id: 'details',
     title: 'Details',
     content: (
-      <div className="h-full flex flex-col">
-        <div className="flex-1 overflow-y-auto">
+      <div className="h-full flex flex-col overflow-auto">
+        <div className="flex-1">
           <DetailsSection key={key} property={property} settings={settings} />
         </div>
         {isPrintView && (
@@ -61,8 +61,8 @@ export const getSections = ({ property, settings, currentPage, isPrintView, wait
         id: `areas-${i}`,
         title: `Areas ${i + 1}`,
         content: (
-          <div className="h-full flex flex-col">
-            <div className="flex-1 overflow-y-auto">
+          <div className="h-full flex flex-col overflow-auto">
+            <div className="flex-1">
               <AreasSection 
                 key={`${key}-areas-${i}`} 
                 property={{
@@ -87,8 +87,8 @@ export const getSections = ({ property, settings, currentPage, isPrintView, wait
       id: 'floorplans',
       title: 'Floorplans',
       content: (
-        <div className="h-full flex flex-col">
-          <div className="flex-1 overflow-y-auto">
+        <div className="h-full flex flex-col overflow-auto">
+          <div className="flex-1">
             <FloorplansSection key={key} property={property} settings={settings} />
           </div>
           {isPrintView && (
@@ -104,8 +104,8 @@ export const getSections = ({ property, settings, currentPage, isPrintView, wait
     id: 'neighborhood',
     title: 'Neighborhood',
     content: (
-      <div className="h-full flex flex-col">
-        <div className="flex-1 overflow-y-auto">
+      <div className="h-full flex flex-col overflow-auto">
+        <div className="flex-1">
           <NeighborhoodSection key={key} property={property} settings={settings} waitForPlaces={waitForPlaces} />
         </div>
         {isPrintView && (
@@ -121,8 +121,8 @@ export const getSections = ({ property, settings, currentPage, isPrintView, wait
       id: 'contact',
       title: 'Contact',
       content: (
-        <div className="h-full flex flex-col">
-          <div className="flex-1 overflow-y-auto">
+        <div className="h-full flex flex-col overflow-auto">
+          <div className="flex-1">
             <ContactSection key={key} property={property} settings={settings} />
           </div>
         </div>
