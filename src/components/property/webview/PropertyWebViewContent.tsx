@@ -55,15 +55,15 @@ export function PropertyWebViewContent({
   };
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full max-h-full">
       {/* Header */}
       <div className="border-b flex-shrink-0">
         <WebViewHeader settings={settings} />
       </div>
 
       {/* Content Section - Make it scrollable */}
-      <div className="flex-1 overflow-hidden">
-        <div className="h-full overflow-y-auto px-4 py-6">
+      <div className="flex-1 overflow-y-auto">
+        <div className="p-4">
           {sections[currentPage]?.content}
         </div>
       </div>
