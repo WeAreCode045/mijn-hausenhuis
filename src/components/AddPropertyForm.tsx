@@ -67,14 +67,14 @@ export function AddPropertyForm() {
   };
 
   // Create adapter functions to match expected types
-  const handleRemoveImageAdapter = async (index: number) => {
+  const handleRemoveImageAdapter = (index: number) => {
     const imageToRemove = formData.images[index];
     if (imageToRemove) {
-      await handleRemoveImage(imageToRemove.id);
+      handleRemoveImage(imageToRemove.id);
     }
   };
 
-  const handleToggleGridImageAdapter = async (url: string) => {
+  const handleToggleGridImageAdapter = (url: string) => {
     const newGridImages = [...(formData.gridImages || [])];
     if (newGridImages.includes(url)) {
       newGridImages.splice(newGridImages.indexOf(url), 1);

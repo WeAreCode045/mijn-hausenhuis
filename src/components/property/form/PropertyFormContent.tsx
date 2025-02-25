@@ -1,4 +1,3 @@
-
 import { PropertyDetails } from "../PropertyDetails";
 import { PropertyFeatures } from "../PropertyFeatures";
 import { PropertyLocation } from "../PropertyLocation";
@@ -22,8 +21,8 @@ interface PropertyFormContentProps {
   handleAreaPhotosUpload: (e: React.ChangeEvent<HTMLInputElement>) => Promise<void>;
   handleFloorplanUpload: (e: React.ChangeEvent<HTMLInputElement>) => Promise<void>;
   handleRemoveImage: (index: number) => Promise<void>;
-  handleRemoveAreaPhoto: (index: number) => Promise<void>;
-  handleRemoveFloorplan: (index: number) => Promise<void>;
+  handleRemoveAreaPhoto: (index: number) => void;
+  handleRemoveFloorplan: (index: number) => void;
   handleSetFeaturedImage: (url: string) => void;
   handleToggleGridImage: (url: string) => void;
   handleMapImageDelete: () => void;
@@ -52,39 +51,23 @@ export function PropertyFormContent({
   handleMapImageDelete
 }: PropertyFormContentProps) {
   const steps = [
-    <PropertyDetails 
-      key="details" 
-      id={formData.id}
-      title={formData.title}
-      price={formData.price}
-      address={formData.address}
-      buildYear={formData.buildYear}
-      sqft={formData.sqft}
-      livingArea={formData.livingArea}
-      bedrooms={formData.bedrooms}
-      bathrooms={formData.bathrooms}
-      garages={formData.garages}
-      energyLabel={formData.energyLabel}
-      hasGarden={formData.hasGarden}
-      onChange={(e) => onFieldChange(e.target.name as keyof PropertyFormData, e.target.value)}
-    />,
+    <PropertyDetails key="details" formData={formData} onFieldChange={onFieldChange} />,
     <PropertyFeatures 
       key="features"
       features={formData.features} 
       onAdd={onAddFeature}
       onRemove={onRemoveFeature}
-      onUpdate={(id, description) => onUpdateFeature(id, 'description', description)}
+      onUpdate={onUpdateFeature}
     />,
     <PropertyLocation 
       key="location"
-      id={formData.id}
       address={formData.address}
-      description={formData.description}
       location_description={formData.location_description}
       map_image={formData.map_image}
+      latitude={formData.latitude}
+      longitude={formData.longitude}
       nearby_places={formData.nearby_places}
-      onChange={(e) => onFieldChange(e.target.name as keyof PropertyFormData, e.target.value)}
-      onLocationFetch={async () => {}} // Add proper implementation if needed
+      onFieldChange={onFieldChange}
       onMapImageDelete={handleMapImageDelete}
     />,
     <PropertyAreas
@@ -100,20 +83,18 @@ export function PropertyFormContent({
     <PropertyImages 
       key="images"
       images={formData.images}
-      floorplans={formData.floorplans}
       areaPhotos={formData.areaPhotos}
+      floorplans={formData.floorplans}
       featuredImage={formData.featuredImage}
       gridImages={formData.gridImages}
-      onImageUpload={handleImageUpload}
-      onFeaturedImageUpload={handleImageUpload}
-      onGridImageUpload={handleImageUpload}
-      onFloorplanUpload={handleFloorplanUpload}
-      onAreaPhotosUpload={handleAreaPhotosUpload}
-      onRemoveImage={handleRemoveImage}
-      onRemoveFloorplan={handleRemoveFloorplan}
-      onRemoveAreaPhoto={handleRemoveAreaPhoto}
-      onSetFeaturedImage={handleSetFeaturedImage}
-      onToggleGridImage={handleToggleGridImage}
+      handleImageUpload={handleImageUpload}
+      handleAreaPhotosUpload={handleAreaPhotosUpload}
+      handleFloorplanUpload={handleFloorplanUpload}
+      handleRemoveImage={handleRemoveImage}
+      handleRemoveAreaPhoto={handleRemoveAreaPhoto}
+      handleRemoveFloorplan={handleRemoveFloorplan}
+      handleSetFeaturedImage={handleSetFeaturedImage}
+      handleToggleGridImage={handleToggleGridImage}
     />
   ];
 
