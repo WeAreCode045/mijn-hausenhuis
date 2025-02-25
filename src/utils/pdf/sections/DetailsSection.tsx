@@ -43,12 +43,16 @@ export const DetailsSection = ({ property, settings, styles }: {
     </View>
     {property.features && property.features.length > 0 && (
       <View style={[styles.descriptionBlock, { marginTop: 20 }]}>
-        <Text style={[styles.sectionTitle, { fontSize: 18 }]}>Features</Text>
-        {property.features.map((feature, index) => (
-          <Text key={index} style={[styles.text, { marginBottom: 5 }]}>
-            • {feature.description}
-          </Text>
-        ))}
+        <Text style={[styles.sectionTitle, { fontSize: 18, marginBottom: 10 }]}>Features</Text>
+        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10 }}>
+          {property.features.map((feature, index) => (
+            <View key={index} style={{ width: '48%' }}>
+              <Text style={[styles.text, { marginBottom: 5 }]}>
+                • {feature.description}
+              </Text>
+            </View>
+          ))}
+        </View>
       </View>
     )}
     <Footer settings={settings} styles={styles} />

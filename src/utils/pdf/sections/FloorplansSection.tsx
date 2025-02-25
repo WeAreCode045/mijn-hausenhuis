@@ -13,9 +13,20 @@ export const FloorplansSection = ({ property, settings, styles }: {
   <Page size="A4" style={styles.page}>
     <Header settings={settings} styles={styles} />
     <Text style={styles.sectionTitle}>Floorplans</Text>
-    <View style={styles.imageGrid}>
+    <View style={{ gap: 20 }}>
       {(property.floorplans || []).map((plan, index) => (
-        <Image key={index} src={plan} style={styles.gridImage} />
+        <View key={index} style={{ width: '100%', marginBottom: 20 }}>
+          <Image 
+            src={plan} 
+            style={{
+              width: '100%',
+              height: 400,
+              objectFit: 'contain',
+              backgroundColor: '#f8f9fa',
+              borderRadius: 8
+            }} 
+          />
+        </View>
       ))}
     </View>
     <Footer settings={settings} styles={styles} />

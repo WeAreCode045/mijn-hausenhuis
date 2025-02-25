@@ -36,6 +36,11 @@ export const generatePropertyPDF = async (property: PropertyData, settings: Agen
       }
     }
 
+    // Filter out any non-existent images from gridImages
+    const validGridImages = (property.gridImages || []).filter(url => 
+      property.images.some(img => img.url === url)
+    );
+
     // Ensure all arrays exist and are properly populated
     const sanitizedProperty = {
       ...property,
@@ -43,17 +48,18 @@ export const generatePropertyPDF = async (property: PropertyData, settings: Agen
         ...area,
         imageIds: (area.imageIds || []).filter(id => 
           property.images.some(img => img.id === id)
-        ) // Filter out deleted images
+        )
       })),
       images: property.images || [],
-      gridImages: (property.gridImages || []).slice(0, 3), // Limit to 3 images for cover grid
+      gridImages: validGridImages.slice(0, 3),
       features: (property.features || []).slice(0, 10),
       nearby_places: (property.nearby_places || []).slice(0, 5),
-      agent: agent // Add agent details to property
+      agent: agent
     };
 
     console.log('Generating PDF with areas:', sanitizedProperty.areas);
     console.log('Total images:', sanitizedProperty.images.length);
+    console.log('Valid grid images:', validGridImages.length);
     console.log('Agent details:', agent);
 
     const blob = await pdf(PropertyBrochureDocument({ 
