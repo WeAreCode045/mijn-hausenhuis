@@ -35,7 +35,7 @@ const createStyles = (settings: AgencySettings) => StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    backgroundColor: settings.primaryColor || '#1a1a1a',
+    backgroundColor: settings.primaryColor || '#9b87f5',
     padding: 20,
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -98,12 +98,14 @@ const createStyles = (settings: AgencySettings) => StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: 15,
+    marginBottom: 60,
   },
   gridImage: {
     width: '23%',
     height: 150,
     objectFit: 'cover',
     borderRadius: 8,
+    aspectRatio: '4:3',
   },
   areaGridImage: {
     width: '48%',
@@ -113,9 +115,10 @@ const createStyles = (settings: AgencySettings) => StyleSheet.create({
   },
   fullWidthImage: {
     width: '100%',
-    height: 300,
+    height: 400,
     objectFit: 'cover',
     borderRadius: 8,
+    marginBottom: 15,
   },
   categoryBlock: {
     backgroundColor: settings.primaryColor || '#40497A',
@@ -294,7 +297,7 @@ export const PropertyBrochureDocument = ({ property, settings, template }: Prope
             {property.featuredImage && (
               <Image 
                 src={property.featuredImage} 
-                style={[styles.fullWidthImage, { height: 500 }]} 
+                style={styles.fullWidthImage} 
               />
             )}
 
