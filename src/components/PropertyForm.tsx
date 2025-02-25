@@ -58,14 +58,14 @@ export function PropertyForm({ onSubmit }: PropertyFormProps) {
   };
 
   // Create adapter functions to match expected types
-  const handleRemoveImageAdapter = (index: number) => {
+  const handleRemoveImageAdapter = async (index: number) => {
     const imageToRemove = formData.images[index];
     if (imageToRemove) {
-      handleRemoveImage(imageToRemove.id);
+      await handleRemoveImage(imageToRemove.id);
     }
   };
 
-  const handleToggleGridImageAdapter = (url: string) => {
+  const handleToggleGridImageAdapter = async (url: string) => {
     const newGridImages = [...(formData.gridImages || [])];
     if (newGridImages.includes(url)) {
       newGridImages.splice(newGridImages.indexOf(url), 1);
