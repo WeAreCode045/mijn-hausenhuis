@@ -55,20 +55,27 @@ export function PropertyWebViewContent({
   };
 
   return (
-    <div className="flex flex-col h-full max-h-full relative">
-      {/* Header */}
-      <div className="border-b flex-shrink-0">
-        <WebViewHeader settings={settings} />
-      </div>
-
-      {/* Content Section - Make it scrollable */}
-      <div className="flex-1 overflow-y-scroll scrollbar-thin scrollbar-track-transparent scrollbar-thumb-gray-400 pb-20">
-        <div className="p-4">
-          {sections[currentPage]?.content}
+    <>
+      <div className="flex flex-col h-full max-h-full">
+        {/* Header */}
+        <div className="border-b flex-shrink-0">
+          <WebViewHeader settings={settings} />
         </div>
+
+        {/* Content Section - Make it scrollable */}
+        <div className="flex-1 overflow-y-scroll scrollbar-thin scrollbar-track-transparent scrollbar-thumb-gray-400">
+          <div className="p-4">
+            {sections[currentPage]?.content}
+          </div>
+        </div>
+
+        <ImagePreviewDialog 
+          selectedImage={selectedImage}
+          onClose={() => setSelectedImage(null)}
+        />
       </div>
 
-      {/* Fixed Navigation Footer */}
+      {/* Fixed Navigation Footer - Outside the content container */}
       {!isPrintView && (
         <div 
           className="fixed bottom-0 left-0 right-0 p-4 border-t z-10"
@@ -106,11 +113,6 @@ export function PropertyWebViewContent({
           </div>
         </div>
       )}
-
-      <ImagePreviewDialog 
-        selectedImage={selectedImage}
-        onClose={() => setSelectedImage(null)}
-      />
-    </div>
+    </>
   );
 }

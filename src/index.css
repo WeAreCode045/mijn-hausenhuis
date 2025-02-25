@@ -113,4 +113,8 @@
     max-width: 800px;
     min-width: 800px;
   }
+
+  .h-\[842px\] {
+    height: 80%;
+  }
 }
