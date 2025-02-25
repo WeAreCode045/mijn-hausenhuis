@@ -1,3 +1,4 @@
+
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -208,6 +209,7 @@ export function PropertyFormContent({
         <div className="col-span-2">
           <PropertyAreas
             areas={formData.areas}
+            images={formData.images}
             onAdd={onAddArea}
             onRemove={onRemoveArea}
             onUpdate={onUpdateArea}

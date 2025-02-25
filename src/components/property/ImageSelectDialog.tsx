@@ -20,7 +20,7 @@ interface ImageSelectDialogProps {
 }
 
 export function ImageSelectDialog({
-  images,
+  images = [],
   onSelect,
   buttonText,
   maxSelect,
@@ -64,7 +64,7 @@ export function ImageSelectDialog({
           <DialogTitle>Select Images</DialogTitle>
         </DialogHeader>
         <div className="grid grid-cols-3 sm:grid-cols-4 gap-4 mt-4 max-h-[60vh] overflow-y-auto p-4">
-          {images.map((image) => (
+          {images?.map((image) => (
             <div
               key={image.id}
               className="relative group cursor-pointer"
