@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { PropertyArea } from "@/types/property";
-import { PlusCircle, MinusCircle } from "lucide-react";
+import { PlusCircle, MinusCircle, ImagePlus, Trash2 } from "lucide-react";
 
 interface PropertyAreasProps {
   areas: PropertyArea[];
@@ -55,6 +55,40 @@ export function PropertyAreas({
             onChange={(e) => onUpdate(area.id, 'description', e.target.value)}
             placeholder="Area Description"
           />
+          <div className="space-y-2">
+            <Label>Area Images</Label>
+            <div className="grid grid-cols-2 gap-2">
+              {area.imageIds.map((imageId) => (
+                <div key={imageId} className="relative group">
+                  <Button
+                    type="button"
+                    variant="destructive"
+                    size="icon"
+                    className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity w-6 h-6"
+                    onClick={() => onImageRemove(area.id, imageId)}
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </Button>
+                </div>
+              ))}
+            </div>
+            <div className="flex items-center gap-2">
+              <Input
+                type="file"
+                onChange={(e) => {
+                  if (e.target.files) {
+                    onImageUpload(area.id, e.target.files);
+                  }
+                }}
+                accept="image/*"
+                multiple
+                className="flex-1"
+              />
+              <Button type="button" variant="outline" size="icon">
+                <ImagePlus className="w-4 h-4" />
+              </Button>
+            </div>
+          </div>
         </div>
       ))}
     </div>
