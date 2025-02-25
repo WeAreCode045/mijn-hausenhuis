@@ -1,3 +1,4 @@
+
 import { PropertyDetails } from "../PropertyDetails";
 import { PropertyFeatures } from "../PropertyFeatures";
 import { PropertyLocation } from "../PropertyLocation";
@@ -23,9 +24,9 @@ interface PropertyFormContentProps {
   handleRemoveImage: (index: number) => Promise<void>;
   handleRemoveAreaPhoto: (index: number) => Promise<void>;
   handleRemoveFloorplan: (index: number) => Promise<void>;
-  handleSetFeaturedImage: (url: string | null) => void;
-  handleToggleGridImage: (urls: string[]) => void;
-  handleMapImageDelete: () => Promise<void>;
+  handleSetFeaturedImage: (url: string) => void;
+  handleToggleGridImage: (url: string) => void;
+  handleMapImageDelete: () => void;
 }
 
 export function PropertyFormContent({ 
