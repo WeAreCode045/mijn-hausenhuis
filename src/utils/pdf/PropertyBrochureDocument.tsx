@@ -1,14 +1,15 @@
 
-import { Document, Page, View, Text, Image } from '@react-pdf/renderer';
+import { Document } from '@react-pdf/renderer';
 import { PropertyData } from '@/types/property';
 import { AgencySettings } from '@/types/agency';
 import { Section } from '@/components/brochure/TemplateBuilder';
 import { createStyles } from './styles/pdfStyles';
-import { Header } from './components/Header';
-import { Footer } from './components/Footer';
 import { CoverSection } from './sections/CoverSection';
 import { DetailsSection } from './sections/DetailsSection';
 import { AreasSection } from './sections/AreasSection';
+import { FloorplansSection } from './sections/FloorplansSection';
+import { LocationSection } from './sections/LocationSection';
+import { ContactSection } from './sections/ContactSection';
 
 interface PropertyBrochureDocumentProps {
   property: PropertyData;
@@ -37,68 +38,11 @@ export const PropertyBrochureDocument = ({ property, settings, template }: Prope
       case 'areas':
         return <AreasSection property={property} settings={settings} styles={styles} />;
       case 'floorplans':
-        return (
-          <Page size="A4" style={styles.page}>
-            <Header settings={settings} styles={styles} />
-            <Text style={styles.sectionTitle}>Floorplans</Text>
-            <View style={styles.imageGrid}>
-              {(property.floorplans || []).map((plan, index) => (
-                <Image key={index} src={plan} style={styles.gridImage} />
-              ))}
-            </View>
-            <Footer settings={settings} styles={styles} />
-          </Page>
-        );
+        return <FloorplansSection property={property} settings={settings} styles={styles} />;
       case 'location':
-        return (
-          <Page size="A4" style={styles.page}>
-            <Header settings={settings} styles={styles} />
-            <Text style={styles.sectionTitle}>Location</Text>
-            <Text style={[styles.text, styles.descriptionBlock]}>
-              {property.location_description}
-            </Text>
-            <View style={styles.imageGrid}>
-              {Object.entries(
-                (property.nearby_places || []).reduce((acc: Record<string, any[]>, place) => {
-                  if (!acc[place.type]) acc[place.type] = [];
-                  if (acc[place.type].length < 2) acc[place.type].push(place);
-                  return acc;
-                }, {})
-              ).map(([type, places], index) => (
-                <View key={type} style={styles.categoryBlock}>
-                  <Text style={styles.categoryTitle}>{type.replace('_', ' ').toUpperCase()}</Text>
-                  {places.map((place: any, placeIndex: number) => (
-                    <Text key={placeIndex} style={styles.placeItem}>
-                      {place.name} ({place.vicinity})
-                    </Text>
-                  ))}
-                </View>
-              ))}
-            </View>
-            {property.map_image && (
-              <Image src={property.map_image} style={[styles.fullWidthImage, { marginTop: 20 }]} />
-            )}
-            <Footer settings={settings} styles={styles} />
-          </Page>
-        );
+        return <LocationSection property={property} settings={settings} styles={styles} />;
       case 'contact':
-        return (
-          <Page size="A4" style={styles.page}>
-            <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-              <View style={styles.contactBlock}>
-                <Text style={styles.contactTitle}>Agency Information</Text>
-                <Text style={styles.contactInfo}>{settings.name}</Text>
-                <Text style={styles.contactInfo}>{settings.address}</Text>
-                <Text style={styles.contactInfo}>{settings.phone}</Text>
-                <Text style={styles.contactInfo}>{settings.email}</Text>
-              </View>
-              <View style={styles.contactBlock}>
-                <Text style={styles.contactTitle}>Agent Information</Text>
-                <Text style={styles.contactInfo}>Your dedicated agent</Text>
-              </View>
-            </View>
-          </Page>
-        );
+        return <ContactSection property={property} settings={settings} styles={styles} />;
       default:
         return null;
     }
