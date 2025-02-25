@@ -55,23 +55,23 @@ export function PropertyWebViewContent({
   };
 
   return (
-    <div className="flex flex-col h-full max-h-full">
+    <div className="flex flex-col h-full max-h-full relative">
       {/* Header */}
       <div className="border-b flex-shrink-0">
         <WebViewHeader settings={settings} />
       </div>
 
       {/* Content Section - Make it scrollable */}
-      <div className="flex-1 overflow-y-auto">
+      <div className="flex-1 overflow-y-auto pb-20">
         <div className="p-4">
           {sections[currentPage]?.content}
         </div>
       </div>
 
-      {/* Navigation Footer */}
+      {/* Fixed Navigation Footer */}
       {!isPrintView && (
         <div 
-          className="p-4 border-t flex-shrink-0"
+          className="fixed bottom-0 left-0 right-0 p-4 border-t z-10"
           style={{ backgroundColor: settings?.primaryColor || '#9b87f5' }}
         >
           <div className="flex justify-between items-center">
