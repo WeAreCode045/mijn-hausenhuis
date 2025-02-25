@@ -1,4 +1,3 @@
-
 import { Card } from "@/components/ui/card";
 import { useToast } from "@/components/ui/use-toast";
 import { useNavigate } from "react-router-dom";
@@ -63,10 +62,12 @@ export function AddPropertyForm() {
   };
 
   const handleMapImageDelete = async () => {
-    setFormData({ ...formData, map_image: null });
+    await new Promise<void>(resolve => {
+      setFormData({ ...formData, map_image: null });
+      resolve();
+    });
   };
 
-  // Create adapter functions to match expected types
   const handleRemoveImageAdapter = async (index: number) => {
     const imageToRemove = formData.images[index];
     if (imageToRemove) {
@@ -74,14 +75,24 @@ export function AddPropertyForm() {
     }
   };
 
-  const handleToggleGridImageAdapter = async (url: string) => {
-    const newGridImages = [...(formData.gridImages || [])];
-    if (newGridImages.includes(url)) {
-      newGridImages.splice(newGridImages.indexOf(url), 1);
-    } else {
-      newGridImages.push(url);
-    }
-    handleToggleGridImage(newGridImages);
+  const handleRemoveAreaPhotoAdapter = async (index: number) => {
+    const newAreaPhotos = formData.areaPhotos?.filter((_, i) => i !== index) || [];
+    await new Promise<void>(resolve => {
+      setFormData({ ...formData, areaPhotos: newAreaPhotos });
+      resolve();
+    });
+  };
+
+  const handleRemoveFloorplanAdapter = async (index: number) => {
+    const newFloorplans = formData.floorplans.filter((_, i) => i !== index);
+    await new Promise<void>(resolve => {
+      setFormData({ ...formData, floorplans: newFloorplans });
+      resolve();
+    });
+  };
+
+  const handleToggleGridImageAdapter = (urls: string[]) => {
+    handleToggleGridImage(urls);
   };
 
   return (
@@ -115,8 +126,8 @@ export function AddPropertyForm() {
             handleAreaPhotosUpload={handleAreaPhotosUpload}
             handleFloorplanUpload={handleFloorplanUpload}
             handleRemoveImage={handleRemoveImageAdapter}
-            handleRemoveAreaPhoto={handleRemoveAreaPhoto}
-            handleRemoveFloorplan={handleRemoveFloorplan}
+            handleRemoveAreaPhoto={handleRemoveAreaPhotoAdapter}
+            handleRemoveFloorplan={handleRemoveFloorplanAdapter}
             handleSetFeaturedImage={handleSetFeaturedImage}
             handleToggleGridImage={handleToggleGridImageAdapter}
             handleMapImageDelete={handleMapImageDelete}
