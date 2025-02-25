@@ -361,17 +361,16 @@ export const PropertyBrochureDocument = ({ property, settings, template }: Prope
             <Header settings={settings} styles={styles} />
             <Text style={styles.sectionTitle}>{area.title}</Text>
             <Text style={[styles.text, { marginBottom: 20 }]}>{area.description}</Text>
-            <View style={styles.imageGrid}>
+            <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 15 }}>
               {area.imageIds.map((imageId, imgIndex) => {
                 const imageUrl = property.images.find(img => img.id === imageId)?.url;
                 if (!imageUrl) return null;
 
-                const isLastAndOdd = imgIndex === area.imageIds.length - 1 && area.imageIds.length % 2 !== 0;
                 return (
                   <Image
                     key={imgIndex}
                     src={imageUrl}
-                    style={isLastAndOdd ? styles.fullWidthImage : styles.areaGridImage}
+                    style={styles.areaGridImage}
                   />
                 );
               })}
