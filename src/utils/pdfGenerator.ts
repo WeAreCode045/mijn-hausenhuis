@@ -21,16 +21,21 @@ export const generatePropertyPDF = async (property: PropertyData, settings: Agen
       template = data;
     }
 
-    // Sanitize the property data to ensure valid arrays
+    // Ensure all arrays exist and are properly populated
     const sanitizedProperty = {
       ...property,
-      // Ensure arrays exist and have reasonable lengths
+      areas: property.areas.map(area => ({
+        ...area,
+        imageIds: area.imageIds || [] // Ensure imageIds exists
+      })),
+      images: property.images || [],
       gridImages: (property.gridImages || []).slice(0, 6),
       features: (property.features || []).slice(0, 10),
       nearby_places: (property.nearby_places || []).slice(0, 5),
-      areas: (property.areas || []).slice(0, 4),
-      images: (property.images || []).slice(0, 20)
     };
+
+    console.log('Generating PDF with areas:', sanitizedProperty.areas);
+    console.log('Total images:', sanitizedProperty.images.length);
 
     const blob = await pdf(PropertyBrochureDocument({ 
       property: sanitizedProperty, 
