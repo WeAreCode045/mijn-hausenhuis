@@ -112,6 +112,7 @@ const createStyles = (settings: AgencySettings) => StyleSheet.create({
     height: 200,
     objectFit: 'cover',
     borderRadius: 8,
+    marginBottom: 15,
   },
   fullWidthImage: {
     width: '100%',
@@ -356,28 +357,39 @@ export const PropertyBrochureDocument = ({ property, settings, template }: Prope
         );
 
       case 'areas':
-        return property.areas.map((area, index) => (
-          <Page key={index} size="A4" style={styles.page}>
-            <Header settings={settings} styles={styles} />
-            <Text style={styles.sectionTitle}>{area.title}</Text>
-            <Text style={[styles.text, { marginBottom: 20 }]}>{area.description}</Text>
-            <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 15 }}>
-              {area.imageIds.map((imageId, imgIndex) => {
-                const imageUrl = property.images.find(img => img.id === imageId)?.url;
-                if (!imageUrl) return null;
+        return property.areas.map((area, index) => {
+          const imagesPerPage = 6;
+          const totalPages = Math.ceil(area.imageIds.length / imagesPerPage);
+          
+          return Array.from({ length: totalPages }).map((_, pageIndex) => (
+            <Page key={`${index}-${pageIndex}`} size="A4" style={styles.page}>
+              <Header settings={settings} styles={styles} />
+              {pageIndex === 0 && (
+                <>
+                  <Text style={styles.sectionTitle}>{area.title}</Text>
+                  <Text style={[styles.text, { marginBottom: 20 }]}>{area.description}</Text>
+                </>
+              )}
+              <View style={styles.imageGrid}>
+                {area.imageIds
+                  .slice(pageIndex * imagesPerPage, (pageIndex + 1) * imagesPerPage)
+                  .map((imageId, imgIndex) => {
+                    const imageUrl = property.images.find(img => img.id === imageId)?.url;
+                    if (!imageUrl) return null;
 
-                return (
-                  <Image
-                    key={imgIndex}
-                    src={imageUrl}
-                    style={styles.areaGridImage}
-                  />
-                );
-              })}
-            </View>
-            <Footer settings={settings} styles={styles} />
-          </Page>
-        ));
+                    return (
+                      <Image
+                        key={imgIndex}
+                        src={imageUrl}
+                        style={styles.areaGridImage}
+                      />
+                    );
+                  })}
+              </View>
+              <Footer settings={settings} styles={styles} />
+            </Page>
+          ));
+        }).flat();
 
       case 'floorplans':
         return (
