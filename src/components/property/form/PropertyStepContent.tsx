@@ -1,3 +1,4 @@
+
 import { PropertyFormContent } from "@/components/property/form/PropertyFormContent";
 import { PropertyAreas } from "@/components/property/PropertyAreas";
 
@@ -50,6 +51,7 @@ export function PropertyStepContent({
     <div>
       {step === 0 && (
         <PropertyFormContent
+          step={step}
           formData={formData}
           onFieldChange={onFieldChange}
           onAddFeature={onAddFeature}

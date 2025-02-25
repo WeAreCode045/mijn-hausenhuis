@@ -100,6 +100,7 @@ export function AddPropertyForm() {
             isUpdateMode={false}
           />
           <PropertyFormContent 
+            step={currentStep}
             formData={formData}
             onFieldChange={handleFieldChange}
             onAddFeature={addFeature}
