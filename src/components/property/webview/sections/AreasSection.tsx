@@ -10,19 +10,19 @@ export function AreasSection({ property, settings }: WebViewSectionProps) {
   const startIndex = pageIndex * 2;
   const areasForThisPage = property.areas.slice(startIndex, startIndex + 2);
 
-  // Looking at the console logs, the area photos are stored in the areaPhotos array
-  const getAreaImages = (index: number): string[] => {
-    if (!property.areaPhotos) return [];
-    // Calculate the starting index for this area's photos (2 photos per area)
-    const startIdx = index * 2;
-    return property.areaPhotos.slice(startIdx, startIdx + 2);
+  // Get image URLs for an area based on its imageIds
+  const getAreaImages = (imageIds: string[]): string[] => {
+    if (!imageIds || !property.images) return [];
+    return imageIds
+      .map(id => property.images.find(img => img.id === id)?.url)
+      .filter((url): url is string => url !== undefined);
   };
 
   return (
     <div className="space-y-4 pb-24">
       <div className="px-6 space-y-8">
         {areasForThisPage.map((area, index) => {
-          const areaImages = getAreaImages(startIndex + index);
+          const areaImages = getAreaImages(area.imageIds || []);
           
           return (
             <div key={index} className="space-y-4">
