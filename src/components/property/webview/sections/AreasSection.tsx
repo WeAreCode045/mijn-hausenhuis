@@ -10,46 +10,49 @@ export function AreasSection({ property, settings }: WebViewSectionProps) {
   const startIndex = pageIndex * 2;
   const areasForThisPage = property.areas.slice(startIndex, startIndex + 2);
 
-  const getImageUrl = (imageId: string): string | undefined => {
-    return property.images.find(img => img.id === imageId)?.url;
+  // Looking at the console logs, the area photos are stored in the areaPhotos array
+  const getAreaImages = (index: number): string[] => {
+    if (!property.areaPhotos) return [];
+    // Calculate the starting index for this area's photos (2 photos per area)
+    const startIdx = index * 2;
+    return property.areaPhotos.slice(startIdx, startIdx + 2);
   };
 
   return (
     <div className="space-y-4 pb-24">
       <div className="px-6 space-y-8">
-        {areasForThisPage.map((area, index) => (
-          <div key={index} className="space-y-4">
-            <div>
-              <h3 
-                className="text-xl font-semibold mb-2"
-                style={{ color: settings?.secondaryColor }}
-              >
-                {area.title}
-              </h3>
-              <p className="text-gray-600 text-[13px] leading-relaxed whitespace-pre-wrap">
-                {area.description}
-              </p>
-            </div>
+        {areasForThisPage.map((area, index) => {
+          const areaImages = getAreaImages(startIndex + index);
+          
+          return (
+            <div key={index} className="space-y-4">
+              <div>
+                <h3 
+                  className="text-xl font-semibold mb-2"
+                  style={{ color: settings?.secondaryColor }}
+                >
+                  {area.title}
+                </h3>
+                <p className="text-gray-600 text-[13px] leading-relaxed whitespace-pre-wrap">
+                  {area.description}
+                </p>
+              </div>
 
-            {area.imageIds && area.imageIds.length > 0 && (
-              <div className="grid grid-cols-2 gap-4">
-                {area.imageIds.map((imageId, imgIndex) => {
-                  const imageUrl = getImageUrl(imageId);
-                  if (!imageUrl) return null;
-
-                  return (
+              {areaImages.length > 0 && (
+                <div className="grid grid-cols-2 gap-4">
+                  {areaImages.map((imageUrl, imgIndex) => (
                     <img
                       key={imgIndex}
                       src={imageUrl}
                       alt={`${area.title} ${imgIndex + 1}`}
                       className="w-full aspect-video object-cover rounded-lg"
                     />
-                  );
-                })}
-              </div>
-            )}
-          </div>
-        ))}
+                  ))}
+                </div>
+              )}
+            </div>
+          );
+        })}
       </div>
     </div>
   );
